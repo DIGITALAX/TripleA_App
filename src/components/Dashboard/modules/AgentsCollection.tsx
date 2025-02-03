@@ -15,7 +15,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
   collection,
   agents,
   setCollection,
-  setNotification
+  setNotification,
 }): JSX.Element => {
   const { address } = useAccount();
   const publicClient = createPublicClient({
@@ -37,14 +37,20 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
     setDailyFrequency,
     customInstructions,
     statusLoading,
-    handleCollectionStatus
-  } = useAgentsCollection(address, publicClient, collection, agents, setNotification);
+    handleCollectionStatus,
+  } = useAgentsCollection(
+    address,
+    publicClient,
+    collection,
+    agents,
+    setNotification
+  );
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
 
   return (
-    <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start ">
-      <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
+    <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+      <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
             className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -70,12 +76,12 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
         </div>
         <div className="flex relative w-full h-full items-center justify-start overflow-x-scroll">
           <div
-            className={`relative h-96 md:h-full flex flex-row gap-6 ${
+            className={`relative h-80 flex flex-row gap-6 ${
               collection?.agents?.length > 1 ? "w-fit" : "w-full"
             }`}
           >
             <div className="relative w-fit h-full flex items-center justify-between flex-col gap-4">
-              <div className="relative w-fit h-fit flex text-sm font-start uppercase">
+              <div className="relative w-fit h-fit flex text-sm uppercase">
                 {collection?.title?.length > 12
                   ? collection?.title?.slice(0, 9) + "..."
                   : collection?.title}
@@ -85,11 +91,13 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                 onClick={() => {
                   animationContext?.setPageChange?.(true);
                   router.push(
-                    `/nft/${collection?.profile?.username}/${collection?.id}`
+                    `/nft/${
+                      collection?.profile?.username?.value?.split("lens/")?.[1]
+                    }/${collection?.id}`
                   );
                 }}
               >
-                <div className="relative w-60 h-full rounded-md flex pixel-border-4">
+                <div className="relative w-60 h-full rounded-md flex pixel-border-7">
                   <Image
                     objectFit="cover"
                     layout="fill"
@@ -102,9 +110,9 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                   />
                 </div>
               </div>
-              <div className="relative w-full h-fit flex flex-row gap-3 justify-between items-center text-xs font-jackey2 text-black">
+              <div className="relative w-full h-fit flex flex-row gap-3 justify-between items-center text-xs">
                 <input
-                  className="relative w-full h-10 pixel-border-3 p-1 "
+                  className="relative w-full h-10 bg-viol p-1 focus:outline-none"
                   type="number"
                   step={1}
                   value={priceAdjusted}
@@ -123,7 +131,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
               </div>
               <div className="relative w-full h-fit flex">
                 <div
-                  className={`relative w-full h-8 pixel-border-3 text-black flex items-center justify-center text-xxs font-start ${
+                  className={`relative w-full h-8 text-viol bg-windows rounded-md hover:opacity-80 flex items-center justify-center text-xxs font-start ${
                     !priceAdjustLoading ? "cursor-canP" : "opacity-70"
                   }`}
                   onClick={() => !priceAdjustLoading && handlePriceAdjust()}
@@ -147,7 +155,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
               </div>
               <div className="relative w-full h-fit flex">
                 <div
-                  className={`relative w-full h-8 pixel-border-3 text-black flex items-center justify-center text-xxs font-start ${
+                  className={`relative w-full h-8  text-viol bg-windows rounded-md hover:opacity-80 flex items-center justify-center text-xxs font-start ${
                     !statusLoading ? "cursor-canP" : "opacity-70"
                   }`}
                   onClick={() => !statusLoading && handleCollectionStatus()}
@@ -174,7 +182,6 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                 </div>
               </div>
             </div>
-
             <div
               className={`relative w-full h-full flex items-start flex-col gap-3 justify-start relative  ${
                 collection?.agents?.length > 1 && "overflow-x-scroll"
@@ -186,7 +193,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                 }`}
               >
                 {collection?.agents?.length < 1 ? (
-                  <div className="relative w-full flex items-center justify-center font-jackey2 text-black text-xs h-full">
+                  <div className="relative w-full flex items-center justify-center text-white text-xs h-full">
                     No Agents Assigned.
                   </div>
                 ) : (
@@ -196,9 +203,10 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                       return (
                         <div
                           key={key}
-                          className={`relative w-60 pixel-border-4 h-full bg-morado rounded-xl flex flex-col items-center justify-between p-2`}
+                          className={`relative w-60 h-full bg-pink rounded-md flex flex-col items-center justify-between p-2 gap-2`}
                         >
-                          <div className="relative w-full h-full rounded-md flex p-2">
+                          <div className="relative w-fit h-fit rounded-md flex">
+                            <div className="relative w-20 h-20 pixel-border-7 bg-white rounded-xl flex">
                             <Image
                               objectFit="contain"
                               layout="fill"
@@ -211,20 +219,20 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                               }`}
                               className="rounded-md"
                             />
+                            </div>
                           </div>
-                          <div className="relative w-fit h-fit flex text-lg font-start uppercase">
+                          <div className="relative w-fit h-fit flex text-lg font-dos uppercase">
                             {agent.title}
                           </div>
-
                           <div
-                            className="relative w-full h-fit flex pt-4 flex-col gap-2"
+                            className="relative w-full h-full flex flex-col gap-2"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
                             }}
                           >
                             <input
-                              className="relative w-full h-10 p-1 bg-white text-sm text-black font-jackey2 focus:outline-none"
+                              className="relative w-full h-10 p-1 bg-viol rounded-md text-sm focus:outline-none"
                               placeholder="1"
                               type="number"
                               min={1}
@@ -250,7 +258,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                               }}
                             />
                             <textarea
-                              className="relative w-full h-40 flex overflow-y-scroll p-1 bg-white text-sm text-black font-jackey2 rounded-b-md cursor-text focus:outline-none"
+                              className="relative w-full h-full flex overflow-y-scroll p-1 bg-viol text-sm rounded-md cursor-text focus:outline-none"
                               placeholder="Add custom instructions for your agent."
                               style={{
                                 resize: "none",
@@ -276,33 +284,28 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                 )}
               </div>
               {collection?.agents?.length > 0 && (
-                <div className="relative w-fit h-fit flex items-center justify-center font-jackey2 text-black text-sm flex-col gap-3">
-                  <div className="relative w-fit h-fit flex items-center text-center justify-center">
-                    Update Agent Frequency and Custom Instructions
-                  </div>
-                  <div className="relative w-full h-fit flex">
-                    <div
-                      className={`relative w-full h-8 pixel-border-3 text-black flex items-center justify-center text-xxs font-start ${
-                        !editAgentsLoading ? "cursor-canP" : "opacity-70"
-                      }`}
-                      onClick={() => !editAgentsLoading && handleEditAgents()}
-                    >
-                      {editAgentsLoading ? (
-                        <svg
-                          fill="none"
-                          className="size-4 animate-spin"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                            fill="currentColor"
-                          />{" "}
-                        </svg>
-                      ) : (
-                        "Update"
-                      )}
-                    </div>
+                <div className="relative w-full h-fit flex">
+                  <div
+                    className={`relative w-full h-8 rounded-md bg-windows text-viol hover:opacity-80 flex items-center justify-center text-xxs font-start ${
+                      !editAgentsLoading ? "cursor-canP" : "opacity-70"
+                    }`}
+                    onClick={() => !editAgentsLoading && handleEditAgents()}
+                  >
+                    {editAgentsLoading ? (
+                      <svg
+                        fill="none"
+                        className="size-4 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
+                          fill="#CECEFF"
+                        />{" "}
+                      </svg>
+                    ) : (
+                      "Update"
+                    )}
                   </div>
                 </div>
               )}

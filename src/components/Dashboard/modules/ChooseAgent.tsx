@@ -12,7 +12,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
 }): JSX.Element => {
   return (
     <div
-      className={`flex relative w-full h-full items-center justify-start ${
+      className={`flex relative w-full h-96 items-center justify-start ${
         Number(mintData?.amount || 0) <= 2 ||
         Number(mintData?.prices?.[0]) * 10 ** 18 <
           Number(
@@ -31,7 +31,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
               return (
                 <div
                   key={key}
-                  className="relative w-60 pixel-border-4 h-full bg-morado rounded-xl animate-pulse"
+                  className="relative w-60 h-full bg-pink rounded-md animate-pulse"
                 ></div>
               );
             })
@@ -39,10 +39,10 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
               return (
                 <div
                   key={key}
-                  className={`relative w-60 pixel-border-4 h-96 md:h-full bg-morado rounded-xl flex flex-col items-center justify-between cursor-canP p-2 ${
+                  className={`relative w-60 h-full bg-pink rounded-md flex flex-col items-center justify-between cursor-canP p-2 ${
                     mintData.agents
                       ?.map((ag) => ag?.agent?.id)
-                      .includes(agent?.id) && "border border-black opacity-70"
+                      .includes(agent?.id) && "border border-windows opacity-70"
                   }`}
                   onClick={(e) => {
                     e.preventDefault();
@@ -75,35 +75,39 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                     });
                   }}
                 >
-                  <div className="relative w-full h-full rounded-md flex">
-                    <Image
-                      objectFit="contain"
-                      layout="fill"
-                      draggable={false}
-                      alt={agent?.title}
-                      src={`${INFURA_GATEWAY}/ipfs/${
-                        agent?.cover?.includes("ipfs")
-                          ? agent?.cover?.split("ipfs://")?.[1]
-                          : agent?.cover
-                      }`}
-                      className="rounded-md"
-                    />
-                  </div>
-                  <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3 pt-4">
-                    <div className="relative w-fit h-fit flex text-lg font-start uppercase">
+                  {!mintData.agents
+                    ?.map((ag) => ag?.agent?.id)
+                    .includes(agent?.id) && (
+                    <div className="relative w-full h-fit flex">
+                      <div className="relative w-full h-28 rounded-lg flex bg-white pixel-border-7">
+                        <Image
+                          objectFit="contain"
+                          layout="fill"
+                          draggable={false}
+                          alt={agent?.title}
+                          src={`${INFURA_GATEWAY}/ipfs/${
+                            agent?.cover?.includes("ipfs")
+                              ? agent?.cover?.split("ipfs://")?.[1]
+                              : agent?.cover
+                          }`}
+                          className="rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="relative w-full h-full flex flex-col items-start justify-start gap-3 pt-4">
+                    <div className="relative w-fit h-fit flex text-lg uppercase">
                       {agent.title}
                     </div>
-                    <div
-                      className={`relative w-fit overflow-y-scroll font-jackey2 h-fit flex text-sm ${
-                        mintData.agents
-                          ?.map((ag) => ag?.agent?.id)
-                          .includes(agent?.id)
-                          ? "max-h-20"
-                          : "max-h-40"
-                      }`}
-                    >
-                      {agent.description}
-                    </div>
+                    {!mintData.agents
+                      ?.map((ag) => ag?.agent?.id)
+                      .includes(agent?.id) && (
+                      <div
+                        className={`relative w-fit overflow-y-scroll max-h-44 flex text-xs`}
+                      >
+                        {agent.description}
+                      </div>
+                    )}
                   </div>
 
                   {mintData.agents
@@ -117,7 +121,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                       }}
                     >
                       <input
-                        className="relative w-full h-10 p-1 bg-white text-sm text-black font-jackey2 focus:outline-none"
+                        className="relative w-full h-10 p-1 bg-viol text-sm rounded-md focus:outline-none"
                         placeholder="1"
                         type="number"
                         min={1}
@@ -155,7 +159,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                         }}
                       />
                       <textarea
-                        className="relative w-full h-40 flex overflow-y-scroll p-1 bg-white text-sm text-black font-jackey2 cursor-text focus:outline-none"
+                        className="relative w-full h-40 flex overflow-y-scroll p-1 bg-viol rounded-md text-sm cursor-text focus:outline-none"
                         placeholder="Add custom instructions for your agent."
                         style={{
                           resize: "none",

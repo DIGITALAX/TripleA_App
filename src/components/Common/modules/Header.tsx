@@ -251,7 +251,7 @@ const Header: FunctionComponent = (): JSX.Element => {
               )}
             </div>
             {openAccount && (
-              <div className="absolute w-40 h-fit rounded-md flex right-0 top-12 flex-col gap-5 shadow-lg p-2 text-xxs font-jackey pixel-border-3">
+              <div className="absolute w-40 h-fit rounded-md flex right-0 top-12 flex-col gap-5 shadow-lg p-2 text-xxs font-jackey pixel-border-3 z-200">
                 <div
                   className={`relative w-full h-fit flex items-center justify-start flex-row gap-1 ${
                     context?.lensConnected?.profile && "cursor-canP"

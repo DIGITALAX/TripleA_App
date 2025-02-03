@@ -9,13 +9,13 @@ const Collection: FunctionComponent<CollectionProps> = ({
   drop,
   setDrop,
   lensClient,
-  setCollection
+  setCollection,
 }): JSX.Element => {
   const { allCollections, collectionsLoading } = useDrops(drop, lensClient);
 
   return (
-    <div className=" relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
-      <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
+    <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+      <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
             className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -45,7 +45,7 @@ const Collection: FunctionComponent<CollectionProps> = ({
                   return (
                     <div
                       key={key}
-                      className="relative w-60 h-full bg-morado pixel-border-4 animate-pulse rounded-xl"
+                      className="relative w-60 h-80 bg-pink rounded-md animate-pulse rounded-xl"
                     ></div>
                   );
                 })
@@ -53,32 +53,33 @@ const Collection: FunctionComponent<CollectionProps> = ({
                   return (
                     <div
                       key={key}
-                      className={`relative w-60 h-96 md:h-full bg-morado pixel-border-4 rounded-lg flex flex-col items-center justify-between cursor-canP p-2`}
+                      className={`relative w-60 h-80 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd cursor-canP`}
                       onClick={() => {
                         setCollection(collection);
                         setDropSwitcher(DropSwitcher.AgentsCollection);
                       }}
                     >
-                      <div className="relative w-full h-full rounded-md flex pixel-border-4">
-                        <Image
-                          objectFit="cover"
-                          layout="fill"
-                          draggable={false}
-                          alt={collection?.title}
-                          src={`${INFURA_GATEWAY}/ipfs/${
-                            collection?.image?.split("ipfs://")?.[1]
-                          }`}
-                          className="rounded-md"
-                        />
-                      </div>
-                      <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3 text-black pt-4">
-                        <div className="relative w-fit h-fit flex text-sm font-start uppercase">
-                          {collection?.title?.length > 12
-                                ? collection?.title?.slice(0, 9) +
-                                  "..."
-                                : collection?.title}
+                      <div className="relative w-full h-fit flex">
+                        <div className="relative w-full h-40 rounded-md flex pixel-border-7">
+                          <Image
+                            objectFit="cover"
+                            layout="fill"
+                            draggable={false}
+                            alt={collection?.title}
+                            src={`${INFURA_GATEWAY}/ipfs/${
+                              collection?.image?.split("ipfs://")?.[1]
+                            }`}
+                            className="rounded-md"
+                          />
                         </div>
-                        <div className="relative w-fit overflow-y-scroll font-jackey2 max-h-40 h-fit flex text-sm">
+                      </div>
+                      <div className="relative w-full h-full flex flex-col items-start justify-start gap-3 pt-4">
+                        <div className="relative text-windows w-fit h-fit flex text-sm uppercase">
+                          {collection?.title?.length > 12
+                            ? collection?.title?.slice(0, 9) + "..."
+                            : collection?.title}
+                        </div>
+                        <div className="relative text-white w-fit overflow-y-scroll max-h-40 h-fit flex text-sm">
                           {collection.description}
                         </div>
                       </div>

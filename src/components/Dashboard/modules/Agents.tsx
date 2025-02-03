@@ -33,8 +33,8 @@ const Agents: FunctionComponent<AgentProps> = ({
   switch (currentAgent) {
     case undefined:
       return (
-        <div className="relative  w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
-          <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
+        <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+          <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
             <div className="relative w-full h-fit flex items-start justify-start">
               <div
                 className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -55,22 +55,22 @@ const Agents: FunctionComponent<AgentProps> = ({
               </div>
             </div>
             <div className="flex relative w-full h-full items-center justify-start overflow-x-scroll">
-            <div
-            className={`relative h-full flex flex-row gap-6 ${
-              !agentsLoading && userAgents?.length < 1 ? "w-full" : "w-fit"
-            }`}
-          >
+              <div
+                className={`relative h-full flex flex-row gap-6 ${
+                  !agentsLoading && userAgents?.length < 1 ? "w-full" : "w-fit"
+                }`}
+              >
                 {agentsLoading ? (
                   Array.from({ length: 10 }).map((_, key) => {
                     return (
                       <div
                         key={key}
-                        className="relative w-60 h-full bg-morado pixel-border-4 animate-pulse rounded-xl"
+                        className="relative w-60 h-80 bg-pink rounded-md animate-pulse rounded-xl"
                       ></div>
                     );
                   })
                 ) : userAgents?.length < 1 ? (
-                  <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
+                  <div className="relative w-full h-80 flex items-center justify-center text-sm text-gray-600 font-jack">
                     No Agents Yet.
                   </div>
                 ) : (
@@ -78,7 +78,7 @@ const Agents: FunctionComponent<AgentProps> = ({
                     return (
                       <div
                         key={key}
-                        className={`relative w-60 h-96 md:h-full bg-morado rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2 cursor-canP`}
+                        className={`relative w-60 h-80 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd`}
                         onClick={() => {
                           setCurrentAgent(agent);
 
@@ -90,10 +90,11 @@ const Agents: FunctionComponent<AgentProps> = ({
                           });
                         }}
                       >
-                        <div className="relative w-full h-full rounded-md flex">
+                        <div className="relative bg-white pixel-border-7 rounded-xl w-full h-full rounded-md flex">
                           <Image
                             objectFit="contain"
                             layout="fill"
+                            className="rounded-xl"
                             draggable={false}
                             alt={agent?.title}
                             src={`${INFURA_GATEWAY}/ipfs/${
@@ -104,7 +105,7 @@ const Agents: FunctionComponent<AgentProps> = ({
                           />
                         </div>
                         <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3 pt-4">
-                          <div className="relative w-fit h-fit flex text-lg font-start uppercase">
+                          <div className="relative w-fit h-fit flex text-lg uppercase">
                             {agent.title}
                           </div>
                         </div>
@@ -120,8 +121,8 @@ const Agents: FunctionComponent<AgentProps> = ({
 
     default:
       return (
-        <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
-          <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
+        <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+          <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
             <div className="relative w-full h-fit flex items-start justify-start">
               <div
                 className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -141,9 +142,9 @@ const Agents: FunctionComponent<AgentProps> = ({
                 </svg>
               </div>
             </div>
-            <div className="relative font-jackey2 w-full h-full flex flex-col md:flex-row gap-6 items-center justify-center">
+            <div className="relative w-full h-full flex flex-col md:flex-row gap-6 items-center justify-center">
               <label
-                className="relative w-full h-80 md:h-full flex items-center justify-center cursor-canP"
+                className="relative w-full h-60 flex items-center justify-center cursor-canP"
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
@@ -197,7 +198,7 @@ const Agents: FunctionComponent<AgentProps> = ({
               <div className="relative w-full h-full flex flex-col gap-5 items-start justify-start">
                 <div className="relative w-full h-full flex flex-col justify-start items-start gap-5">
                   <input
-                    className="relative flex w-full h-10 text-left text-black pixel-border-2 focus:outline-none text-3xl p-1.5"
+                    className="relative flex w-full h-10 text-left bg-windows text-viol rounded-md focus:outline-none text-3xl p-1.5"
                     placeholder="Title"
                     onChange={(e) =>
                       setAgentMetadata({
@@ -210,7 +211,7 @@ const Agents: FunctionComponent<AgentProps> = ({
                   />
 
                   <textarea
-                    className="relative flex w-full h-1/2 overflow-y-scroll text-left text-black pixel-border-2 p-1.5 focus:outline-none text-lg"
+                    className="relative flex w-full h-1/2 overflow-y-scroll text-left bg-windows text-viol rounded-md p-1.5 focus:outline-none text-sm"
                     placeholder="Description"
                     onChange={(e) =>
                       setAgentMetadata({
@@ -225,16 +226,12 @@ const Agents: FunctionComponent<AgentProps> = ({
                     }}
                   ></textarea>
                 </div>
-                <div className="relative w-full h-fit flex items-center justify-center gap-1 flex-col">
-                  <div className="h-1 w-full flex bg-black" />
-                  <div className="h-1 w-full flex bg-black" />
-                </div>
                 <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
-                  <div className="relative w-fit h-fit flex items-start justify-start text-gray-600">
+                  <div className="relative w-fit h-fit flex items-start justify-start">
                     Custom Instructions
                   </div>
                   <textarea
-                    className="relative flex w-full h-full overflow-y-scroll text-left text-black pixel-border-2 p-1.5 focus:outline-none text-lg"
+                    className="relative flex w-full h-full overflow-y-scroll text-left bg-windows text-viol rounded-md p-1.5 focus:outline-none text-sm"
                     placeholder="Custom Instructions"
                     onChange={(e) =>
                       setAgentMetadata({
@@ -251,7 +248,7 @@ const Agents: FunctionComponent<AgentProps> = ({
                 </div>
                 <div className="relative w-full h-fit flex items-center justify-center">
                   <div
-                    className={`relative w-full md:w-1/2 h-14 font-jackey pixel-border-2 text-black flex items-center justify-center md:text-sm text-center text-xs ${
+                    className={`relative w-full md:w-40 h-10 text-viol hover:opacity-80 bg-windows rounded-md flex items-center justify-center md:text-sm text-center text-base ${
                       !agentEditLoading ? "cursor-canP" : "opacity-70"
                     }`}
                     onClick={() => !agentEditLoading && handleEditAgent()}

@@ -17,7 +17,7 @@ const Sales: FunctionComponent<SalesProps> = ({
   const { salesLoading, allSales } = useSales(address, lensClient);
   const router = useRouter();
   return (
-    <div className="relative  w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+    <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
      <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
@@ -49,12 +49,12 @@ const Sales: FunctionComponent<SalesProps> = ({
                 return (
                   <div
                     key={key}
-                    className="relative w-60 h-full bg-morado pixel-border-4 animate-pulse rounded-xl"
+                    className="relative w-60 h-80 bg-pink rounded-md animate-pulse rounded-xl"
                   ></div>
                 );
               })
             ) : allSales?.length < 1 ? (
-              <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
+              <div className="relative w-full h-80 flex items-center justify-center text-sm text-gray-600 font-jack">
                 No Sales Yet.
               </div>
             ) : (
@@ -62,10 +62,10 @@ const Sales: FunctionComponent<SalesProps> = ({
                 return (
                   <div
                     key={key}
-                    className={`relative w-60 h-96 md:h-full bg-morado rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2`}
+                    className={`relative w-60 h-80 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd`}
                   >
                     <div
-                      className="relative w-full h-full rounded-2xl flex cursor-canP pixel-border-2"
+                      className="relative w-full h-full flex cursor-canP pixel-border-7"
                       onClick={() => {
                         animationContext?.setPageChange?.(true);
                         router.push(
@@ -85,25 +85,25 @@ const Sales: FunctionComponent<SalesProps> = ({
                         src={`${INFURA_GATEWAY}/ipfs/${
                           sale?.collection?.image?.split("ipfs://")?.[1]
                         }`}
-                        className="rounded-2xl"
+                        className="rounded-lg"
                       />
                     </div>
                     <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3 pt-4">
-                      <div className="relative w-fit h-fit flex text-xs font-start">
+                      <div className="relative w-fit h-fit flex text-xs">
                         {sale?.collection?.title}
                       </div>
                       <div
-                        className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2 font-jack text-sm"
+                        className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2 text-sm"
                         onClick={() =>
                           window.open(
                             `https://block-explorer.testnet.lens.dev/tx/${sale?.transactionHash}`
                           )
                         }
                       >
-                        <div className="relative w-fit h-fit flex items-center justify-center text-black">
+                        <div className="relative w-fit h-fit flex items-center justify-center text-white">
                           X {sale?.amount}
                         </div>
-                        <div className="relative w-fit h-fit flex items-center justify-center text-black">
+                        <div className="relative w-fit h-fit flex items-center justify-center text-white">
                           {moment.unix(Number(sale?.blockTimestamp)).fromNow()}
                         </div>
                       </div>

@@ -11,11 +11,11 @@ const Drop: FunctionComponent<DropProps> = ({
   setMintSwitcher,
 }): JSX.Element => {
   return (
-    <div className="relative w-full h-full flex flex-col sm:flex-row gap-6 items-center justify-center font-jackey2">
-      <div className="relative flex w-full h-full items-start justify-between flex-col gap-3">
+    <div className="relative w-full h-full flex items-start flex-row justify-between gap-3 font-nerd text-windows">
+      <div className="relative w-full h-full flex flex-col items-center justify-between gap-5">
         <div className="relative w-full h-fit flex items-center justify-center">
           <input
-            className="relative flex w-1/2 h-10 text-center text-black p-1.5 focus:outline-none text-3xl pixel-border-2"
+            className="relative flex w-1/2 h-10 text-center bg-windows text-viol rounded-md p-1.5 focus:outline-none text-3xl"
             placeholder="Drop Title"
             onChange={(e) =>
               setMintData({
@@ -28,7 +28,7 @@ const Drop: FunctionComponent<DropProps> = ({
           />
         </div>
         <label
-          className="relative w-full h-96 md:h-full flex items-center justify-center cursor-canP"
+          className="relative w-full h-96 md:h-60 flex items-center justify-center cursor-canP"
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -75,7 +75,7 @@ const Drop: FunctionComponent<DropProps> = ({
         </label>
         <div className="relative w-full h-fit flex items-center justify-center">
           <div
-            className={`relative w-1/2 h-12 bg-black text-white rounded-md flex items-center justify-center ${
+            className={`relative hover:opacity-80 w-1/2 h-12 bg-black text-white rounded-md flex items-center justify-center ${
               mintData.dropCover &&
               mintData.dropTitle?.trim() !== "" &&
               "cursor-canP active:scale-95"
@@ -93,7 +93,7 @@ const Drop: FunctionComponent<DropProps> = ({
         </div>
       </div>
       <div className="relative flex w-full h-full items-center justify-start flex-col gap-5">
-        <div className="relative w-full text-gray-600 flex text-center h-fit text-xl items-center justify-center">
+        <div className="relative w-full flex text-center h-fit text-xl items-center justify-center">
           {allDrops?.length < 1 || !allDrops
             ? "Create New Drop"
             : "Select Existing Drop"}
@@ -103,7 +103,7 @@ const Drop: FunctionComponent<DropProps> = ({
             return (
               <div
                 key={key}
-                className={`relative w-full h-96 sm:h-40 rounded-md flex cursor-canP pixel-border-4 ${
+                className={`relative w-full h-96 sm:h-40 rounded-md flex cursor-canP pixel-border-7 ${
                   mintData.dropId == Number(drop.id) && "opacity-80"
                 }`}
                 onClick={() => {

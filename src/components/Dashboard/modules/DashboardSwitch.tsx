@@ -68,8 +68,8 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
 
     case Switcher.Mint:
       return (
-        <div className="relative w-full h-full  flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
-          <div className="relative w-full h-full p-3 pixel-border-2 flex flex-col items-center justify-between gap-6">
+        <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+          <div className="relative w-full min-h-96 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
             <div className="relative w-full h-fit flex items-start justify-start">
               <div
                 className="relative flex w-fit h-fit cursor-canP hover:opacity-70"

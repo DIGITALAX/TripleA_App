@@ -12,10 +12,10 @@ const Mint: FunctionComponent<MintProps> = ({
   tokenThresholds,
 }): JSX.Element => {
   return (
-    <div className="relative w-full h-full flex flex-col gap-6 items-center justify-between">
-      <div className="relative w-full h-full flex flex-col sm:flex-row items-center justify-center gap-4">
-        <div className="relative w-full sm:w-fit h-60 sm:h-full flex">
-          <div className="relative w-full sm:w-80 h-full flex items-center justify-center">
+    <div className="relative w-full h-full flex items-start justify-between font-nerd text-windows flex-col gap-4">
+     <div className="relative w-full h-full flex flex-col sm:flex-row items-center justify-center gap-6">
+        <div className="relative w-full sm:w-fit h-fit flex">
+          <div className="relative w-full sm:w-80 h-60 flex items-center justify-center">
             {mintData.image && (
               <Image
                 src={URL.createObjectURL(mintData.image)}
@@ -26,8 +26,8 @@ const Mint: FunctionComponent<MintProps> = ({
             )}
           </div>
         </div>
-        <div className="relative w-fit h-fit sm:h-full flex flex-col gap-4 items-start justify-start">
-          <div className="relative flex w-fit h-10 text-center text-black font-start uppercase text-2xl">
+        <div className="relative w-fit h-fit sm:h-full flex flex-col gap-3 items-start justify-start">
+          <div className="relative flex w-fit h-10 text-center font-dos uppercase text-2xl">
             {mintData.title}
           </div>
           <div className="font-jackey text-xxs relative w-fit h-fit flex items-center justify-center">
@@ -35,7 +35,7 @@ const Mint: FunctionComponent<MintProps> = ({
             {allDrops?.find((drop) => mintData.dropId == Number(drop.id))
               ?.title || mintData?.dropTitle}
           </div>
-          <div className="relative w-fit h-fit flex items-center justify-between flex-row gap-4 text-gray-600 text-xl font-jackey2">
+          <div className="relative w-fit h-fit flex items-center justify-between flex-row gap-4 text-pink text-xl">
             <div className="relative w-fit h-fit flex text-left">
               {mintData.amount} x {mintData.prices?.[0]}{" "}
               {
@@ -44,26 +44,24 @@ const Mint: FunctionComponent<MintProps> = ({
               }
             </div>
           </div>
-          <div className="relative flex w-full sm:w-fit max-w-96 h-fit max-h-60 overflow-y-scroll text-left text-black text-base font-jack">
+          <div className="relative flex w-full sm:w-fit max-w-96 h-fit max-h-60 overflow-y-scroll text-left text-black text-windows">
             {mintData.description}
           </div>
           {mintData?.agents?.length > 0 && (
-            <div className="relative flex w-fit h-fit flex flex-col gap-2 font-start items-start justify-start">
-              <div className="relative flex w-fit h-fit max-h-60 overflow-y-scroll text-left text-black text-base font-jack">
+            <div className="relative flex w-fit h-fit flex flex-col gap-2 items-start justify-start">
+              <div className="relative flex w-fit h-fit max-h-60 overflow-y-scroll text-left text-base">
                 Agent Costs
               </div>
               {mintData?.agents?.map((agent, index) => {
                 return (
                   <div
                     key={index}
-                    className="relative text-xxs text-black w-fit h-fit px-2 py-1 rounded-lg bg-morado pixel-border-4 flex flex-row gap-2 items-center justify-center"
+                    className="relative text-xxs text-white w-fit h-fit px-2 py-1 rounded-lg bg-pink rounded-md flex flex-row gap-2 items-center justify-center"
                   >
                     <div className="relative w-fit h-fit flex">
-                      {" "}
                       {agent?.agent?.title}
                     </div>
                     <div className="relative w-fit h-fit flex">
-                      {" "}
                       {(Number(
                         tokenThresholds?.find(
                           (t) =>
@@ -90,7 +88,7 @@ const Mint: FunctionComponent<MintProps> = ({
       </div>
       <div className="relative w-full h-fit flex items-center justify-center">
         <div
-          className={`relative w-1/2 h-14 font-jackey pixel-border-2 text-black flex items-center justify-center ${
+          className={`relative w-40 h-10 hover:opacity-80 bg-windows text-viol rounded-md flex items-center justify-center ${
             !mintLoading ? "cursor-canP" : "opacity-70"
           }`}
           onClick={() => !mintLoading && handleMint()}

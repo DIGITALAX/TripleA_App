@@ -2,7 +2,7 @@ import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useState } from "react";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
-import { ACCESS_CONTROLS_CONTRACT, AGENTS_CONTRACT } from "@/lib/constants";
+import { AGENTS_CONTRACT } from "@/lib/constants";
 import AgentAbi from "@abis/AgentAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
 import { StorageClient } from "@lens-protocol/storage-node-client";
@@ -14,7 +14,7 @@ import {
 } from "@lens-protocol/client";
 import pollResult from "@/lib/helpers/pollResult";
 import fetchAccount from "../../../../graphql/lens/queries/account";
-import {  Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
+import { Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
 import forge from "node-forge";
 import { enableSignless } from "@lens-protocol/client/actions";
 

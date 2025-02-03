@@ -15,12 +15,12 @@ const Collects: FunctionComponent<CollectsProps> = ({
 }): JSX.Element => {
   const { address } = useAccount();
   const { collectsLoading, allCollects } = useCollects(address, lensClient);
-    const animationContext = useContext(AnimationContext);
+  const animationContext = useContext(AnimationContext);
   const router = useRouter();
- 
+
   return (
-    <div className="relative w-full h-full  flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
-      <div className="relative w-full h-full pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
+    <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+      <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
             className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -51,12 +51,12 @@ const Collects: FunctionComponent<CollectsProps> = ({
                 return (
                   <div
                     key={key}
-                    className="relative w-60 h-full bg-morado pixel-border-4 animate-pulse rounded-xl"
+                    className="relative w-60 h-80 bg-pink rounded-md animate-pulse rounded-xl"
                   ></div>
                 );
               })
             ) : allCollects?.length < 1 ? (
-              <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
+              <div className="relative w-full h-80 flex items-center justify-center text-sm text-gray-600 font-jack">
                 No Collects Yet.
               </div>
             ) : (
@@ -64,10 +64,10 @@ const Collects: FunctionComponent<CollectsProps> = ({
                 return (
                   <div
                     key={key}
-                    className={`relative w-60 h-96 md:h-full bg-morado rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2`}
+                    className={`relative w-60 h-80 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd`}
                   >
                     <div
-                      className="relative w-full h-80 md:h-full rounded-2xl flex cursor-canP pixel-border-2"
+                      className="relative w-full h-full flex cursor-canP pixel-border-7"
                       onClick={() => {
                         animationContext?.setPageChange?.(true);
                         router.push(
@@ -87,11 +87,11 @@ const Collects: FunctionComponent<CollectsProps> = ({
                         src={`${INFURA_GATEWAY}/ipfs/${
                           collect?.collection?.image?.split("ipfs://")?.[1]
                         }`}
-                        className="rounded-2xl"
+                        className="rounded-lg"
                       />
                     </div>
                     <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3 pt-4">
-                      <div className="relative w-fit h-fit flex text-xs font-start">
+                      <div className="relative w-fit h-fit flex text-xs">
                         {collect?.collection?.title}
                       </div>
                       <div
@@ -102,10 +102,10 @@ const Collects: FunctionComponent<CollectsProps> = ({
                           )
                         }
                       >
-                        <div className="relative w-fit h-fit flex items-center justify-center text-black">
+                        <div className="relative w-fit h-fit flex items-center justify-center text-white">
                           X {collect?.amount}
                         </div>
-                        <div className="relative w-fit h-fit flex items-center justify-center text-black">
+                        <div className="relative w-fit h-fit flex items-center justify-center text-white">
                           {moment
                             .unix(Number(collect?.blockTimestamp))
                             .fromNow()}
