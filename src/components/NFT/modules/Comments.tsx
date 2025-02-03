@@ -24,8 +24,8 @@ const Comments: FunctionComponent<CommentsProps> = ({
 
   return (
     <div
-      className={`relative w-full text-windows font-nerd flex flex-col items-start justify-start gap-3 h-fit ${
-        post ? "h-full" : "h-fit"
+      className={`relative w-full font-nerd flex flex-col items-start justify-start gap-3 h-fit ${
+        post ? "h-full text-viol" : "h-fit text-windows"
       }`}
     >
       {comments?.map((activity, key) => {
@@ -54,26 +54,28 @@ const Comments: FunctionComponent<CommentsProps> = ({
                       )?.content?.slice(0, 10)}`) + "..."}
                 </div>
               )}
-              <div
-                className="flex items-center justify-center relative w-fit h-fit cursor-canP hover:opacity-70"
-                onClick={() => {
-                  animationContext?.setPageChange?.(true);
-                  router.push(`/post/${activity?.id}`);
-                }}
-              >
-                <svg
-                  fill="none"
-                  className="size-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
+              {!post && (
+                <div
+                  className="flex items-center justify-center relative w-fit h-fit cursor-canP hover:opacity-70"
+                  onClick={() => {
+                    animationContext?.setPageChange?.(true);
+                    router.push(`/post/${activity?.id}`);
+                  }}
                 >
-                  {" "}
-                  <path
-                    d="M21 3h-8v2h4v2h2v4h2V3zm-4 4h-2v2h-2v2h2V9h2V7zm-8 8h2v-2H9v2H7v2h2v-2zm-4-2v4h2v2H5h6v2H3v-8h2z"
-                    fill="currentColor"
-                  />{" "}
-                </svg>
-              </div>
+                  <svg
+                    fill="none"
+                    className="size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    {" "}
+                    <path
+                      d="M21 3h-8v2h4v2h2v4h2V3zm-4 4h-2v2h-2v2h2V9h2V7zm-8 8h2v-2H9v2H7v2h2v-2zm-4-2v4h2v2H5h6v2H3v-8h2z"
+                      fill="currentColor"
+                    />{" "}
+                  </svg>
+                </div>
+              )}
             </div>
 
             <div className="relative w-full h-fit px-1.5 py-1 flex items-start justify-between flex-row gap-2 sm:flex-nowrap flex-wrap">
@@ -125,7 +127,11 @@ const Comments: FunctionComponent<CommentsProps> = ({
               setImageView={setImageView}
               post={post}
             />
-            <div className="relative w-full h-fit p-1 bg-windows rounded-md justify-between flex flex-row gap-3 items-center sm:flex-nowrap flex-wrap text-viol">
+            <div
+              className={`relative w-full h-fit p-1 rounded-md justify-between flex flex-row gap-3 items-center sm:flex-nowrap flex-wrap ${
+                post ? "bg-viol text-windows" : "bg-windows text-viol"
+              }`}
+            >
               {[
                 {
                   name: "Like",

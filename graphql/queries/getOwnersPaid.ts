@@ -3,7 +3,7 @@ import { FetchResult, gql } from "@apollo/client";
 
 const OWNERS_PAID = gql`
   query($skip: Int!) {
-    agentOwnerPaids(first: 20, skip: $skip) {
+    agentOwnerPaids(first: 20, skip: $skip, orderDirection: desc, orderBy: blockTimestamp) {
       amount
       blockTimestamp
       owner

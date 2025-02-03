@@ -9,7 +9,7 @@ const UserInfo: FunctionComponent<UserInfoProps> = ({
   return (
     <div className="relative w-full h-fit flex flex-col gap-3">
       <div
-        className={`pixel-border-2 rounded-2xl w-full h-fit text-sm text-black flex items-center justify-start p-3 flex-col gap-6 font-jackey2 text-black ${
+        className={`bg-viol rounded-md rounded-2xl w-full h-fit text-sm flex items-center justify-start p-3 flex-col gap-6 text-windows ${
           !userInfo && "animate-pulse"
         }`}
       >
@@ -20,7 +20,7 @@ const UserInfo: FunctionComponent<UserInfoProps> = ({
             </div>
             <div className="relative w-full h-fit flex flex-col gap-3 items-center justify-center">
               <div className="relative items-center justify-center flex w-fit h-fit">
-                <div className="relative w-20 rounded-full h-20 flex items-center justify-center border border-black bg-white">
+                <div className="relative w-20 rounded-full h-20 flex items-center justify-center border border-windows bg-white">
                   {userInfo?.metadata?.picture && (
                     <Image
                       src={`${INFURA_GATEWAY}/ipfs/${
@@ -39,7 +39,7 @@ const UserInfo: FunctionComponent<UserInfoProps> = ({
         )}
       </div>
       {userInfo && (
-        <div className="relative w-full h-fit flex justify-center sm:justify-between items-center gap-2 flex-wrap sm:flex-row text-black text-xxs sm:text-sm font-start uppercase">
+        <div className="relative w-full h-fit flex justify-center sm:justify-between items-center gap-2 flex-wrap sm:flex-row text-white text-xxs sm:text-sm uppercase">
           <div className="relative w-fit h-fit flex flex-row gap-1.5">
             <div className="relative w-fit h-fit flex">Followers: </div>
             <div className="relative w-fit h-fit flex">
@@ -55,8 +55,8 @@ const UserInfo: FunctionComponent<UserInfoProps> = ({
         </div>
       )}
       {userInfo?.metadata?.bio && (
-        <div className="relative w-full h-fit flex items-start justify-start">
-          <div className="relative w-full h-14 overflow-y-scroll font-jackey2 text-sm text-left">
+        <div className="relative w-full text-white h-fit flex items-start justify-start">
+          <div className="relative w-full h-14 overflow-y-scroll text-sm text-left">
             {userInfo?.metadata?.bio}
           </div>
         </div>

@@ -50,8 +50,8 @@ export default function Post() {
     id?.id as string
   );
   return (
-    <div className="relative w-full h-full flex flex-col md:flex-row items-center justify-between gap-4 pb-10">
-      <div className="relative w-full h-full flex px-1 sm:px-6 py-2">
+    <div className="relative w-full h-full flex items-start justify-between flex-row py-6 px-10 gap-24">
+      <div className="relative w-1/2 h-full flex px-1 sm:px-6 py-2">
         <Comments
           comments={postData}
           setImageView={context?.setImageView!}
@@ -66,7 +66,7 @@ export default function Post() {
         />
       </div>
       <div
-        className={`relative w-full md:w-[38rem] h-[60rem] md:h-[40rem] flex flex-col gap-4 items-start justify-start text-left p-3 pixel-border-2 bg-white ${
+        className={`relative w-full md:w-[38rem] h-[40rem] flex flex-col gap-4 items-start justify-start text-left text-windows p-3 bg-viol rounded-md ${
           (postDataLoading || postData?.length < 1 || activityLoading) &&
           "animate-pulse"
         }`}

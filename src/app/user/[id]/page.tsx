@@ -32,68 +32,64 @@ export default function User() {
   } = useUser(id?.id as string, context?.lensClient!);
 
   return (
-    <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
+    <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-white">
       <UserInfo userInfo={userInfo} />
-      <div className="relative w-full h-fit flex items-center justify-center gap-3 flex-col">
-        <div className="relative w-full h-fit flex items-center justify-center gap-1 flex-col">
-          <div className="h-1 w-full flex bg-black" />
-          <div className="h-1 w-full flex bg-black" />
+      <div className="relative w-full h-fit flex flex-row justify-between items-center">
+        <div
+          className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
+          onClick={() => setScreen(screen > 0 ? screen - 1 : 2)}
+        >
+          <svg
+            className="size-6"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
+            {" "}
+            <path
+              d="M20 11v2H8v2H6v-2H4v-2h2V9h2v2h12zM10 7H8v2h2V7zm0 0h2V5h-2v2zm0 10H8v-2h2v2zm0 0h2v2h-2v-2z"
+              fill="currentColor"
+            />{" "}
+          </svg>
         </div>
-        <div className="relative w-full h-fit flex flex-row justify-between items-center">
-          <div
-            className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
-            onClick={() => setScreen(screen > 0 ? screen - 1 : 2)}
+        <div className="font-dos text-lg relative flex w-fit h-fit text-center">
+          {screen < 1 ? "Drops" : screen == 1 ? "Collected" : "Agents"}
+        </div>
+        <div
+          className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
+          onClick={() => setScreen(screen < 2 ? screen + 1 : 0)}
+        >
+          <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className="size-6"
           >
-            <svg
-              className="size-6"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              {" "}
-              <path
-                d="M20 11v2H8v2H6v-2H4v-2h2V9h2v2h12zM10 7H8v2h2V7zm0 0h2V5h-2v2zm0 10H8v-2h2v2zm0 0h2v2h-2v-2z"
-                fill="currentColor"
-              />{" "}
-            </svg>
-          </div>
-          <div className="text-black font-start text-sm relative flex w-fit h-fit text-center text-black">
-            {screen < 1 ? "Drops" : screen == 1 ? "Collected" : "Agents"}
-          </div>
-          <div
-            className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
-            onClick={() => setScreen(screen < 2 ? screen + 1 : 0)}
-          >
-            <svg
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              className="size-6"
-            >
-              {" "}
-              <path
-                d="M4 11v2h12v2h2v-2h2v-2h-2V9h-2v2H4zm10-4h2v2h-2V7zm0 0h-2V5h2v2zm0 10h2v-2h-2v2zm0 0h-2v2h2v-2z"
-                fill="currentColor"
-              />{" "}
-            </svg>
-          </div>
+            {" "}
+            <path
+              d="M4 11v2h12v2h2v-2h2v-2h-2V9h-2v2H4zm10-4h2v2h-2V7zm0 0h-2V5h2v2zm0 10h2v-2h-2v2zm0 0h-2v2h2v-2z"
+              fill="currentColor"
+            />{" "}
+          </svg>
         </div>
       </div>
 
       <div className="flex relative w-full h-full items-start justify-start overflow-y-scroll">
-        <div className="relative w-full h-full flex flex-wrap gap-6 items-start justify-start">
+        <div className={`relative w-full h-full flex flex-wrap gap-6 items-start ${
+          itemsLoading ? "justify-between" : "justify-start"
+        }`}>
           {itemsLoading ? (
             Array.from({ length: 10 }).map((_, key) => {
               return (
                 <div
                   key={key}
-                  className="relative w-60 h-80 bg-morado pixel-border-4 animate-pulse rounded-xl"
+                  className="relative w-60 h-80 bg-pink rounded-md animate-pulse"
                 ></div>
               );
             })
           ) : (screen < 1 ? drops : screen == 1 ? collected : agents)?.length <
             1 ? (
-            <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
+            <div className="relative w-full h-80 flex items-center justify-center text-sm text-white">
               {`No ${
                 screen < 1 ? "Drops" : screen == 1 ? "Collects" : "Agents"
               } yet.`}
@@ -121,13 +117,13 @@ export default function User() {
                     {screen > 1 ? (
                       <div
                         key={key}
-                        className={`relative w-60 h-80 rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2 cursor-canP`}
+                        className={`relative w-60 h-80 rounded-md bg-pink flex flex-col items-center justify-between p-2 cursor-canP`}
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
                           router.push(`/agent/${(item as any)?.AAAAgents_id}`);
                         }}
                       >
-                        <div className="relative w-full h-full rounded-md flex">
+                        <div className="relative w-full h-full border border-windows bg-white rounded-md flex">
                           <Image
                             objectFit="contain"
                             layout="fill"
@@ -143,7 +139,7 @@ export default function User() {
                           />
                         </div>
                         <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3 pt-4">
-                          <div className="relative w-fit h-fit flex text-lg font-start uppercase">
+                          <div className="relative w-fit h-fit flex text-lg uppercase">
                             {(item as any).metadata?.title}
                           </div>
                         </div>
@@ -151,7 +147,7 @@ export default function User() {
                     ) : screen == 1 ? (
                       <div
                         key={key}
-                        className={`relative w-60 h-80 rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2 cursor-canP`}
+                        className={`relative w-60 h-80 rounded-md bg-pink flex flex-col items-center justify-between p-2 cursor-canP`}
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
                           router.push(
@@ -161,7 +157,7 @@ export default function User() {
                           );
                         }}
                       >
-                        <div className="relative w-full h-full rounded-md flex">
+                        <div className="relative w-full h-full border border-windows rounded-md flex">
                           <Image
                             objectFit="cover"
                             layout="fill"
@@ -184,10 +180,10 @@ export default function User() {
                           />
                         </div>
                         <div className="relative w-full h-fit flex flex-row items-start justify-between gap-3 pt-4">
-                          <div className="relative w-fit h-fit flex text-sm font-start uppercase">
+                          <div className="relative w-fit h-fit flex text-sm uppercase">
                             {(item as any)?.collection?.metadata?.title}
                           </div>
-                          <div className="relative w-fit h-fit flex text-sm font-start uppercase">
+                          <div className="relative w-fit h-fit flex text-sm uppercase">
                             x {Number((item as any)?.amount || 0)}
                           </div>
                         </div>
@@ -195,9 +191,9 @@ export default function User() {
                     ) : (
                       <div
                         key={key}
-                        className={`relative w-60 h-80 rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2`}
+                        className={`relative w-60 h-80 rounded-md bg-pink flex flex-col items-center justify-between p-2`}
                       >
-                        <div className="relative w-full h-full rounded-md flex">
+                        <div className="relative w-full h-full rounded-md flex border border-windows">
                           <Image
                             objectFit="cover"
                             layout="fill"
@@ -216,14 +212,14 @@ export default function User() {
                           />
                         </div>
                         <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3 pt-4">
-                          <div className="relative w-fit h-fit flex text-lg font-start uppercase">
+                          <div className="relative w-fit h-fit flex text-lg uppercase">
                             {(item as any)?.metadata?.title?.length > 12
                               ? (item as any)?.metadata?.title?.slice(0, 9) +
                                 "..."
                               : (item as any)?.metadata?.title}
                           </div>
                         </div>
-                        <div className="relative w-full h-full overflow-y-scroll flex items-start justify-between flex-wrap gap-2">
+                        <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start flex-wrap gap-2">
                           {(item as DropInterface)?.collections?.map(
                             (col, index) => {
                               return (
@@ -240,7 +236,7 @@ export default function User() {
                                   }}
                                   title={(col as any)?.metadata?.title}
                                 >
-                                  <div className="relative w-14 h-14 flex rounded-md items-center justify-center border border-morado">
+                                  <div className="relative w-14 h-14 flex rounded-md items-center justify-center border border-windows">
                                     <Image
                                       objectFit="cover"
                                       layout="fill"

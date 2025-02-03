@@ -153,9 +153,35 @@ const usePost = (
         lensConnected?.sessionClient || lensClient
       );
 
+      let picture = res?.author?.metadata?.picture;
+
+      if (res?.author?.metadata?.picture) {
+        const cadena = await fetch(
+          `${STORAGE_NODE}/${
+            res?.author?.metadata?.picture?.split("lens://")?.[1]
+          }`
+        );
+
+        if (cadena) {
+          const json = await cadena.json();
+          picture = json.item;
+        }
+      }
+
       await handleActivity(false);
 
-      setPostData([res]);
+      setPostData([
+        {
+          ...res,
+          author: {
+            ...res?.author,
+            metadata: {
+              ...res?.author?.metadata,
+              picture,
+            },
+          },
+        },
+      ]);
     } catch (err: any) {
       console.error(err.message);
     }
@@ -168,7 +194,6 @@ const usePost = (
     }
   }, [lensConnected, lensClient]);
 
-
   return {
     postData,
     handleActivity,
@@ -178,7 +203,7 @@ const usePost = (
     postDataLoading,
     handleMoreActivity,
     setActivity,
-    setPostData
+    setPostData,
   };
 };
 

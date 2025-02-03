@@ -76,7 +76,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
 
     case MintSwitcher.Success:
       return (
-        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-center font-jacey">
+        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-center">
           <div className="relative flex w-fit h-10 text-center text-black font-start uppercase text-3xl">
             Minted!
           </div>

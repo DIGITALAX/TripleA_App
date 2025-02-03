@@ -22,9 +22,10 @@ export default function AgentPayouts() {
     handleMorePaid,
     hasMore,
   } = useAgentPayouts(context?.lensClient!);
+ 
   return (
-    <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
-      <div className="relative w-full h-full p-3 pixel-border-2 flex flex-col items-center justify-between gap-6">
+    <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-viol">
+      <div className="relative w-full h-full p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex flex-row justify-between items-center">
           <div
             className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
@@ -43,7 +44,7 @@ export default function AgentPayouts() {
               />{" "}
             </svg>
           </div>
-          <div className="text-black font-start text-sm relative flex w-fit h-fit text-center text-black">
+          <div className="text-sm relative flex w-fit h-fit text-center">
             {screen < 1 ? "Agent Owners Paid" : "Collectors Paid"}
           </div>
           <div
@@ -64,7 +65,7 @@ export default function AgentPayouts() {
             </svg>
           </div>
         </div>
-        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-center font-jacey">
+        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-center">
           <div
             className="relative w-full h-[50%] overflow-y-scroll"
             id="scrollableDiv"
@@ -83,7 +84,7 @@ export default function AgentPayouts() {
                 ? Array.from({ length: 20 }).map((_, key) => {
                     return (
                       <div
-                        className="relative animate-pulse w-full h-px bg-black "
+                        className="relative animate-pulse w-full h-px bg-viol"
                         key={key}
                       ></div>
                     );
@@ -114,7 +115,7 @@ export default function AgentPayouts() {
                                   );
                                 }}
                               >
-                                <div className="relative flex rounded-full w-8 h-8 bg-morado border border-morado">
+                                <div className="relative flex rounded-full w-8 h-8 bg-pink border border-pink">
                                   {item?.profile?.metadata?.picture && (
                                     <Image
                                       src={`${INFURA_GATEWAY}/ipfs/${
@@ -129,7 +130,7 @@ export default function AgentPayouts() {
                                     />
                                   )}
                                 </div>
-                                <div className="relative flex w-fit h-fit text-xs text-black font-jackey2">
+                                <div className="relative flex w-fit h-fit text-xs">
                                   {"@" +
                                     item?.profile?.username?.localName?.slice(
                                       0,
@@ -138,13 +139,13 @@ export default function AgentPayouts() {
                                 </div>
                               </div>
                             )}
-                            <div className="relative w-fit h-fit flex font-start text-xs">
+                            <div className="relative w-fit h-fit flex text-xs">
                               {(screen < 1
                                 ? (item as any)?.owner
                                 : (item as any)?.recipient
                               )?.slice(0, 10) + " ..."}
                             </div>
-                            <div className="relative w-fit h-fit flex items-center justify-center text-black font-jackey2">
+                            <div className="relative w-fit h-fit flex items-center justify-center">
                               {Number(item?.amount) / 10 ** 18}{" "}
                               {
                                 TOKENS.find(
@@ -154,13 +155,13 @@ export default function AgentPayouts() {
                                 )?.symbol
                               }
                             </div>
-                            <div className="relative w-fit h-fit flex items-center justify-center text-black font-jackey2 text-xs">
+                            <div className="relative w-fit h-fit flex items-center justify-center text-xs">
                               {moment
                                 .unix(Number(item?.blockTimestamp))
                                 .fromNow()}
                             </div>
                           </div>
-                          <div className="relative w-full h-px bg-black/70 flex"></div>
+                          <div className="relative w-full h-px bg-viol flex"></div>
                         </div>
                       );
                     }
