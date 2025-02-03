@@ -18,7 +18,7 @@ import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 
 export const config = createConfig(
   getDefaultConfig({
-    appName: "Triple A",
+    appName: "TripleA",
     walletConnectProjectId: process.env
       .NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
     appUrl: "https://triplea.agentmeme.xyz",
@@ -28,7 +28,6 @@ export const config = createConfig(
       [chains.testnet.id]: http("https://rpc.testnet.lens.dev"),
     },
     ssr: true,
-  
   })
 );
 
@@ -57,6 +56,8 @@ export const ModalContext = createContext<
       setCreateAccount: (e: SetStateAction<boolean>) => void;
       signless: boolean;
       setSignless: (e: SetStateAction<boolean>) => void;
+      setAgentsLoading: (e: SetStateAction<boolean>) => void;
+      agentsLoading: boolean;
       lensConnected: LensConnected | undefined;
       setLensConnected: (e: SetStateAction<LensConnected | undefined>) => void;
       storageClient: StorageClient;
@@ -78,6 +79,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const [signless, setSignless] = useState<boolean>(false);
   const [createAccount, setCreateAccount] = useState<boolean>(false);
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [lensClient, setLensClient] = useState<PublicClient | undefined>();
   const storageClient = StorageClient.create(storageTestnet);
 
@@ -126,6 +128,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 setSignless,
                 tokenThresholds,
                 setTokenThresholds,
+                agentsLoading,
+                setAgentsLoading,
               }}
             >
               {children}

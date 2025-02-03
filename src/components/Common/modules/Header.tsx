@@ -11,6 +11,7 @@ import { NFTData } from "../types/common.types";
 import { Account } from "@lens-protocol/client";
 import { useModal } from "connectkit";
 import Slider from "./Slider";
+import useAgents from "../hooks/useAgents";
 
 const Header: FunctionComponent = (): JSX.Element => {
   const router = useRouter();
@@ -39,18 +40,24 @@ const Header: FunctionComponent = (): JSX.Element => {
     context?.lensConnected
   );
 
+  useAgents(
+    context?.agents!,
+    context?.setAgents!,
+    context?.lensClient!,
+    context?.tokenThresholds!,
+    context?.setTokenThresholds!,
+    context?.setAgentsLoading!
+  );
+
   return (
     <div className="relative w-full h-fit flex flex-col gap-3 bg-white">
       <div className="relative px-2 w-full h-fit sm:h-16 flex flex-col gap-4 sm:flex-row justify-between items-center z-50">
         <div
           className="relative flex items-center justify-center w-fit h-fit cursor-canP"
-          onClick={() => {
-            animationContext?.setPageChange?.(true);
-            router.push("/");
-          }}
+          onClick={() => router.push("/")}
         >
           <div className="w-fit h-fit text-xl font-jackey text-black flex relative">
-            Triple A
+            TripleA
           </div>
         </div>
         <div className="relative flex flex-row gap-2 items-center justify-center w-full sm:w-fit h-fit">

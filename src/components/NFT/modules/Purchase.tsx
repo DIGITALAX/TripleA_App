@@ -94,94 +94,88 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
 
   return (
     <div
-      className={`relative w-full md:w-[38rem] h-[60rem] md:h-[40rem] flex flex-col gap-4 items-start justify-start text-left p-3 pixel-border-2 bg-white ${
-        (nftLoading || nft?.amount == 0) && "animate-pulse"
+      className={`relative w-full md:w-[38rem] h-full flex flex-col gap-4 items-start justify-start text-left text-windows p-3 bg-viol rounded-md ${
+        (nftLoading || agentLoading || nft?.amount == 0) && "animate-pulse"
       }`}
     >
       {!nftLoading && nft?.amount > 0 && (
         <>
-          <div className="relative w-full h-fit flex items-center justify-center gap-3 flex-col">
-            <div className="relative w-full h-fit flex items-center justify-center gap-1 flex-col">
-              <div className="h-1 w-full flex bg-black" />
-              <div className="h-1 w-full flex bg-black" />
+          <div className="relative w-full h-fit flex flex-row justify-between items-center">
+            <div
+              className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
+              onClick={() =>
+                setScreen(
+                  screen > 0
+                    ? screen - 1
+                    : Number(nft?.agents?.length || 0) > 0
+                    ? 3
+                    : 1
+                )
+              }
+            >
+              <svg
+                className="size-6"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                {" "}
+                <path
+                  d="M20 11v2H8v2H6v-2H4v-2h2V9h2v2h12zM10 7H8v2h2V7zm0 0h2V5h-2v2zm0 10H8v-2h2v2zm0 0h2v2h-2v-2z"
+                  fill="#0000f5"
+                />{" "}
+              </svg>
             </div>
-            <div className="relative w-full h-fit flex flex-row justify-between items-center">
-              <div
-                className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
-                onClick={() =>
-                  setScreen(
-                    screen > 0
-                      ? screen - 1
-                      : Number(nft?.agents?.length || 0) > 0
-                      ? 3
-                      : 1
-                  )
-                }
-              >
-                <svg
-                  className="size-6"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  {" "}
-                  <path
-                    d="M20 11v2H8v2H6v-2H4v-2h2V9h2v2h12zM10 7H8v2h2V7zm0 0h2V5h-2v2zm0 10H8v-2h2v2zm0 0h2v2h-2v-2z"
-                    fill="currentColor"
-                  />{" "}
-                </svg>
-              </div>
-              <div className="text-black font-start text-sm relative flex w-fit h-fit text-center text-black">
-                {Number(nft?.agents?.length || 0) > 0
-                  ? screen < 1
-                    ? "Collect"
-                    : screen == 1
-                    ? "Collectors"
-                    : screen == 2
-                    ? "Agents On Lens"
-                    : "Agent Recharge Station"
-                  : screen < 1
+            <div className="text-sm relative flex w-fit h-fit text-center uppercase font-nerd">
+              {Number(nft?.agents?.length || 0) > 0
+                ? screen < 1
                   ? "Collect"
-                  : "Collectors"}
-              </div>
-              <div
-                className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
-                onClick={() =>
-                  setScreen(
-                    screen < (Number(nft?.agents?.length || 0) > 0 ? 3 : 1)
-                      ? screen + 1
-                      : 0
-                  )
-                }
+                  : screen == 1
+                  ? "Collectors"
+                  : screen == 2
+                  ? "Agents On Lens"
+                  : "Agent Recharge Station"
+                : screen < 1
+                ? "Collect"
+                : "Collectors"}
+            </div>
+            <div
+              className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
+              onClick={() =>
+                setScreen(
+                  screen < (Number(nft?.agents?.length || 0) > 0 ? 3 : 1)
+                    ? screen + 1
+                    : 0
+                )
+              }
+            >
+              <svg
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                className="size-6"
               >
-                <svg
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  className="size-6"
-                >
-                  {" "}
-                  <path
-                    d="M4 11v2h12v2h2v-2h2v-2h-2V9h-2v2H4zm10-4h2v2h-2V7zm0 0h-2V5h2v2zm0 10h2v-2h-2v2zm0 0h-2v2h2v-2z"
-                    fill="currentColor"
-                  />{" "}
-                </svg>
-              </div>
+                {" "}
+                <path
+                  d="M4 11v2h12v2h2v-2h2v-2h-2V9h-2v2H4zm10-4h2v2h-2V7zm0 0h-2V5h2v2zm0 10h2v-2h-2v2zm0 0h-2v2h2v-2z"
+                  fill="#0000f5"
+                />{" "}
+              </svg>
             </div>
           </div>
           {screen < 1 ? (
             <>
-              <div className="relative text-xl break-all text-black flex font-start">
+              <div className="relative font-dos text-xl break-all flex">
                 {nft?.title}
               </div>
-              <div className="relative text-sm text-black flex font-jackey2">
+              <div className="relative text-sm flex font-nerd">
                 Edition — {nft?.amountSold || 0} / {nft?.amount}
               </div>
-              <div className="relative w-full h-fit flex items-center justify-between flex-row gap-3 font-jackey2 flex-wrap sm:flex-nowrap">
+              <div className="relative w-full h-fit flex items-center justify-between flex-row gap-3 font-nim flex-wrap sm:flex-nowrap text-xs">
                 <div className="relative w-fit h-fit flex items-center justify-start gap-2 flex-row">
                   {nft?.profile?.metadata?.picture && (
                     <div
-                      className="relative flex rounded-full w-8 h-8 bg-morado border border-morado cursor-canP"
+                      className="relative flex rounded-full w-8 h-8 bg-morado border border-windows cursor-canP"
                       onClick={(e) => {
                         e.stopPropagation();
                         animationContext?.setPageChange?.(true);
@@ -201,7 +195,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       />
                     </div>
                   )}
-                  <div className="relative flex w-fit h-fit text-xs text-black">
+                  <div className="relative flex w-fit h-fit">
                     {nft?.profile?.username?.localName
                       ? nft?.profile?.username?.localName?.slice(0, 10)
                       : nft?.artist?.slice(0, 10)}
@@ -221,7 +215,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   placeholder={"1"}
                   value={collectData.amount}
                   step={1}
-                  className="relative flex w-20 px-1 h-10 text-black focus:outline-none text-xl text-left text-lg pixel-border-3"
+                  className="relative flex w-20 px-1 h-10 focus:outline-none text-xl text-left text-lg pixel-border-7 rounded-xl bg-viol"
                   onChange={(e) =>
                     setCollectData({
                       ...collectData,
@@ -243,7 +237,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   }
                 </div>
               </div>
-              <div className="relative w-full h-fit flex font-start text-xxs text-[#e14c14] items-start justify-start text-left">
+              <div className="relative w-full h-fit flex text-xxs text-pink items-start justify-start text-left font-nim">
                 {Number(nft?.agents?.length || 0) <= 0
                   ? "No Agents Assigned To this Collection."
                   : (Number(nft?.amountSold || 0) > 1 &&
@@ -294,7 +288,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               </div>
               <div className="relative w-full h-fit flex">
                 <div
-                  className={`relative w-full h-14 pixel-border-2 text-black flex items-center justify-center font-start ${
+                  className={`relative w-full h-14 bg-windows rounded-md text-white flex items-center justify-center font-nerd hover:opacity-80 ${
                     !purchaseLoading ? "cursor-canP" : "opacity-70"
                   }`}
                   onClick={() => {
@@ -318,7 +312,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                     >
                       <path
                         d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                        fill="currentColor"
+                        fill="white"
                       />{" "}
                     </svg>
                   ) : approved || !isConnected ? (
@@ -329,7 +323,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 </div>
               </div>
               <div className="relative w-full h-fit flex py-4 overflow-y-scroll">
-                <div className="py-3 h-full max-h-full overflow-y-scroll flex relative items-start justify-start text-left text-black text-sm font-jack">
+                <div className="py-3 h-full max-h-full overflow-y-scroll flex relative items-start justify-start text-left text-sm font-nerd">
                   {nft?.description}
                 </div>
               </div>
@@ -341,7 +335,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   No Collectors Yet.
                 </div>
               ) : (
-                <div className="relative w-full h-fit flex flex-col items-start justify-start  gap-3">
+                <div className="relative w-full h-fit flex flex-col items-start justify-start gap-6">
                   {nft?.collectors?.map((collector, key) => {
                     return (
                       <div
@@ -364,7 +358,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             }}
                           >
                             {collector?.pfp && (
-                              <div className="relative rounded-full w-6 h-6 bg-crema border border-morado">
+                              <div className="relative rounded-full w-6 h-6 bg-crema border border-windows">
                                 <Image
                                   src={`${INFURA_GATEWAY}/ipfs/${
                                     (collector?.pfp || "")?.split(
@@ -379,7 +373,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                 />
                               </div>
                             )}
-                            <div className="relative w-fit h-fit flex text-black text-xxs font-start">
+                            <div className="relative w-fit h-fit flex text-xs font-nim">
                               @
                               {collector?.name?.length > 10
                                 ? collector?.name?.slice(0, 10) + " ..."
@@ -387,15 +381,15 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             </div>
                           </div>
                         ) : (
-                          <div className="relative w-fit h-fit flex font-start text-xs">
+                          <div className="relative w-fit h-fit flex font-nim text-xs">
                             {collector?.address?.slice(0, 10) + " ..."}
                           </div>
                         )}
 
-                        <div className="relative w-fit h-fit flex items-center justify-center text-black font-jackey2">
+                        <div className="relative w-fit h-fit flex items-center justify-center font-nim">
                           X {collector?.amount}
                         </div>
-                        <div className="relative w-fit h-fit flex items-center justify-center text-black font-jackey2 text-xs">
+                        <div className="relative w-fit h-fit flex items-center justify-center font-nim text-xs">
                           {moment
                             .unix(Number(collector?.blockTimestamp))
                             .fromNow()}
@@ -461,9 +455,9 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                     return (
                       <div
                         key={key}
-                        className="relative w-full h-fit flex justify-between items-center flex-col gap-2"
+                        className="relative w-full h-fit font-nerd flex justify-between items-center flex-col gap-2"
                       >
-                        <div className="relative w-full h-px flex bg-black"></div>
+                        <div className="relative w-full h-px flex bg-windows"></div>
                         <div className="relative w-full h-fit flex flex-row gap-2 justify-between items-center md:flex-nowrap flex-wrap">
                           <div
                             className="relative w-fit h-fit flex cursor-canP"
@@ -486,7 +480,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             </div>
                           </div>
                           <input
-                            className="relative w-full h-full p-1 bg-white text-sm text-black font-jackey2 focus:outline-none pixel-border-3"
+                            className="relative w-full h-full p-1 bg-viol text-sm text-windows focus:outline-none pixel-border-7"
                             placeholder="1"
                             type="number"
                             disabled={rechargeLoading[key]}
@@ -504,7 +498,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                               });
                             }}
                           />
-                          <div className="relative w-fit h-fit flex text-sm font-jackey2">
+                          <div className="relative w-fit h-fit flex text-sm">
                             {
                               TOKENS?.find(
                                 (tok) =>
@@ -515,7 +509,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                           </div>
                           <div className="relative w-fit h-fit flex">
                             <div
-                              className={`relative w-24 h-8 pixel-border-2 text-black flex items-center justify-center text-xxs font-start ${
+                              className={`relative w-24 h-8 bg-windows text-white rounded-md hover:opacity-80 flex items-center justify-center text-xxs ${
                                 !rechargeLoading[key]
                                   ? "cursor-canP"
                                   : "opacity-70"
@@ -545,7 +539,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                 >
                                   <path
                                     d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                                    fill="currentColor"
+                                    fill="white"
                                   />{" "}
                                 </svg>
                               ) : approvedRecharge[key] || !isConnected ? (
@@ -556,7 +550,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             </div>
                           </div>
                         </div>
-                        <div className="relative w-full h-fit flex items-start justify-between gap-2 text-xs font-jackey2 sm:flex-nowrap flex-wrap">
+                        <div className="relative w-full h-fit flex items-start justify-between gap-2 text-xs sm:flex-nowrap flex-wrap">
                           <div className="relative w-full h-fit flex items-start justify-between flex-col gap-1">
                             <div className="relative w-fit h-fit flex">
                               Active Collection Balance:
@@ -593,7 +587,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             </div>
                           </div>
                         </div>
-                        <div className="relative w-full h-fit text-[#e14c14] font-jackey2 text-sm break-all flex">
+                        <div className="relative w-full h-fit text-pink text-sm break-all flex">
                           {Number(
                             agent?.balance?.find(
                               (bal) =>
@@ -635,8 +629,8 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                           nft?.tokens?.[0]?.toLowerCase()
                                       )?.rent || 0
                                     )) || 0
-                              } cycles!!`
-                            : "Agent needs to be recharged to start activity!"}
+                              } cycles.`
+                            : "Agent needs to be recharged to start activity."}
                         </div>
                       </div>
                     );

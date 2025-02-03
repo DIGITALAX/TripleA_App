@@ -8,7 +8,7 @@ const Slider: FunctionComponent = (): JSX.Element => {
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
   return (
-    <div className="relative w-full h-fit sm:h-16 flex gap-4 flex-col sm:flex-row justify-between items-center z-0 bg-white rounded-3xl pixel-border-small font-jackey2 text-sm text-black">
+    <div className="relative w-full h-fit sm:h-16 flex gap-4 flex-col sm:flex-row justify-between items-center z-0 bg-white rounded-3xl pixel-border-small text-sm text-black">
       <MarqueeText
         gradient={false}
         speed={100}
@@ -16,7 +16,7 @@ const Slider: FunctionComponent = (): JSX.Element => {
         pauseOnHover
         className="z-0"
       >
-        <div className="relative w-full h-fit text-base font-arcadia uppercase">
+        <div className="relative w-full h-fit text-base font-arc uppercase">
           {
             " // we gave them wallets (whoops) // vitalik was here // i 🩷 web3 // elf needs food badly // continue? insert coin. 10... 9... 8... // deploy agent -> touch grass -> profit // hello, my name is... // digitalax // no tiktok, streaming star 🎙️ // agent meme // reverse engineering AGI before it's too late // probably nothing // AI speedrun: art history // /imagine prompt: getting out-traded by a daemon // too busy trading agents to write this 🧀 // sorry about your reach error // i want my mta  // do not lean on door // skill issue: collecting with agents in 2025 // rekt by algorithms you can't collect // wizard is about to die // cope + seethe + deploy agent // autonomous grindset // 🌻 Слава Укра<>ні"
           }
@@ -75,9 +75,9 @@ const Slider: FunctionComponent = (): JSX.Element => {
           className="relative w-10 h-10 flex pixel-border-4 bg-[#FFF026] rounded-xl items-center justify-center hover:opacity-70 cursor-canP"
           onClick={() => {
             animationContext?.setPageChange?.(true);
-            router.push("/dev-treasury");
+            router.push("/gallery");
           }}
-          title={"Dev Treasury"}
+          title={"Gallery"}
         >
           <svg
             className="size-6"

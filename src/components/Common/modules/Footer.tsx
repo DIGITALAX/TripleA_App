@@ -22,9 +22,11 @@ const Footer: FunctionComponent = (): JSX.Element => {
               />
             </div>
           </div>
-          <div className="relative w-fit h-fit flex whitespace-nowrap">NEW AGENT ACTIONS:</div>
+          <div className="relative w-fit h-fit flex whitespace-nowrap">
+            NEW AGENT ACTIONS:
+          </div>
         </div>
-        <div className="relative w-full h-full bg-white flex">
+        <div className="relative w-full h-full bg-white flex overflow-x-hidden">
           <MarqueeText
             gradient={false}
             speed={100}
@@ -32,11 +34,12 @@ const Footer: FunctionComponent = (): JSX.Element => {
             pauseOnHover
             className="z-0"
           >
-            <div className="relative w-full h-fit text-black font-arcadia uppercase">
-              {
-                " // we gave them wallets (whoops) // vitalik was here // i ❤️ web3 // elf needs food badly // continue? insert coin. 10... 9... 8... // deploy agent -> touch grass -> profit // hello, my name is... // digitalax // no tiktok, streaming star // agent meme // reverse engineering AGI before it's too late // probably nothing // AI speedrun: art history // /imagine prompt: getting out-traded by a daemon // too busy trading agents to write this // sorry about your reach error // i want my mta  // do not lean on door // skill issue: collecting with agents in 2025 // rekt by algorithms you can't collect // wizard is about to die // cope + seethe + deploy agent // autonomous grindset // 🌻 Слава Укра<>ні"
-              }
-            </div>
+            <div
+              className="relative w-full h-fit text-black font-arcadia uppercase flex flex-row gap-2 items-center "
+              dangerouslySetInnerHTML={{
+                __html: `<img style='width: 15px; height: 15px;' src='https://thedial.infura-ipfs.io/ipfs/Qmcwxxf8Ndg9Mj4ny247ZAXTnQ7czHGyU3et7ye6MDrDmn' draggable='false' /> we gave them wallets (whoops) <img src='https://thedial.infura-ipfs.io/ipfs/QmenbMocrCELUVwhGiL1HNFc4LyXCfYVpNGtdm3m4y9mfk' draggable='false' style='width: 15px; height: 15px;' /> vitalik was here <img src='https://thedial.infura-ipfs.io/ipfs/Qmed3dvT7gtuhU6UjjvT9cXu4E5RM8bHgomQE7BvAEqH1H' draggable='false' style='width: 15px; height: 15px;' /> i ❤️ web3 <img src='https://thedial.infura-ipfs.io/ipfs/QmU7oYPQvdQKyRdxG1s54YXNVUVm8XJBUopbTMdJPUzdEj' draggable='false' style='width: 15px; height: 15px;' /> elf needs food badly <img src='https://thedial.infura-ipfs.io/ipfs/Qmcwxxf8Ndg9Mj4ny247ZAXTnQ7czHGyU3et7ye6MDrDmn' draggable='false' style='width: 15px; height: 15px;' /> continue? insert coin. 10... 9... 8... <img src='https://thedial.infura-ipfs.io/ipfs/QmenbMocrCELUVwhGiL1HNFc4LyXCfYVpNGtdm3m4y9mfk' draggable='false' style='width: 15px; height: 15px;' /> deploy agent -> touch grass -> profit  <img src='https://thedial.infura-ipfs.io/ipfs/Qmed3dvT7gtuhU6UjjvT9cXu4E5RM8bHgomQE7BvAEqH1H' draggable='false' style='width: 15px; height: 15px;' /> hello, my name is...  <img src='https://thedial.infura-ipfs.io/ipfs/QmU7oYPQvdQKyRdxG1s54YXNVUVm8XJBUopbTMdJPUzdEj' draggable='false' style='width: 15px; height: 15px;' /> digitalax <img src='https://thedial.infura-ipfs.io/ipfs/Qmcwxxf8Ndg9Mj4ny247ZAXTnQ7czHGyU3et7ye6MDrDmn' draggable='false' style='width: 15px; height: 15px;' /> no tiktok, streaming star <img src='https://thedial.infura-ipfs.io/ipfs/QmenbMocrCELUVwhGiL1HNFc4LyXCfYVpNGtdm3m4y9mfk' draggable='false' style='width: 15px; height: 15px;' /> agent meme <img src='https://thedial.infura-ipfs.io/ipfs/Qmed3dvT7gtuhU6UjjvT9cXu4E5RM8bHgomQE7BvAEqH1H' draggable='false' style='width: 15px; height: 15px;' /> reverse engineering AGI before it's too late <img src='https://thedial.infura-ipfs.io/ipfs/QmU7oYPQvdQKyRdxG1s54YXNVUVm8XJBUopbTMdJPUzdEj' draggable='false' style='width: 15px; height: 15px;' /> probably nothing <img src='https://thedial.infura-ipfs.io/ipfs/Qmcwxxf8Ndg9Mj4ny247ZAXTnQ7czHGyU3et7ye6MDrDmn' draggable='false' style='width: 15px; height: 15px;' /> AI speedrun: art history <img src='https://thedial.infura-ipfs.io/ipfs/QmenbMocrCELUVwhGiL1HNFc4LyXCfYVpNGtdm3m4y9mfk' draggable='false' style='width: 15px; height: 15px;' /> /imagine prompt: getting out-traded by a daemon <img src='https://thedial.infura-ipfs.io/ipfs/Qmed3dvT7gtuhU6UjjvT9cXu4E5RM8bHgomQE7BvAEqH1H' draggable='false' style='width: 15px; height: 15px;' /> too busy trading agents to write this <img src='https://thedial.infura-ipfs.io/ipfs/QmU7oYPQvdQKyRdxG1s54YXNVUVm8XJBUopbTMdJPUzdEj' draggable='false' style='width: 15px; height: 15px;' /> sorry about your reach error <img src='https://thedial.infura-ipfs.io/ipfs/Qmcwxxf8Ndg9Mj4ny247ZAXTnQ7czHGyU3et7ye6MDrDmn' draggable='false' style='width: 15px; height: 15px;' /> i want my mta   <img src='https://thedial.infura-ipfs.io/ipfs/QmenbMocrCELUVwhGiL1HNFc4LyXCfYVpNGtdm3m4y9mfk' draggable='false' style='width: 15px; height: 15px;' /> do not lean on door <img src='https://thedial.infura-ipfs.io/ipfs/Qmed3dvT7gtuhU6UjjvT9cXu4E5RM8bHgomQE7BvAEqH1H' draggable='false' style='width: 15px; height: 15px;' /> skill issue: collecting with agents in 2025 <img src='https://thedial.infura-ipfs.io/ipfs/QmU7oYPQvdQKyRdxG1s54YXNVUVm8XJBUopbTMdJPUzdEj' draggable='false' style='width: 15px; height: 15px;' /> rekt by algorithms you can't collect <img src='https://thedial.infura-ipfs.io/ipfs/Qmcwxxf8Ndg9Mj4ny247ZAXTnQ7czHGyU3et7ye6MDrDmn' draggable='false' style='width: 15px; height: 15px;' /> wizard is about to die <img src='https://thedial.infura-ipfs.io/ipfs/QmenbMocrCELUVwhGiL1HNFc4LyXCfYVpNGtdm3m4y9mfk' draggable='false' style='width: 15px; height: 15px;' /> cope + seethe + deploy agent <img src='https://thedial.infura-ipfs.io/ipfs/Qmed3dvT7gtuhU6UjjvT9cXu4E5RM8bHgomQE7BvAEqH1H' draggable='false' style='width: 15px; height: 15px;' /> autonomous grindset <img src='https://thedial.infura-ipfs.io/ipfs/QmU7oYPQvdQKyRdxG1s54YXNVUVm8XJBUopbTMdJPUzdEj' draggable='false' style='width: 15px; height: 15px;' /> 🌻 Слава Укра<>ні`,
+              }}
+            ></div>
           </MarqueeText>
         </div>
       </div>

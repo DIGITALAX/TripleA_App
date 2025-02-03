@@ -19,8 +19,13 @@ export default {
         mar: "#4BA1D1",
         pink: "#F50092",
         windows: "#0000f5",
+        win: "#0000E1",
+        viol: "#CECEFF",
+        verde: "#3cff00",
+        ama: "#FFF800"
       },
       zIndex: {
+        100: "100",
         200: "200",
       },
       fontFamily: {
@@ -31,6 +36,7 @@ export default {
         arc: "Arcadia",
         nerd: "Nerd",
         nim: "Nimbus",
+        dos: "Dos"
       },
       fontSize: {
         xxs: "0.6rem",

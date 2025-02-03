@@ -8,10 +8,8 @@ import { useEffect, useState } from "react";
 import { getCollection } from "../../../../graphql/queries/getCollection";
 import {
   evmAddress,
-  MainContentFocus,
   PageSize,
   Post,
-  PostType,
   PublicClient,
   TextOnlyMetadata,
 } from "@lens-protocol/client";
@@ -19,7 +17,10 @@ import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAc
 import { getCollectors } from "../../../../graphql/queries/getCollectors";
 import fetchPosts from "../../../../graphql/lens/queries/posts";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
-import { fetchPosts as fetchP } from "@lens-protocol/client/actions";
+import {
+  getCollectionsArtist,
+  getCollectionsArtistNot,
+} from "../../../../graphql/queries/getGallery";
 
 const useNFT = (
   id: string,
@@ -28,10 +29,13 @@ const useNFT = (
   lensConnected: LensConnected | undefined
 ) => {
   const [nft, setNft] = useState<NFTData | undefined>();
+  const [moreCollections, setMoreCollections] = useState<NFTData[]>([]);
   const [nftLoading, setNftLoading] = useState<boolean>(false);
   const [agentLoading, setAgentLoading] = useState<boolean>(false);
   const [activityCursor, setActivityCursor] = useState<string | undefined>();
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [moreCollectionsLoading, setMoreCollectionsLoading] =
+    useState<boolean>(true);
 
   const handlePosts = async (
     reset: boolean,
@@ -112,7 +116,6 @@ const useNFT = (
           } as Post;
         })
       );
-
 
       if (!reset) {
         return posts;
@@ -315,7 +318,6 @@ const useNFT = (
         })
       );
 
-      
       setNft({
         ...(nft as NFTData),
         agentActivity: [...(nft?.agentActivity || []), ...posts],
@@ -326,11 +328,81 @@ const useNFT = (
     setAgentLoading(false);
   };
 
+  const handleMoreCollections = async () => {
+    setMoreCollectionsLoading(true);
+    try {
+      const data = await getCollectionsArtist(nft?.artist!);
+      let collData = data?.data?.collectionCreateds;
+      if (collData?.length < 10) {
+        const data = await getCollectionsArtistNot(nft?.artist!);
+        collData = [...collData, ...data?.data?.collectionCreateds].sort(
+          () => Math.random() - 0.5
+        );
+      }
+
+      let colls = await Promise.all(
+        collData.map(async (col: any) => {
+          if (!col?.metadata) {
+            const cadena = await fetch(
+              `${INFURA_GATEWAY}/ipfs/${col?.uri.split("ipfs://")?.[1]}`
+            );
+            col.metadata = await cadena.json();
+          }
+
+          const result = await fetchAccountsAvailable(
+            {
+              managedBy: evmAddress(col?.artist),
+            },
+            lensConnected?.sessionClient || lensClient
+          );
+
+          let picture = "";
+          const cadena = await fetch(
+            `${STORAGE_NODE}/${
+              (result as any)?.[0]?.account?.metadata?.picture?.split(
+                "lens://"
+              )?.[1]
+            }`
+          );
+
+          if (cadena) {
+            const json = await cadena.json();
+            picture = json.item;
+          }
+
+          return {
+            id: Number(col?.id),
+            image: col?.metadata?.image,
+            artist: col?.artist,
+            profile: {
+              ...(result as any)?.[0]?.account,
+              metadata: {
+                ...(result as any)?.[0]?.account?.metadata,
+                picture,
+              },
+            },
+          };
+        })
+      );
+
+      setMoreCollections(colls);
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setMoreCollectionsLoading(false);
+  };
+
   useEffect(() => {
     if (Number(id) > 0 && !nft && lensClient && agents?.length > 0) {
       handleNFT();
     }
   }, [id, lensClient, agents, lensConnected?.sessionClient]);
+
+  useEffect(() => {
+    if (nft && moreCollections?.length < 1) {
+      handleMoreCollections();
+    }
+  }, [nft]);
 
   return {
     nft,
@@ -340,6 +412,8 @@ const useNFT = (
     handleMoreActivity,
     hasMore,
     handlePosts,
+    moreCollections,
+    moreCollectionsLoading,
   };
 };
 

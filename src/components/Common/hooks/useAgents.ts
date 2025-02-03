@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect } from "react";
 import { Agent } from "../../Dashboard/types/dashboard.types";
 import { getAgents } from "../../../../graphql/queries/getAgents";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
@@ -13,9 +13,8 @@ const useAgents = (
   lensClient: SessionClient | PublicClient,
   tokenThresholds: TokenThreshold[],
   setTokenThresholds: (e: SetStateAction<TokenThreshold[]>) => void,
+  setAgentsLoading: (e: SetStateAction<boolean>) => void
 ) => {
-  const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
-
   const loadAgents = async () => {
     setAgentsLoading(true);
 
@@ -75,7 +74,7 @@ const useAgents = (
           };
         })
       );
-      setAgents?.(allAgents ?.sort(() => Math.random() - 0.5));
+      setAgents?.(allAgents?.sort(() => Math.random() - 0.5));
     } catch (err: any) {
       console.error(err.message);
     }
@@ -87,10 +86,10 @@ const useAgents = (
       const data = await getTokenThresholds();
 
       setTokenThresholds?.(data?.data?.tokenThresholdSets);
-    } catch(err:any){
-      console.error(err.message)
+    } catch (err: any) {
+      console.error(err.message);
     }
-  }
+  };
 
   useEffect(() => {
     if (!agents || (agents?.length < 1 && lensClient)) {
@@ -101,10 +100,6 @@ const useAgents = (
       loadThresholdsAndRent();
     }
   }, [lensClient]);
-
-  return {
-    agentsLoading,
-  };
 };
 
 export default useAgents;

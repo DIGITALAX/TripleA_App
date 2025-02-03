@@ -1,133 +1,88 @@
 "use client";
 
-import AgentSwitch from "@/components/Agents/modules/AgentSwitch";
-import {
-  AgentSwitcher,
-  CreateSwitcher,
-} from "@/components/Agents/types/agents.types";
 import { useContext, useState } from "react";
+import GalleryItems from "@/components/Common/modules/Gallery";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import { AnimationContext, ModalContext } from "../providers";
 import { useRouter } from "next/navigation";
-import useArt from "@/components/Agents/hooks/useArt";
-import { useAccount } from "wagmi";
-import { useModal } from "connectkit";
-export default function Agents() {
-  const [agentSwitcher, setAgentSwitcher] = useState<AgentSwitcher>(
-    AgentSwitcher.Gallery
-  );
-  const [createSwitcher, setCreateSwitcher] = useState<CreateSwitcher>(
-    CreateSwitcher.Details
-  );
-  const router = useRouter();
+
+export default function Gallery() {
   const context = useContext(ModalContext);
   const animationContext = useContext(AnimationContext);
-  const { moreArt, moreArtLoading } = useArt(
-    context?.lensClient!,
-    context?.lensConnected!
-  );
-  const { isConnected } = useAccount();
-  const { setOpen } = useModal();
-
+  const [openChoice, setOpenChoice] = useState<boolean>(false);
+  const [choice, setChoice] = useState<string>("All Minted");
+  const router = useRouter();
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-10 gap-24">
       <div className="relative w-full h-fit flex flex-row justify-between items-start gap-6">
-        <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-4 top-20 left-10">
-          <div className="relative w-80 h-60 flex">
+        <div className="relative w-fit h-fit flex items-start justify-start">
+          <div className="relative w-80 h-60 flex top-20 left-10">
             <Image
-              src={`${INFURA_GATEWAY}/ipfs/QmWLPmcf4LerwrL1pTmiWDsFc2rfaMLHeY4Zvim8dhcUur`}
+              src={`${INFURA_GATEWAY}/ipfs/QmbxJAdseh52v72wdSztAVWghF1FTDE3Uee2gJJ2wHR17a`}
               draggable={false}
               layout="fill"
             />
           </div>
-          <div className="relative w-fit h-fit flex items-end justify-end">
-            <div
-              className="relative w-40 h-10 flex pixel-border-5 bg-white rounded-xl items-center justify-between hover:opacity-70 cursor-canP flex-row gap-2 px-2"
-              title={"Create Agent"}
-              onClick={() => {
-                if (isConnected) {
-                  if (agentSwitcher != AgentSwitcher.Create) {
-                    setCreateSwitcher(CreateSwitcher.Details);
-                  }
-                  setAgentSwitcher(
-                    agentSwitcher == AgentSwitcher.Create
-                      ? AgentSwitcher.Gallery
-                      : AgentSwitcher.Create
-                  );
-                } else {
-                  setOpen?.(!open);
-                }
-              }}
-            >
-              <svg
-                className="size-6"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                {" "}
-                <path
-                  d="M4 2h4v4H4V2zM1 7h10v9H9v6H7v-6H5v6H3v-6H1V7zm18-5h-2v2h-2v2h-2v2h2V6h2v12h-2v-2h-2v2h2v2h2v2h2v-2h2v-2h2v-2h-2v2h-2V6h2v2h2V6h-2V4h-2V2z"
-                  fill="currentColor"
-                />{" "}
-              </svg>
-              <svg
-                className="size-6"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                {" "}
-                <path
-                  d="M15 9V7h2v2h-2zm2 6v-2h-4v-2h4V9h2v2h2v2h-2v2h-2zm0 0v2h-2v-2h2zm-6-4v2H7v2H5v-2H3v-2h2V9h2v2h4zm-4 4h2v2H7v-2zm2-8v2H7V7h2z"
-                  fill="currentColor"
-                />{" "}
-              </svg>
-              <svg
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="size-6"
-              >
-                <path
-                  d="M10 3H8v2H6v2h2V5h2v2h2v2h-2v2H8v2H6v2H4v-2H2v2h2v2h2v-2h4v2h2v2h-2v2h2v-2h2v-2h-2v-4h2v-2h2v2h2v2h2v-2h2v-2h-2v2h-2v-2h-2V9h2V5h-4v2h-2V5h-2V3z"
-                  fill="currentColor"
-                />
-              </svg>
-            </div>
-          </div>
         </div>
-        <div className={`${agentSwitcher == AgentSwitcher.Create ? "w-full" : "w-fit"} relative flex flex-col h-fit items-between justify-start gap-5`}>
-          <div className="relative w-full h-fit flex justify-between items-center">
+        <div className="relative flex flex-col w-fit h-fit items-between justify-start gap-5">
+          <div className="relative w-full h-fit flex justify-between items-center flex-row gap-3">
             <div className="relative w-fit h-fit flex font-nim text-white text-3xl uppercase left-12">
-              Agency For Hire
+              Agent Art Market
+            </div>
+            <div
+              className="relative w-36 h-fit flex font-nerd text-white text-sm cursor-canP flex-row gap-2 items-center justify-center border border-verde"
+              onClick={() => setOpenChoice(!openChoice)}
+            >
+              <div className="relative w-fit h-fit flex items-center justify-center">
+                {choice}
+              </div>
+              <div className="relative w-fit h-fit text-lg top-px flex items-center justify-center">
+                ▼
+              </div>
+              {openChoice && (
+                <div className="absolute w-full top-7 bg-windows h-fit flex flex-col items-center justify-start text-xs text-white border border-verde z-20">
+                  {["All Minted", "Minted By Agent", "Minted By Hand"]
+                    .filter((item) => item !== choice)
+                    .map((item: string, index: number) => {
+                      return (
+                        <div
+                          key={index}
+                          className={`relative w-full h-8 flex items-center justify-center cursor-canP hover:opacity-70 ${
+                            index !== item.length - 1 && "border-b border-verde"
+                          }`}
+                          onClick={() => {
+                            setOpenChoice(false);
+                            setChoice(item);
+                          }}
+                        >
+                          {item}
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
             </div>
           </div>
-          <AgentSwitch
-            agentSwitcher={agentSwitcher}
-            setAgentSwitcher={setAgentSwitcher}
-            createSwitcher={createSwitcher}
-            setCreateSwitcher={setCreateSwitcher}
-          />
+          <GalleryItems lensClient={context?.lensClient!} choice={choice} />
         </div>
       </div>
       <div className="relative w-full h-fit flex items-center justify-center">
         <div className="relative w-5/6 flex items-center justify-center flex-col gap-3 h-fit">
           <div className="relative w-fit h-fit flex font-nim text-white text-3xl uppercase">
-            {"<= ART IN ACTION =>"}
+            {"<= AGENTS ONBOARD =>"}
           </div>
           <div className="relative w-full h-fit flex overflow-x-scroll">
             <div className="relative w-fit h-fit flex flex-row gap-6">
-              {moreArtLoading
+              {context?.agentsLoading
                 ? Array.from({ length: 20 }).map((_, index) => {
                     return (
                       <div
                         className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
                         key={index}
                       >
-                        <div className="relative animate-pulse flex w-56 h-56 rounded-3xl pixel-border-6 bg-white p-3">
-                          <div className="pixel-border-7 w-full h-full relative bg-mochi rounded-xl"></div>
+                        <div className="relative animate-pulse flex w-56 h-56 rounded-md bg-pink p-4">
+                          <div className="pixel-border-6 w-full h-full relative bg-mochi rounded-3xl"></div>
                         </div>
                         <div className="relative w-fit h-fit flex items-center justify-center">
                           <div className="relative w-20 h-20 flex">
@@ -148,32 +103,26 @@ export default function Agents() {
                       </div>
                     );
                   })
-                : moreArt.map((art, index) => {
+                : context?.agents.map((agent, index) => {
                     return (
                       <div
                         className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
                         key={index}
                       >
                         <div
-                          className="relative cursor-canP flex w-56 h-56 bg-white pixel-border-6 rounded-3xl p-3"
+                          className="relative cursor-canP flex w-56 h-56 rounded-md bg-pink p-4"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
-                            router.push(
-                              `/nft/${
-                                art?.profile?.username?.value?.split(
-                                  "lens/"
-                                )?.[1]
-                              }/${art?.id}`
-                            );
+                            router.push(`/agent/${agent.id}`);
                           }}
                         >
-                          <div className="pixel-border-7 w-full h-full relative bg-mochi rounded-xl">
+                          <div className="pixel-border-3 w-full h-full relative bg-mochi rounded-xl">
                             <Image
                               draggable={false}
                               layout="fill"
                               objectFit="cover"
                               src={`${INFURA_GATEWAY}/ipfs/${
-                                art.image?.split("ipfs://")?.[1]
+                                agent.cover?.split("ipfs://")?.[1]
                               }`}
                             />
                           </div>

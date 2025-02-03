@@ -19,7 +19,7 @@ const Post: FunctionComponent<PostProps> = ({
         <textarea
           value={post}
           onChange={(e) => setPost(e.target.value)}
-          className="relative w-full h-28 flex items-start justify-start p-2 text-left text-black text-sm focus:outline-none font-jack pixel-border-2"
+          className="relative w-full h-28 flex items-start justify-start p-2 text-left text-sm focus:outline-none font-nerd bg-windows rounded-md text-viol"
           style={{
             resize: "none",
           }}
@@ -46,7 +46,7 @@ const Post: FunctionComponent<PostProps> = ({
               </div>
             )}
             <div
-              className={`relative w-full h-full pixel-border-2 text-black font-start text-center flex items-center justify-center ${
+              className={`relative w-full h-full text-white font-nerd rounded-md hover:opacity-80 bg-windows text-center flex items-center justify-center ${
                 !success && !postLoading && post?.trim() !== ""
                   ? "cursor-canP"
                   : "opacity-70"
@@ -74,7 +74,7 @@ const Post: FunctionComponent<PostProps> = ({
                   >
                     <path
                       d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                      fill="currentColor"
+                      fill="white"
                     />{" "}
                   </svg>
                 ) : postPage ? (

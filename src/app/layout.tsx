@@ -8,7 +8,7 @@ import Animation from "./animation";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://triplea.agentmeme.xyz"),
-  title: "Triple A",
+  title: "TripleA",
   robots: {
     googleBot: {
       index: true,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Triple A",
+    title: "TripleA",
     description: "Everyone wins in this agent-to-earn story.",
     images: [
       "https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Triple A",
+    title: "TripleA",
     description: "Everyone wins in this agent-to-earn story.",
     images:
       "https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut",
@@ -44,7 +44,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <Animation>
-            <div className="relative w-full h-fit flex flex-col items-start justify-start">
+            <div className="relative w-full h-full flex flex-col items-start justify-start overflow-x-hidden">
               <Header />
               {children}
             </div>

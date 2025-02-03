@@ -8,6 +8,11 @@
 }
 
 @font-face {
+  font-family: "Dos";
+  src: url("/fonts/Dos.ttf");
+}
+
+@font-face {
   font-family: "Jackey";
   src: url("/fonts/Jackey.otf");
 }

@@ -2,6 +2,8 @@
 import { motion } from "framer-motion";
 import { useContext, useEffect } from "react";
 import { AnimationContext } from "./providers";
+import Image from "next/legacy/image";
+import { INFURA_GATEWAY } from "@/lib/constants";
 
 export default function Animation({ children }: { children: React.ReactNode }) {
   const context = useContext(AnimationContext);
@@ -10,28 +12,55 @@ export default function Animation({ children }: { children: React.ReactNode }) {
     if (context?.pageChange) {
       const timer = setTimeout(() => {
         context?.setPageChange(false);
-      }, 2000);
+      }, 6000);
 
       return () => clearTimeout(timer);
     }
   }, [context?.pageChange]);
 
   return (
-    <motion.div
-      style={{ height: "100%", width: "100%" }}
-      initial={{ opacity: 1, scale: 1 }}
-      animate={{
-        opacity: context?.pageChange ? 0 : 1,
-        scale: context?.pageChange ? 0.8 : 1,
-        rotate: context?.pageChange ? 10 : 0, 
-        backgroundColor: context?.pageChange ? "#73B6DF" : undefined,
-      }}
-      transition={{
-        duration: 0.7, 
-        ease: [0.6, -0.05, 0.01, 0.99], 
-      }}
-    >
-      {children}
-    </motion.div>
+    <>
+      {context?.pageChange ? (
+        <>
+          <motion.div
+            initial={{ x: "-99%" }}
+            animate={{ x: 0 }}
+            transition={{
+              duration: 2,
+              ease: "easeInOut",
+              repeat: 1,
+              repeatType: "reverse",
+            }}
+            className="absolute top-0 left-0 w-1/2 h-full z-100"
+          >
+            <Image
+              src={`${INFURA_GATEWAY}/ipfs/Qma4hocWVFBDDJtHCDEAqBVMiNgsE8Pk5ocyWg6snj4ZPS`}
+              layout="fill"
+              draggable={false}
+            />
+          </motion.div>
+          {children}
+          <motion.div
+            initial={{ x: "99%" }}
+            animate={{ x: 0}}
+            transition={{
+              duration: 2,
+              ease: "easeInOut",
+              repeat: 1,
+              repeatType: "reverse",
+            }}
+            className="absolute top-0 right-0 w-1/2 h-full z-100"
+          >
+            <Image
+              src={`${INFURA_GATEWAY}/ipfs/QmWWkuW45Rj9mmAp6i9bSoTToxKMSpu5U7RkYF5chANCxj`}
+              layout="fill"
+              draggable={false}
+            />
+          </motion.div>
+        </>
+      ) : (
+        children
+      )}
+    </>
   );
 }

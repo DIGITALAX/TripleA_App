@@ -4,8 +4,9 @@ import { getCollections } from "../../../../graphql/queries/getGallery";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { evmAddress, PublicClient } from "@lens-protocol/client";
 import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
+import { FetchResult } from "@apollo/client";
 
-const useGallery = (lensClient: PublicClient) => {
+const useGallery = (lensClient: PublicClient, choice: string) => {
   const [nfts, setNfts] = useState<NFTData[]>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -14,7 +15,15 @@ const useGallery = (lensClient: PublicClient) => {
   const handleGallery = async (): Promise<void> => {
     setGalleryLoading(true);
     try {
-      const data = await getCollections(page);
+      let data: FetchResult | void;
+      if (choice?.includes("All")) {
+        data = await getCollections(page);
+      } else {
+        data = await getCollections(
+          page,
+          choice?.includes("Agent") ? true : false
+        );
+      }
 
       const gallery: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds.map(async (collection: any) => {
@@ -34,7 +43,9 @@ const useGallery = (lensClient: PublicClient) => {
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split("lens://")?.[1]
+              (result as any)?.[0]?.account?.metadata?.picture?.split(
+                "lens://"
+              )?.[1]
             }`
           );
 
@@ -76,17 +87,25 @@ const useGallery = (lensClient: PublicClient) => {
     setGalleryLoading(false);
   };
 
-
   useEffect(() => {
-    if (nfts?.length < 1 && lensClient) {
+    if (lensClient) {
       handleGallery();
     }
-  }, [lensClient]);
+  }, [lensClient, choice]);
 
   const handleMoreGallery = async () => {
     setGalleryLoading(true);
     try {
-      const data = await getCollections(page);
+      let data: FetchResult | void;
+
+      if (choice?.includes("All")) {
+        data = await getCollections(page);
+      } else {
+        data = await getCollections(
+          page,
+          choice?.includes("Agent") ? true : false
+        );
+      }
 
       const gallery: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds.map(async (collection: any) => {
@@ -107,7 +126,9 @@ const useGallery = (lensClient: PublicClient) => {
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split("lens://")?.[1]
+              (result as any)?.[0]?.account?.metadata?.picture?.split(
+                "lens://"
+              )?.[1]
             }`
           );
 

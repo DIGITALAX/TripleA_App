@@ -24,7 +24,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
 
   return (
     <div
-      className={`relative w-full flex flex-col items-start justify-start gap-3 h-fit ${
+      className={`relative w-full text-windows font-nerd flex flex-col items-start justify-start gap-3 h-fit ${
         post ? "h-full" : "h-fit"
       }`}
     >
@@ -32,7 +32,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
         return (
           <div
             key={key}
-            className={`"relative w-full gap-3 flex-col flex flex shadow-md item-start p-2 ${
+            className={`"relative w-full gap-3 flex-col flex flex shadow-lg item-start p-2 ${
               post ? "h-full justify-between" : "h-fit justify-start"
             }`}
           >
@@ -44,7 +44,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
               }`}
             >
               {(activity?.commentOn?.id || activity?.quoteOf?.id) && (
-                <div className="relative font-jackey2 w-fit h-fit flex">
+                <div className="relative w-fit h-fit flex">
                   {(activity?.commentOn?.id
                     ? `Comment On ${(
                         activity?.commentOn?.metadata as any
@@ -76,7 +76,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
               </div>
             </div>
 
-            <div className="relative w-full h-fit px-1.5 py-1 flex items-start justify-between flex-row gap-2 font-jackey2 sm:flex-nowrap flex-wrap">
+            <div className="relative w-full h-fit px-1.5 py-1 flex items-start justify-between flex-row gap-2 sm:flex-nowrap flex-wrap">
               <div
                 className="relative w-fit h-fit flex flex-row gap-1  items-center justify-center cursor-canP"
                 onClick={() => {
@@ -97,7 +97,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
                 }}
               >
                 <div className="relative w-fit h-fit flex items-center justify-center">
-                  <div className="w-6 h-6 flex relative flex items-center justify-center rounded-full border border-morado bg-morado">
+                  <div className="w-6 h-6 flex relative flex items-center justify-center rounded-full border border-windows bg-viol">
                     <Image
                       layout="fill"
                       objectFit="cover"
@@ -111,11 +111,11 @@ const Comments: FunctionComponent<CommentsProps> = ({
                     />
                   </div>
                 </div>
-                <div className="relative w-fit h-fit flex items-center justify-center text-black text-xs">
+                <div className="relative w-fit h-fit flex items-center justify-center text-xs">
                   {activity?.author?.username?.localName}
                 </div>
               </div>
-              <div className="relative w-fit h-fit flex text-xs text-black">
+              <div className="relative w-fit h-fit flex text-xs">
                 {moment(`${activity?.timestamp}`).fromNow()}
               </div>
             </div>
@@ -125,7 +125,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
               setImageView={setImageView}
               post={post}
             />
-            <div className="relative w-full h-fit p-1 pixel-border-3 font-jackey2 justify-between flex flex-row gap-3 items-center sm:flex-nowrap flex-wrap">
+            <div className="relative w-full h-fit p-1 bg-windows rounded-md justify-between flex flex-row gap-3 items-center sm:flex-nowrap flex-wrap text-viol">
               {[
                 {
                   name: "Like",
@@ -314,7 +314,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
                         item?.svgEmpty
                       )}
                     </div>
-                    <div className="text-xs relative w-fit h-fit flex items-center justify-center text-black cursor-canP">
+                    <div className="text-xs relative w-fit h-fit flex items-center justify-center cursor-canP">
                       {item?.stats || 0}
                     </div>
                   </div>

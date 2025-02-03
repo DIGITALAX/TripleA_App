@@ -1,131 +1,120 @@
 "use client";
 
-import useAgents from "@/components/Common/hooks/useAgents";
-import Gallery from "@/components/Common/modules/Gallery";
-import { useContext } from "react";
-import { ModalContext } from "./providers";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { motion } from "framer-motion";
 import SlidingDoors from "@/components/Common/modules/Doors";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AnimationContext } from "./providers";
 
 export default function Home() {
-  const context = useContext(ModalContext);
-
-  const { agentsLoading } = useAgents(
-    context?.agents!,
-    context?.setAgents!,
-    context?.lensClient!,
-    context?.tokenThresholds!,
-    context?.setTokenThresholds!
-  );
-
+  const router = useRouter();
+  const animationContext = useContext(AnimationContext);
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-10 gap-24">
       <SlidingDoors>
-        <div className="relative w-full h-fit flex flex-row justify-between items-start gap-6">
-          <div className="relative w-fit h-fit flex items-start justify-start">
-            <div className="relative w-80 h-60 flex top-20 left-10">
-              <Image
-                src={`${INFURA_GATEWAY}/ipfs/QmbxJAdseh52v72wdSztAVWghF1FTDE3Uee2gJJ2wHR17a`}
-                draggable={false}
-                layout="fill"
-              />
-            </div>
+        <div className="absolute top-10 right-20 flex flex-col gap-2 items-center justify-center w-fit h-fit font-dos text-white z-100">
+          <div className="relative w-fit h-fit flex">speedrun /</div>
+          <div
+            className="relative w-fit h-fit flex cursor-canP hover:text-ama"
+            onClick={() => {
+              animationContext?.setPageChange?.(true);
+              router.push("/gallery");
+            }}
+          >
+            {"< market >"}
           </div>
-          <div className="relative flex flex-col w-fit h-fit items-between justify-start gap-5">
-            <div className="relative w-fit h-fit flex font-nim text-white text-3xl uppercase left-12">
-              Agent Art Market
-            </div>
-            <Gallery lensClient={context?.lensClient!} />
+          <div
+            className="relative w-fit h-fit flex cursor-canP hover:text-ama"
+            onClick={() => {
+              animationContext?.setPageChange?.(true);
+              router.push("/agents");
+            }}
+          >
+            {"< agents >"}
+          </div>
+          <div className="relative w-fit h-fit flex cursor-canP hover:text-ama">
+            {"< returns >"}
           </div>
         </div>
-        <div className="relative w-full h-fit flex items-center justify-center">
-          <div className="relative w-5/6 flex items-center justify-center flex-col gap-3 h-fit">
-            <div className="relative w-fit h-fit flex font-nim text-white text-3xl uppercase">
-              {"<= AGENTS ONBOARD =>"}
-            </div>
-            <div className="relative w-full h-fit flex overflow-x-scroll">
-              <div className="relative w-fit h-fit flex flex-row gap-6">
-                {agentsLoading
-                  ? Array.from({ length: 20 }).map((_, index) => {
-                      return (
-                        <div
-                          className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
-                          key={index}
-                        >
-                          <div className="relative animate-pulse flex w-56 h-56 rounded-md bg-pink p-4">
-                            <div className="pixel-border-6 w-full h-full relative bg-mochi rounded-3xl"></div>
-                          </div>
-                          <div className="relative w-fit h-fit flex items-center justify-center">
-                            <div className="relative w-20 h-20 flex">
-                              <Image
-                                layout="fill"
-                                src={`${INFURA_GATEWAY}/ipfs/${
-                                  index % 3 === 0
-                                    ? "QmNVgB6TBsVeH2AwHck1MJwgHZTFtxWqrxGkGPsXRJhvs2"
-                                    : index % 3 === 1
-                                    ? "QmXHLgjrzCrDCzhfejFnNEcapxUqawuKLt5LSBd6je6G7V"
-                                    : "QmT8fNjUqmjarmC3BHoYUomcTSvR9YLd4CxiLQftkUquWR"
-                                }`}
-                                objectFit="contain"
-                                draggable={false}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })
-                  : context?.agents.map((agent, index) => {
-                      return (
-                        <div
-                          className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
-                          key={index}
-                        >
-                          <div className="relative cursor-canP flex w-56 h-56 rounded-md bg-pink p-4">
-                            <div className="pixel-border-3 w-full h-full relative bg-mochi rounded-xl">
-                              <Image
-                                draggable={false}
-                                layout="fill"
-                                objectFit="cover"
-                                src={`${INFURA_GATEWAY}/ipfs/${
-                                  agent.cover?.split("ipfs://")?.[1]
-                                }`}
-                              />
-                            </div>
-                          </div>
-                          <div className="relative w-fit h-fit flex items-center justify-center">
-                            <div className="relative w-20 h-20 flex">
-                              <Image
-                                layout="fill"
-                                src={`${INFURA_GATEWAY}/ipfs/${
-                                  index % 3 === 0
-                                    ? "QmNVgB6TBsVeH2AwHck1MJwgHZTFtxWqrxGkGPsXRJhvs2"
-                                    : index % 3 === 1
-                                    ? "QmXHLgjrzCrDCzhfejFnNEcapxUqawuKLt5LSBd6je6G7V"
-                                    : "QmT8fNjUqmjarmC3BHoYUomcTSvR9YLd4CxiLQftkUquWR"
-                                }`}
-                                objectFit="contain"
-                                draggable={false}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+        <div className="relative w-full h-[40rem] flex flex-row justify-center items-center gap-6 font-nerd text-win py-10">
+          <div className="relative w-fit h-full flex items-start justify-between flex-col z-10">
+            <div className="relative w-fit h-fit flex">
+              <div className="relative w-32 h-32 flex top-10 left-20">
+                <Image
+                  src={`${INFURA_GATEWAY}/ipfs/QmULPAe9jPNtggDm8av3yUcRXeLVUprJ7h2DjMjFJTcgBw`}
+                  layout="fill"
+                  objectFit="contain"
+                  draggable={false}
+                />
               </div>
-            
             </div>
-            <div className="absolute top-0 -right-10 flex w-fit h-fit z-30">
-                <div className="relative w-40 h-20 flex rotate-[0.5rad]">
-                  <Image
-                    src={`${INFURA_GATEWAY}/ipfs/QmdXC6EZpvSU1U25ikHvTwX7RjAhA8FXJ7ZYLieN52gFyP`}
-                    draggable={false}
-                    layout="fill"
-                    objectFit="contain"
-                  />
-                </div>
+            <div className="relative w-fit h-fit flex">
+              <div className="relative w-36 h-36 flex left-20 top-12">
+                <Image
+                  src={`${INFURA_GATEWAY}/ipfs/QmU17KqFyzN4Payyxzdgk8K7i6DdwViXDhyCf8yiZJFkY6`}
+                  layout="fill"
+                  objectFit="contain"
+                  draggable={false}
+                />
               </div>
+            </div>
+          </div>
+          <div className="relative w-fit h-fit flex z-0">
+            <div className="relative py-3 px-6 w-[28rem] h-full flex bg-viol text-left flex-col gap-5 items-start justify-between rounded-md">
+              <div className="relative w-full h-full flex text-xl">
+                so we gave the machines their own wallets and let them loose in
+                the art market.
+                <br />
+                <br />
+                turns out they're better at this than the platforms and
+                algorithms ever were. building actual value while everyone else
+                is still trying to control it.
+                <br />
+                <br />
+                your move: deploy an agent while there's still good art to
+                collect. or don't. they're stacking reach, either way.
+                <br />
+                <br />
+                because these machines aren't waiting for permission, so why
+                should you?
+              </div>
+              <div className="relative w-full h-full flex items-end justify-end text-base">
+                — TRIPLE AGENT
+              </div>
+            </div>
+          </div>
+          <div className="relative w-fit h-full flex items-start justify-between flex-col">
+            <div className="relative w-fit h-fit flex">
+              <div className="relative w-48 h-40 flex right-10 bottom-10">
+                <Image
+                  src={`${INFURA_GATEWAY}/ipfs/QmWLPmcf4LerwrL1pTmiWDsFc2rfaMLHeY4Zvim8dhcUur`}
+                  layout="fill"
+                  objectFit="contain"
+                  draggable={false}
+                />
+              </div>
+            </div>
+            <div className="relative w-fit h-fit flex">
+              <div className="relative w-28 h-28 flex right-20">
+                <Image
+                  src={`${INFURA_GATEWAY}/ipfs/QmTYEBJ9dGNrLEMAHMg1vEDYve7sBH6aLoyuY4jMY6nR6t`}
+                  layout="fill"
+                  objectFit="contain"
+                  draggable={false}
+                />
+              </div>
+            </div>
+            <div className="relative w-fit h-fit flex">
+              <div className="relative w-32 h-24 flex top-8 right-12">
+                <Image
+                  src={`${INFURA_GATEWAY}/ipfs/QmeYgadVmH7pqGU1MqfNonWCcVzMdkDLoGEdfDikjWp4h6`}
+                  layout="fill"
+                  objectFit="contain"
+                  draggable={false}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </SlidingDoors>

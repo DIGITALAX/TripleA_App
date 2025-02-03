@@ -8,12 +8,14 @@ import { useRouter } from "next/navigation";
 import { AnimationContext } from "@/app/providers";
 import { PublicClient } from "@lens-protocol/client";
 
-const Gallery: FunctionComponent<{ lensClient: PublicClient }> = ({
-  lensClient,
-}): JSX.Element => {
+const Gallery: FunctionComponent<{
+  lensClient: PublicClient;
+  choice: string;
+}> = ({ lensClient, choice }): JSX.Element => {
   const animationContext = useContext(AnimationContext);
   const { handleMoreGallery, nfts, hasMore, galleryLoading } = useGallery(
-    lensClient!
+    lensClient!,
+    choice
   );
   const router = useRouter();
   return (
