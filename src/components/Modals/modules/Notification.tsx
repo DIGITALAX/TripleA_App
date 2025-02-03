@@ -7,7 +7,7 @@ const Notification: FunctionComponent<NotificationProps> = ({
 }): JSX.Element => {
   return (
     <div
-      className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-pixel items-center justify-center"
+      className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-canP items-center justify-center"
       onClick={() => setNotification(undefined)}
     >
       <div

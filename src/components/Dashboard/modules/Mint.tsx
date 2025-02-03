@@ -91,7 +91,7 @@ const Mint: FunctionComponent<MintProps> = ({
       <div className="relative w-full h-fit flex items-center justify-center">
         <div
           className={`relative w-1/2 h-14 font-jackey pixel-border-2 text-black flex items-center justify-center ${
-            !mintLoading ? "cursor-pixel" : "opacity-70"
+            !mintLoading ? "cursor-canP" : "opacity-70"
           }`}
           onClick={() => !mintLoading && handleMint()}
         >

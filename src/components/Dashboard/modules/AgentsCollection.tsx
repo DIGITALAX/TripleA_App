@@ -47,7 +47,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
       <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
-            className="relative flex w-fit h-fit cursor-pixel hover:opacity-70"
+            className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
             onClick={() => {
               setDropSwitcher(DropSwitcher.Drops);
               setDrop(undefined);
@@ -81,7 +81,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                   : collection?.title}
               </div>
               <div
-                className="relative w-fit h-full flex cursor-pixel"
+                className="relative w-fit h-full flex cursor-canP"
                 onClick={() => {
                   animationContext?.setPageChange?.(true);
                   router.push(
@@ -124,7 +124,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
               <div className="relative w-full h-fit flex">
                 <div
                   className={`relative w-full h-8 pixel-border-3 text-black flex items-center justify-center text-xxs font-start ${
-                    !priceAdjustLoading ? "cursor-pixel" : "opacity-70"
+                    !priceAdjustLoading ? "cursor-canP" : "opacity-70"
                   }`}
                   onClick={() => !priceAdjustLoading && handlePriceAdjust()}
                 >
@@ -148,7 +148,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
               <div className="relative w-full h-fit flex">
                 <div
                   className={`relative w-full h-8 pixel-border-3 text-black flex items-center justify-center text-xxs font-start ${
-                    !statusLoading ? "cursor-pixel" : "opacity-70"
+                    !statusLoading ? "cursor-canP" : "opacity-70"
                   }`}
                   onClick={() => !statusLoading && handleCollectionStatus()}
                 >
@@ -283,7 +283,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                   <div className="relative w-full h-fit flex">
                     <div
                       className={`relative w-full h-8 pixel-border-3 text-black flex items-center justify-center text-xxs font-start ${
-                        !editAgentsLoading ? "cursor-pixel" : "opacity-70"
+                        !editAgentsLoading ? "cursor-canP" : "opacity-70"
                       }`}
                       onClick={() => !editAgentsLoading && handleEditAgents()}
                     >

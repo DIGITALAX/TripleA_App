@@ -107,7 +107,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
             </div>
             <div className="relative w-full h-fit flex flex-row justify-between items-center">
               <div
-                className="relative w-fit h-fit flex items-center justiy-center cursor-pixel"
+                className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
                 onClick={() =>
                   setScreen(
                     screen > 0
@@ -145,7 +145,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   : "Collectors"}
               </div>
               <div
-                className="relative w-fit h-fit flex items-center justiy-center cursor-pixel"
+                className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
                 onClick={() =>
                   setScreen(
                     screen < (Number(nft?.agents?.length || 0) > 0 ? 3 : 1)
@@ -181,7 +181,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 <div className="relative w-fit h-fit flex items-center justify-start gap-2 flex-row">
                   {nft?.profile?.metadata?.picture && (
                     <div
-                      className="relative flex rounded-full w-8 h-8 bg-morado border border-morado cursor-pixel"
+                      className="relative flex rounded-full w-8 h-8 bg-morado border border-morado cursor-canP"
                       onClick={(e) => {
                         e.stopPropagation();
                         animationContext?.setPageChange?.(true);
@@ -295,7 +295,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               <div className="relative w-full h-fit flex">
                 <div
                   className={`relative w-full h-14 pixel-border-2 text-black flex items-center justify-center font-start ${
-                    !purchaseLoading ? "cursor-pixel" : "opacity-70"
+                    !purchaseLoading ? "cursor-canP" : "opacity-70"
                   }`}
                   onClick={() => {
                     if (!purchaseLoading) {
@@ -346,7 +346,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                     return (
                       <div
                         key={key}
-                        className="relative w-full h-fit flex cursor-pixel justify-between items-center flex-wrap sm:flex-nowrap flex-row gap-2"
+                        className="relative w-full h-fit flex cursor-canP justify-between items-center flex-wrap sm:flex-nowrap flex-row gap-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           window.open(
@@ -356,7 +356,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       >
                         {collector?.name ? (
                           <div
-                            className="relative w-fit h-fit flex flex-row gap-1 items-center justify-center cursor-pixel"
+                            className="relative w-fit h-fit flex flex-row gap-1 items-center justify-center cursor-canP"
                             onClick={(e) => {
                               e.stopPropagation();
                               animationContext?.setPageChange?.(true);
@@ -466,7 +466,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                         <div className="relative w-full h-px flex bg-black"></div>
                         <div className="relative w-full h-fit flex flex-row gap-2 justify-between items-center md:flex-nowrap flex-wrap">
                           <div
-                            className="relative w-fit h-fit flex cursor-pixel"
+                            className="relative w-fit h-fit flex cursor-canP"
                             onClick={(e) => {
                               e.stopPropagation();
                               animationContext?.setPageChange?.(true);
@@ -517,7 +517,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             <div
                               className={`relative w-24 h-8 pixel-border-2 text-black flex items-center justify-center text-xxs font-start ${
                                 !rechargeLoading[key]
-                                  ? "cursor-pixel"
+                                  ? "cursor-canP"
                                   : "opacity-70"
                               }`}
                               onClick={() => {

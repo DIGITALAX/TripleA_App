@@ -13,7 +13,7 @@ const Signless: FunctionComponent<SignlessProps> = ({
   );
   return (
     <div
-      className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-pixel items-center justify-center"
+      className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-canP items-center justify-center"
       onClick={() => setSignless(false)}
     >
       <div
@@ -25,7 +25,7 @@ const Signless: FunctionComponent<SignlessProps> = ({
         </div>
         <div
           className={`"relative px-3 py-1 flex items-center justify-center pixel-border-3 text-black font-start w-28 h-8 rounded-md ${
-            !signlessLoading && "cursor-pixel active:scale-95"
+            !signlessLoading && "cursor-canP active:scale-95"
           }`}
           onClick={() => !signlessLoading && handleSignless()}
         >

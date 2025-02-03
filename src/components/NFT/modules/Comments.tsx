@@ -55,7 +55,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
                 </div>
               )}
               <div
-                className="flex items-center justify-center relative w-fit h-fit cursor-pixel hover:opacity-70"
+                className="flex items-center justify-center relative w-fit h-fit cursor-canP hover:opacity-70"
                 onClick={() => {
                   animationContext?.setPageChange?.(true);
                   router.push(`/post/${activity?.id}`);
@@ -78,7 +78,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
 
             <div className="relative w-full h-fit px-1.5 py-1 flex items-start justify-between flex-row gap-2 font-jackey2 sm:flex-nowrap flex-wrap">
               <div
-                className="relative w-fit h-fit flex flex-row gap-1  items-center justify-center cursor-pixel"
+                className="relative w-fit h-fit flex flex-row gap-1  items-center justify-center cursor-canP"
                 onClick={() => {
                   animationContext?.setPageChange?.(true);
                   router.push(
@@ -292,7 +292,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
                   >
                     <div
                       className={`relative w-fit h-fit flex ${
-                        item?.loader ? "animate-spin" : "cursor-pixel"
+                        item?.loader ? "animate-spin" : "cursor-canP"
                       }`}
                       onClick={() => !item?.loader && item.function()}
                     >
@@ -314,7 +314,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
                         item?.svgEmpty
                       )}
                     </div>
-                    <div className="text-xs relative w-fit h-fit flex items-center justify-center text-black cursor-pixel">
+                    <div className="text-xs relative w-fit h-fit flex items-center justify-center text-black cursor-canP">
                       {item?.stats || 0}
                     </div>
                   </div>

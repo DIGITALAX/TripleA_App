@@ -72,7 +72,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
           <div className="relative w-full h-full p-3 pixel-border-2 flex flex-col items-center justify-between gap-6">
             <div className="relative w-full h-fit flex items-start justify-start">
               <div
-                className="relative flex w-fit h-fit cursor-pixel hover:opacity-70"
+                className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
                 onClick={() => setSwitcher(Switcher.Home)}
               >
                 <svg
@@ -103,7 +103,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               <div
                 className={`relative flex w-fit h-fit  ${
                   mintSwitcher > 0
-                    ? "cursor-pixel hover:opacity-70"
+                    ? "cursor-canP hover:opacity-70"
                     : "opacity-70"
                 }`}
                 onClick={() =>
@@ -132,7 +132,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               <div
                 className={`relative flex w-fit h-fit  ${
                   mintSwitcher < 3
-                    ? "cursor-pixel hover:opacity-70"
+                    ? "cursor-canP hover:opacity-70"
                     : "opacity-70"
                 }`}
                 onClick={() =>
@@ -311,7 +311,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               ) => {
                 return (
                   <div
-                    className="relative w-14 h-14 flex pixel-border-4 rounded-xl items-center justify-center hover:opacity-70 cursor-pixel"
+                    className="relative w-14 h-14 flex pixel-border-4 rounded-xl items-center justify-center hover:opacity-70 cursor-canP"
                     style={{
                       backgroundColor: item.color,
                     }}

@@ -23,7 +23,7 @@ const Collects: FunctionComponent<CollectsProps> = ({
       <div className="relative w-full h-full pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
-            className="relative flex w-fit h-fit cursor-pixel hover:opacity-70"
+            className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
             onClick={() => setSwitcher(Switcher.Home)}
           >
             <svg
@@ -67,7 +67,7 @@ const Collects: FunctionComponent<CollectsProps> = ({
                     className={`relative w-60 h-96 md:h-full bg-morado rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2`}
                   >
                     <div
-                      className="relative w-full h-80 md:h-full rounded-2xl flex cursor-pixel pixel-border-2"
+                      className="relative w-full h-80 md:h-full rounded-2xl flex cursor-canP pixel-border-2"
                       onClick={() => {
                         animationContext?.setPageChange?.(true);
                         router.push(
@@ -95,7 +95,7 @@ const Collects: FunctionComponent<CollectsProps> = ({
                         {collect?.collection?.title}
                       </div>
                       <div
-                        className="relative w-full h-fit flex cursor-pixel justify-between items-center flex-row gap-2 font-jack text-sm"
+                        className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2 font-jack text-sm"
                         onClick={() =>
                           window.open(
                             `https://block-explorer.testnet.lens.dev/tx/${collect?.transactionHash}`

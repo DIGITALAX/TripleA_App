@@ -82,7 +82,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
           </div>
           <div className="relative w-full h-fit flex items-center justify-center">
             <div
-              className={`relative w-fit px-6 py-1 h-12 bg-black text-white cursor-pixel hover:opacity-70 text-base rounded-md flex items-center justify-center font-jack`}
+              className={`relative w-fit px-6 py-1 h-12 bg-black text-white cursor-canP hover:opacity-70 text-base rounded-md flex items-center justify-center font-jack`}
               onClick={() => {
                 animationContext?.setPageChange?.(true);
                 router.push(
@@ -100,7 +100,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
       return (
         <div className="relative font-jackey2 w-full h-full flex flex-col sm:flex-row gap-6 items-center justify-center">
           <label
-            className="relative w-full h-60 sm:h-full flex items-center justify-center cursor-pixel"
+            className="relative w-full h-60 sm:h-full flex items-center justify-center cursor-canP"
             onClick={(e) => {
               e.stopPropagation();
             }}

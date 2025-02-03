@@ -28,7 +28,7 @@ const Post: FunctionComponent<PostProps> = ({
           <div className="relative w-full flex h-12 flex-row gap-2 justify-between items-center">
             {commentQuote && !commentQuote?.post && (
               <div
-                className="cursor-pixel w-10 h-full bg-black rounded-md text-white text-center flex items-center justify-center"
+                className="cursor-canP w-10 h-full bg-black rounded-md text-white text-center flex items-center justify-center"
                 onClick={() => setCommentQuote(undefined)}
               >
                 <svg
@@ -48,7 +48,7 @@ const Post: FunctionComponent<PostProps> = ({
             <div
               className={`relative w-full h-full pixel-border-2 text-black font-start text-center flex items-center justify-center ${
                 !success && !postLoading && post?.trim() !== ""
-                  ? "cursor-pixel"
+                  ? "cursor-canP"
                   : "opacity-70"
               }`}
               onClick={() =>

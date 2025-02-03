@@ -57,7 +57,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
           </div>
           <div className="relative w-full h-fit flex items-center justify-center">
             <div
-              className={`relative w-fit px-6 py-1 h-12 bg-black text-white cursor-pixel hover:opacity-70 text-base rounded-md flex items-center justify-center font-jack`}
+              className={`relative w-fit px-6 py-1 h-12 bg-black text-white cursor-canP hover:opacity-70 text-base rounded-md flex items-center justify-center font-jack`}
               onClick={() => {
                 animationContext?.setPageChange?.(true);
                 router.push(`/agent/${id}`);
@@ -100,7 +100,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
           <div className="relative w-full h-fit flex items-center justify-center">
             <div
               className={`relative w-full sm:w-1/2 h-14 font-jackey pixel-border-2 text-black flex items-center justify-center md:text-base text-sm text-center ${
-                !createAgentLoading ? "cursor-pixel" : "opacity-70"
+                !createAgentLoading ? "cursor-canP" : "opacity-70"
               }`}
               onClick={() => !createAgentLoading && handleCreateAgent()}
             >
@@ -133,7 +133,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
           <div className="relative w-full h-fit flex flex-col gap-3 items-center justify-center">
             <div className="relative items-center justify-center flex w-fit h-fit">
               <label
-                className="relative w-20 rounded-full h-20 flex items-center justify-center border border-black cursor-pixel bg-white"
+                className="relative w-20 rounded-full h-20 flex items-center justify-center border border-black cursor-canP bg-white"
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
@@ -230,7 +230,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
           <div
             className={`relative px-3 py-1 flex items-center justify-center pixel-border-3 text-black w-28 h-8 ${
               !(createAgentLoading || lensLoading) &&
-              "cursor-pixel active:scale-95"
+              "cursor-canP active:scale-95"
             }`}
             onClick={() =>
               !(createAgentLoading || lensLoading) && handleCreateAccount()
@@ -259,7 +259,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
       return (
         <div className="relative font-jackey2 w-full h-full flex flex-col sm:flex-row gap-6 items-center justify-center">
           <label
-            className="relative w-full h-60 sm:h-full flex items-center justify-center cursor-pixel"
+            className="relative w-full h-60 sm:h-full flex items-center justify-center cursor-canP"
             onClick={(e) => {
               e.stopPropagation();
             }}

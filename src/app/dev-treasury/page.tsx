@@ -1,14 +1,12 @@
 "use client";
 
-import Slider from "@/components/Common/modules/Slider";
 import useDevTreasury from "@/components/Dev/hooks/useDevTreasury";
 import { TOKENS } from "@/lib/constants";
 
 export default function DevTreasury() {
   const { treasuryLoading, treasury } = useDevTreasury();
   return (
-    <>
-      <Slider />
+
       <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
         <div className="relative w-full h-full p-3 pixel-border-2 flex flex-col items-center justify-between gap-6">
           <div className="text-black font-start text-sm relative flex w-fit h-fit text-center text-black">
@@ -44,6 +42,6 @@ export default function DevTreasury() {
           </div>
         </div>
       </div>
-    </>
+
   );
 }

@@ -3,13 +3,77 @@
 import { FOOTER_TEXT, INFURA_GATEWAY } from "@/lib/constants";
 import Image from "next/legacy/image";
 import { FunctionComponent, JSX, useState } from "react";
+import { BsDiscord, BsTwitter, BsGithub } from "react-icons/bs";
+import MarqueeText from "react-fast-marquee";
 
 const Footer: FunctionComponent = (): JSX.Element => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [openDetails, setOpenDetails] = useState<boolean>(false);
   return (
-    <div className="relative w-full h-fit flex border-4 border-morado border">
-      <div className="relative w-full h-fit bg-gradient-to-r from-[#EA5EFF] to-[#9568F6] border-2 border-black flex flex-col items-center justify-between gap-8">
-        <div className="relative w-full h-fit flex flex-row justify-between items-center gap-6 pt-6 px-2 sm:px-6 flex-wrap lg:flex-nowrap">
+    <div className="relative w-full h-fit bg-gradient-to-r from-[#EA5EFF] to-[#9568F6] border-2 border-black flex flex-col items-center justify-between">
+      <div className="relative w-full h-10 flex flex-row text-base uppercase gap-3 items-center justify-center font-nerd bg-black">
+        <div className="relative flex text-[#00FFEE] flex flex-row w-fit h-full items-center justify-center gap-2">
+          <div className="relative w-fit h-fit flex">
+            <div className="relative w-7 h-7 flex">
+              <Image
+                src={`${INFURA_GATEWAY}/ipfs/Qma5pNQqqy1Z17FwvhvWbFnCxfHk3Bj9gJuift9thVNsWW`}
+                draggable={false}
+                layout="fill"
+              />
+            </div>
+          </div>
+          <div className="relative w-fit h-fit flex whitespace-nowrap">NEW AGENT ACTIONS:</div>
+        </div>
+        <div className="relative w-full h-full bg-white flex">
+          <MarqueeText
+            gradient={false}
+            speed={100}
+            direction={"left"}
+            pauseOnHover
+            className="z-0"
+          >
+            <div className="relative w-full h-fit text-black font-arcadia uppercase">
+              {
+                " // we gave them wallets (whoops) // vitalik was here // i ❤️ web3 // elf needs food badly // continue? insert coin. 10... 9... 8... // deploy agent -> touch grass -> profit // hello, my name is... // digitalax // no tiktok, streaming star // agent meme // reverse engineering AGI before it's too late // probably nothing // AI speedrun: art history // /imagine prompt: getting out-traded by a daemon // too busy trading agents to write this // sorry about your reach error // i want my mta  // do not lean on door // skill issue: collecting with agents in 2025 // rekt by algorithms you can't collect // wizard is about to die // cope + seethe + deploy agent // autonomous grindset // 🌻 Слава Укра<>ні"
+              }
+            </div>
+          </MarqueeText>
+        </div>
+      </div>
+      <div className="relative w-full h-[33rem] flex">
+        <video
+          muted
+          autoPlay
+          loop
+          className="flex object-cover w-full h-full"
+          draggable={false}
+        >
+          <source
+            src={`${INFURA_GATEWAY}/ipfs/Qmcy2HA8ugTTjnsfNieGhAMmLrJvi5MMLSU7iCmTLTJbbA`}
+          />
+        </video>
+        <div
+          className={`absolute bottom-3 right-3 w-fit h-fit flex cursor-canP  ${
+            openDetails && "rotate-180"
+          }`}
+          onClick={() => setOpenDetails(!openDetails)}
+        >
+          <div
+            className={`relative flex ${
+              openDetails ? "w-12 h-12" : "w-20 h-20"
+            }`}
+          >
+            <Image
+              draggable={false}
+              src={`${INFURA_GATEWAY}/ipfs/QmbPHZuqofaVWRM4KCMRaqhVrQJvCiUKnrdWZ6jhWmPstZ`}
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+        </div>
+      </div>
+      {openDetails && (
+        <div className="relative w-full h-fit flex flex-row justify-between items-center gap-6 pb-6 pt-6 px-2 sm:px-6 flex-wrap lg:flex-nowrap">
           <div className="relative w-full h-fit flex justify-between items-center gap-6 lg:flex-row flex-col">
             <div className="relative w-full sm:w-fit h-fit flex items-center justify-center">
               <div className="relative w-full sm:w-72 h-80 flex">
@@ -23,10 +87,10 @@ const Footer: FunctionComponent = (): JSX.Element => {
             </div>
             <div className="relative w-full sm:w-fit h-full flex items-center md:items-start justify-center md:justify-start flex-row gap-4 xl:flex-nowrap flex-wrap">
               <div className="relative w-full sm:w-fit h-fit flex">
-              <div className="w-full sm:w-60 h-60 xl:w-80 xl:h-80 flex items-center justify-center pixel-border-2 rounded-xl relative p-3">
+                <div className="w-full sm:w-60 h-60 xl:w-80 xl:h-80 flex items-center justify-center pixel-border-2 rounded-xl relative p-3">
                   <div className="rounded-lg pixel-border-4 relative w-full h-full flex p-1 bg-[#73B6DF]">
                     <div
-                    className="relative w-full h-full rounded-md bg-[#0B75FF] border border-black flex overflow-y-scroll break-words p-3 text-base lg:text-lg font-arc text-white whitespace-inline"
+                      className="relative w-full h-full rounded-md bg-[#0B75FF] border border-black flex overflow-y-scroll break-words p-3 text-base lg:text-lg font-arc text-white whitespace-inline"
                       dangerouslySetInnerHTML={{
                         __html: FOOTER_TEXT[currentPage - 1],
                       }}
@@ -35,7 +99,7 @@ const Footer: FunctionComponent = (): JSX.Element => {
                 </div>
               </div>
               <div
-                className="relative w-fit h-fit flex cursor-pixel"
+                className="relative w-fit h-fit flex cursor-canP"
                 onClick={() =>
                   setCurrentPage(
                     currentPage < FOOTER_TEXT.length ? currentPage + 1 : 1
@@ -52,7 +116,7 @@ const Footer: FunctionComponent = (): JSX.Element => {
                 </div>
               </div>
               <div className="relative w-full sm:w-fit h-fit flex">
-              <div className="w-full sm:w-60 h-60 xl:w-80 xl:h-80 flex items-center justify-center pixel-border-2 rounded-xl relative p-3">
+                <div className="w-full sm:w-60 h-60 xl:w-80 xl:h-80 flex items-center justify-center pixel-border-2 rounded-xl relative p-3">
                   <div className="rounded-lg pixel-border-4 relative w-full h-full flex p-1 bg-[#73B6DF]">
                     <div
                       className="relative w-full h-full rounded-md bg-[#0B75FF] border border-black flex overflow-y-scroll break-words p-3 text-base lg:text-lg font-arc text-white whitespace-inline"
@@ -81,11 +145,53 @@ const Footer: FunctionComponent = (): JSX.Element => {
             </div>
           </div>
         </div>
-
-        <div className="relative w-full h-20 bg-[#FFD237] flex items-center justify-center font-start text-xxs text-black">
-          <div className="relative w-fit h-fit flex">
-            {`${currentPage} / ${FOOTER_TEXT.length}`}
-          </div>
+      )}
+      <div className="relative w-full h-20 bg-[#FFD237] flex items-center justify-between font-start text-xxs text-black flex-row px-2 gap-6">
+        <div className="relative w-fit h-fit flex flex-row gap-1">
+          {[
+            {
+              link: "https://github.com/digitalax",
+              title: "Github",
+              component: <BsGithub size={30} color={"black"} />,
+            },
+            {
+              image: "QmR9scKZgM7oYzhdiTGMPjxYU44PqUovzVb6Xef9AYHWJS",
+              link: "https://cypher.digitalax.xyz/autograph/digitalax",
+              title: "Autograph",
+            },
+            {
+              link: "https://twitter.com/digitalax_",
+              title: "Twitter",
+              component: <BsTwitter size={30} color={"black"} />,
+            },
+            {
+              link: "https://discord.gg/wz7Bxg4feG",
+              title: "Discord",
+              component: <BsDiscord size={30} color={"black"} />,
+            },
+          ].map((elemento, indice) => {
+            return (
+              <div
+                key={indice}
+                className="relative w-5 h-5 flex items-center justify-center cursor-canP active:scale-95"
+                onClick={() => window.open(elemento.link)}
+                title={elemento.title}
+              >
+                {elemento?.component ? (
+                  elemento.component
+                ) : (
+                  <Image
+                    src={`${INFURA_GATEWAY}/ipfs/${elemento.image}`}
+                    layout="fill"
+                    draggable={false}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="relative w-fit h-fit flex">
+          {`${currentPage} / ${FOOTER_TEXT.length}`}
         </div>
       </div>
     </div>

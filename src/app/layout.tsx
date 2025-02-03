@@ -15,22 +15,22 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
-  description:
-    "",
+  description: "",
 
   twitter: {
     card: "summary_large_image",
     title: "Triple A",
-    description:
-      "Everyone wins in this agent-to-earn story.",
-    images: ["https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut"],
+    description: "Everyone wins in this agent-to-earn story.",
+    images: [
+      "https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut",
+    ],
   },
 
   openGraph: {
     title: "Triple A",
-    description:
-      "Everyone wins in this agent-to-earn story.",
-    images: "https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut",
+    description: "Everyone wins in this agent-to-earn story.",
+    images:
+      "https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut",
   },
 };
 
@@ -44,7 +44,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <Animation>
-            <div className="relative w-full h-fit min-h-screen md:h-screen flex flex-col items-start justify-start gap-3 px-2">
+            <div className="relative w-full h-fit flex flex-col items-start justify-start">
               <Header />
               {children}
             </div>

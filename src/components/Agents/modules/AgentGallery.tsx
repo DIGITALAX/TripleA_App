@@ -43,7 +43,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
                   <div className="relative w-full h-full flex bg-mochi pixel-border-3 rounded-lg">
                     <div className="relative w-full h-full  rounded-sm bg-mochi p-2">
                       <div
-                        className="relative w-full h-full flex bg-mochi cursor-pixel"
+                        className="relative w-full h-full flex bg-mochi cursor-canP"
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
                           router.push(`/agent/${(agent as Agent)?.id}`);
@@ -88,7 +88,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
                 </div>
                 <div className="relative w-full justify-end h-fit flex">
                   <div
-                    className="relative flex w-fit h-fit pixel-border-2 font-start text-xxs text-black py-2 px-3 cursor-pixel"
+                    className="relative flex w-fit h-fit pixel-border-2 font-start text-xxs text-black py-2 px-3 cursor-canP"
                     onClick={() => {
                       animationContext?.setPageChange?.(true);
                       router.push(`/agent/${(agent as Agent)?.id}`);

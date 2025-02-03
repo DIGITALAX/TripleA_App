@@ -22,7 +22,7 @@ const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
           <div className="relative w-full h-full p-3 pixel-border-2 flex flex-col items-center justify-between gap-6">
             <div className="relative w-full h-fit flex items-start justify-start">
               <div
-                className="relative flex w-fit h-fit cursor-pixel hover:opacity-70"
+                className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
                 onClick={() => setAgentSwitcher(AgentSwitcher.Gallery)}
               >
                 <svg
@@ -52,7 +52,7 @@ const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
               <div
                 className={`relative flex w-fit h-fit  ${
                   createSwitcher > 0
-                    ? "cursor-pixel hover:opacity-70"
+                    ? "cursor-canP hover:opacity-70"
                     : "opacity-70"
                 }`}
                 onClick={() =>
@@ -81,7 +81,7 @@ const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
               <div
                 className={`relative flex w-fit h-fit  ${
                   createSwitcher < 2
-                    ? "cursor-pixel hover:opacity-70"
+                    ? "cursor-canP hover:opacity-70"
                     : "opacity-70"
                 }`}
                 onClick={() =>

@@ -18,7 +18,7 @@ const Collection: FunctionComponent<CollectionProps> = ({
       <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
-            className="relative flex w-fit h-fit cursor-pixel hover:opacity-70"
+            className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
             onClick={() => {
               setDropSwitcher(DropSwitcher.Drops);
               setDrop(undefined);
@@ -53,7 +53,7 @@ const Collection: FunctionComponent<CollectionProps> = ({
                   return (
                     <div
                       key={key}
-                      className={`relative w-60 h-96 md:h-full bg-morado pixel-border-4 rounded-lg flex flex-col items-center justify-between cursor-pixel p-2`}
+                      className={`relative w-60 h-96 md:h-full bg-morado pixel-border-4 rounded-lg flex flex-col items-center justify-between cursor-canP p-2`}
                       onClick={() => {
                         setCollection(collection);
                         setDropSwitcher(DropSwitcher.AgentsCollection);

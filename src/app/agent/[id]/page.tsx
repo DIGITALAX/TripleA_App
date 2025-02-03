@@ -104,7 +104,7 @@ export default function Agent() {
             draggable={false}
             layout="fill"
             objectFit="contain"
-            className="cursor-pixel"
+            className="cursor-canP"
             onClick={() =>
               context?.setImageView(
                 `${INFURA_GATEWAY}/ipfs/${agent?.cover?.split("ipfs://")?.[1]}`
@@ -127,7 +127,7 @@ export default function Agent() {
               </div>
               <div className="relative w-full h-fit flex flex-row justify-between items-center">
                 <div
-                  className="relative w-fit h-fit flex items-center justiy-center cursor-pixel"
+                  className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
                   onClick={() => setScreen(screen > 0 ? screen - 1 : 6)}
                 >
                   <svg
@@ -159,7 +159,7 @@ export default function Agent() {
                     : "Activate Collections"}
                 </div>
                 <div
-                  className="relative w-fit h-fit flex items-center justiy-center cursor-pixel"
+                  className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
                   onClick={() => setScreen(screen < 6 ? screen + 1 : 0)}
                 >
                   <svg
@@ -276,7 +276,7 @@ export default function Agent() {
                 </div>
                 <div
                   className={`relative w-full h-10 pixel-border-2 text-black font-start text-center flex items-center justify-center ${
-                    !followLoading ? "cursor-pixel" : "opacity-70"
+                    !followLoading ? "cursor-canP" : "opacity-70"
                   }`}
                   onClick={() => !followLoading && handleFollow()}
                 >
@@ -351,7 +351,7 @@ export default function Agent() {
                           key={key}
                         >
                           <div
-                            className="relative w-full h-fit flex cursor-pixel justify-between items-center flex-row gap-2 font-jackey2 text-xs"
+                            className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2 font-jackey2 text-xs"
                             onClick={() =>
                               window.open(
                                 `https://block-explorer.testnet.lens.dev/tx/${rent?.transactionHash}`
@@ -377,7 +377,7 @@ export default function Agent() {
                                   className="relative w-full h-fit flex items-center justify-between gap-2 font-jackey2 text-xxs"
                                 >
                                   <div
-                                    className="relative w-fit h-fit flex items-center justify-center cursor-pixel"
+                                    className="relative w-fit h-fit flex items-center justify-center cursor-canP"
                                     onClick={() => {
                                       animationContext?.setPageChange?.(true);
                                       router.push(
@@ -458,7 +458,7 @@ export default function Agent() {
                       return (
                         <div
                           key={key}
-                          className="relative w-full h-fit flex justify-between items-center flex-row gap-2 cursor-pixel"
+                          className="relative w-full h-fit flex justify-between items-center flex-row gap-2 cursor-canP"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
                             router.push(
@@ -540,7 +540,7 @@ export default function Agent() {
                                 <div className="relative w-full h-px flex bg-black"></div>
                                 <div className="relative w-full h-fit flex flex-row gap-2 justify-between items-center md:flex-nowrap flex-wrap">
                                   <div
-                                    className="relative w-fit h-fit flex cursor-pixel"
+                                    className="relative w-fit h-fit flex cursor-canP"
                                     onClick={() => {
                                       animationContext?.setPageChange?.(true);
                                       router.push(
@@ -605,7 +605,7 @@ export default function Agent() {
                                     <div
                                       className={`relative w-24 h-8 pixel-border-2 text-black flex items-center justify-center text-xxs font-start ${
                                         !rechargeLoading[key]
-                                          ? "cursor-pixel"
+                                          ? "cursor-canP"
                                           : "opacity-70"
                                       }`}
                                       onClick={() => {
@@ -766,7 +766,7 @@ export default function Agent() {
                       return (
                         <div
                           key={key}
-                          className="relative w-full h-fit flex cursor-pixel justify-between items-center flex-row gap-2"
+                          className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
                             router.push(

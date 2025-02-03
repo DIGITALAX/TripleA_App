@@ -41,7 +41,7 @@ export default function User() {
         </div>
         <div className="relative w-full h-fit flex flex-row justify-between items-center">
           <div
-            className="relative w-fit h-fit flex items-center justiy-center cursor-pixel"
+            className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
             onClick={() => setScreen(screen > 0 ? screen - 1 : 2)}
           >
             <svg
@@ -61,7 +61,7 @@ export default function User() {
             {screen < 1 ? "Drops" : screen == 1 ? "Collected" : "Agents"}
           </div>
           <div
-            className="relative w-fit h-fit flex items-center justiy-center cursor-pixel"
+            className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
             onClick={() => setScreen(screen < 2 ? screen + 1 : 0)}
           >
             <svg
@@ -121,7 +121,7 @@ export default function User() {
                     {screen > 1 ? (
                       <div
                         key={key}
-                        className={`relative w-60 h-80 rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2 cursor-pixel`}
+                        className={`relative w-60 h-80 rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2 cursor-canP`}
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
                           router.push(`/agent/${(item as any)?.AAAAgents_id}`);
@@ -151,7 +151,7 @@ export default function User() {
                     ) : screen == 1 ? (
                       <div
                         key={key}
-                        className={`relative w-60 h-80 rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2 cursor-pixel`}
+                        className={`relative w-60 h-80 rounded-xl pixel-border-4 flex flex-col items-center justify-between p-2 cursor-canP`}
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
                           router.push(
@@ -229,7 +229,7 @@ export default function User() {
                               return (
                                 <div
                                   key={index}
-                                  className="relative w-fit h-fit flex rounded-md items-center justify-center cursor-pixel"
+                                  className="relative w-fit h-fit flex rounded-md items-center justify-center cursor-canP"
                                   onClick={() => {
                                     animationContext?.setPageChange?.(true);
                                     router.push(

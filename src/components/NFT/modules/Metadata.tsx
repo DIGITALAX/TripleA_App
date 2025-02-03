@@ -23,7 +23,7 @@ const Metadata: FunctionComponent<MetadataProps> = ({
                 className={`relative w-full flex items-center justify-center h-full`}
               >
                 <div
-                  className="relative w-full sm:w-1/2 h-full flex items-start justify-start cursor-pixel pixel-border-3"
+                  className="relative w-full sm:w-1/2 h-full flex items-start justify-start cursor-canP pixel-border-3"
                   onClick={() =>
                     setImageView(
                       `${INFURA_GATEWAY}/ipfs/${
@@ -82,7 +82,7 @@ const Metadata: FunctionComponent<MetadataProps> = ({
                 className={`relative w-full flex items-start justify-start h-72 sm:h-full`}
               >
                 <div
-                  className="relative w-full h-full flex items-start justify-start cursor-pixel pixel-border-3"
+                  className="relative w-full h-full flex items-start justify-start cursor-canP pixel-border-3"
                   onClick={() =>
                     setImageView(
                       `${INFURA_GATEWAY}/ipfs/${

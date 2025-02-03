@@ -18,7 +18,7 @@ const Account: FunctionComponent<AccountProps> = ({
       <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
-            className="relative flex w-fit h-fit cursor-pixel hover:opacity-70"
+            className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
             onClick={() => setSwitcher(Switcher.Home)}
           >
             <svg
@@ -38,7 +38,7 @@ const Account: FunctionComponent<AccountProps> = ({
         <div className="relative w-full h-full flex flex-col gap-3 items-center justify-center font-jackey2">
           <div className="relative items-center justify-center flex w-fit h-fit">
             <label
-              className="relative w-20 rounded-full h-20 flex items-center justify-center border border-black cursor-pixel"
+              className="relative w-20 rounded-full h-20 flex items-center justify-center border border-black cursor-canP"
               onClick={(e) => {
                 e.stopPropagation();
               }}
@@ -122,7 +122,7 @@ const Account: FunctionComponent<AccountProps> = ({
         </div>
         <div
           className={`relative px-3 py-1 flex items-center justify-center font-jackey2 pixel-border-3 text-black w-28 h-8 ${
-            !accountLoading && "cursor-pixel active:scale-95"
+            !accountLoading && "cursor-canP active:scale-95"
           }`}
           onClick={() => !accountLoading && handleUpdateAccount()}
         >

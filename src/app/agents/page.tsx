@@ -5,7 +5,6 @@ import {
   AgentSwitcher,
   CreateSwitcher,
 } from "@/components/Agents/types/agents.types";
-import Slider from "@/components/Common/modules/Slider";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useModal } from "connectkit";
@@ -21,10 +20,9 @@ export default function Agents() {
   const { isConnected } = useAccount();
   return (
     <>
-      <Slider />
       <div className="relative w-full h-fit flex items-end justify-end">
         <div
-          className="relative w-40 h-10 flex pixel-border-4 bg-[#E14C14] rounded-xl items-center justify-between hover:opacity-70 cursor-pixel flex-row gap-2 px-2"
+          className="relative w-40 h-10 flex pixel-border-4 bg-[#E14C14] rounded-xl items-center justify-between hover:opacity-70 cursor-canP flex-row gap-2 px-2"
           title={"Create Agent"}
           onClick={() => {
             if (isConnected) {
