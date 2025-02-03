@@ -14,10 +14,9 @@ import {
 } from "@lens-protocol/client";
 import pollResult from "@/lib/helpers/pollResult";
 import fetchAccount from "../../../../graphql/lens/queries/account";
-import { Contract, Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
+import {  Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
 import forge from "node-forge";
 import { enableSignless } from "@lens-protocol/client/actions";
-import AccessControlsAbi from "@abis/AccessControlsAbi.json";
 
 const useCreateAgent = (
   publicClient: PublicClient,

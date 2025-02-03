@@ -14,8 +14,8 @@ const Account: FunctionComponent<AccountProps> = ({
   const { accountLoading, setNewAccount, newAccount, handleUpdateAccount } =
     useAccount(lensConnected, setLensConnected, storageClient, setSignless);
   return (
-    <div className="relative w-full h-full  flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start">
-      <div className="relative w-full h-full  pixel-border-2 p-3 flex flex-col items-center justify-between gap-6">
+    <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
+      <div className="relative w-full h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6 min-h-80">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
             className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -35,10 +35,10 @@ const Account: FunctionComponent<AccountProps> = ({
             </svg>
           </div>
         </div>
-        <div className="relative w-full h-full flex flex-col gap-3 items-center justify-center font-jackey2">
+        <div className="relative w-full h-full flex flex-col gap-3 items-center justify-center">
           <div className="relative items-center justify-center flex w-fit h-fit">
             <label
-              className="relative w-20 rounded-full h-20 flex items-center justify-center border border-black cursor-canP"
+              className="relative w-20 rounded-full h-20 flex items-center justify-center border border-windows cursor-canP"
               onClick={(e) => {
                 e.stopPropagation();
               }}
@@ -78,12 +78,12 @@ const Account: FunctionComponent<AccountProps> = ({
               />
             </label>
           </div>
-          <div className="relative w-full h-fit flex items-start justify-start flex-col sm:flex-row gap-3 text-black">
+          <div className="relative w-full h-fit flex items-start justify-start flex-col sm:flex-row gap-3">
             <div className="relative w-full h-fit flex flex-col gap-1.5 items-start justify-start">
               <div className="relative w-fit h-fit flex">Username</div>
               <input
                 disabled={true}
-                className="relative w-full h-8 border border-black focus:outline-none p-1"
+                className="relative w-full h-8 border border-windows bg-viol focus:outline-none p-1"
                 value={lensConnected?.profile?.username?.localName}
               />
             </div>
@@ -97,7 +97,7 @@ const Account: FunctionComponent<AccountProps> = ({
                     localname: e.target.value,
                   })
                 }
-                className="relative w-full h-8 border border-black focus:outline-none p-1"
+                className="relative w-full h-8 border border-windows bg-viol focus:outline-none p-1"
                 value={newAccount?.localname}
               />
             </div>
@@ -112,7 +112,7 @@ const Account: FunctionComponent<AccountProps> = ({
                   bio: e.target.value,
                 })
               }
-              className="relative w-full h-full overflow-y-scroll border border-black focus:outline-none p-1"
+              className="relative w-full h-full overflow-y-scroll border border-windows bg-viol focus:outline-none p-1"
               value={newAccount?.bio}
               style={{
                 resize: "none",
@@ -121,7 +121,7 @@ const Account: FunctionComponent<AccountProps> = ({
           </div>
         </div>
         <div
-          className={`relative px-3 py-1 flex items-center justify-center font-jackey2 pixel-border-3 text-black w-28 h-8 ${
+          className={`relative px-3 py-1 flex items-center justify-center font-nerd rounded-md hover:opacity-80 bg-windows text-viol w-28 h-8 ${
             !accountLoading && "cursor-canP active:scale-95"
           }`}
           onClick={() => !accountLoading && handleUpdateAccount()}
@@ -135,7 +135,7 @@ const Account: FunctionComponent<AccountProps> = ({
             >
               <path
                 d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                fill="currentColor"
+                fill="#CECEFF"
               />{" "}
             </svg>
           ) : (

@@ -166,7 +166,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
 
     default:
       return (
-        <div className="relative w-full h-screen md:h-full flex items-center justify-center">
+        <div className="relative w-full h-screen min-h-80 flex items-center justify-center">
           <div className="relative w-full h-fit flex flex-wrap gap-10 items-center justify-center">
             {[
               {
@@ -180,7 +180,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                     {" "}
                     <path
                       d="M6 2h12v2H6V2zM4 6V4h2v2H4zm0 12V6H2v12h2zm2 2v-2H4v2h2zm12 0v2H6v-2h12zm2-2v2h-2v-2h2zm0-12h2v12h-2V6zm0 0V4h-2v2h2zm-9-1h2v2h3v2h-6v2h6v6h-3v2h-2v-2H8v-2h6v-2H8V7h3V5z"
-                      fill="currentColor"
+                      fill="#0000f5"
                     />{" "}
                   </svg>
                 ),
@@ -199,7 +199,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                     {" "}
                     <path
                       d="M9 2h6v2H9V2zm6 4V4h2v2h4v16H3V6h4V4h2v2h6zm0 2H9v2H7V8H5v12h14V8h-2v2h-2V8z"
-                      fill="currentColor"
+                      fill="#0000f5"
                     />{" "}
                   </svg>
                 ),
@@ -218,7 +218,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                     {" "}
                     <path
                       d="M10 2h4v4h-4V2zM7 7h10v2h-2v13h-2v-6h-2v6H9V9H7V7zM5 5v2h2V5H5zm0 0H3V3h2v2zm14 0v2h-2V5h2zm0 0V3h2v2h-2z"
-                      fill="currentColor"
+                      fill="#0000f5"
                     />{" "}
                   </svg>
                 ),
@@ -231,7 +231,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                   <svg
                     className="size-6"
                     xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
+                    fill="#0000f5"
                     viewBox="0 0 24 24"
                   >
                     {" "}
@@ -253,7 +253,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                     {" "}
                     <path
                       d="M2 2h2v2H2V2zm4 4H4V4h2v2zm2 2H6V6h2v2zm2 2V8H8v2h2zm4 0h-4v4H2v8h8v-8h4v8h8v-8h-8v-4zm2-2v2h-2V8h2zm2-2v2h-2V6h2zm2-2h-2v2h2V4zm0 0V2h2v2h-2zM4 20v-4h4v4H4zm12 0v-4h4v4h-4z"
-                      fill="currentColor"
+                      fill="#0000f5"
                     />{" "}
                   </svg>
                 ),
@@ -272,7 +272,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                     {" "}
                     <path
                       d="M4 3h10v2H4v14h16v-8h2v10H2V3h2zm10 6h-2v2h-2v2H8v2H6v2h2v-2h2v-2h2v-2h2v2h2v2h2v-2h-2v-2h-2V9zM8 7H6v2h2V7zm10-4h2v2h2v2h-2v2h-2V7h-2V5h2V3z"
-                      fill="currentColor"
+                      fill="#0000f5"
                     />{" "}
                   </svg>
                 ),
@@ -291,7 +291,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                     {" "}
                     <path
                       d="M15 2H9v2H7v6h2V4h6V2zm0 8H9v2h6v-2zm0-6h2v6h-2V4zM4 16h2v-2h12v2H6v4h12v-4h2v6H4v-6z"
-                      fill="currentColor"
+                      fill="#0000f5"
                     />{" "}
                   </svg>
                 ),
@@ -311,7 +311,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               ) => {
                 return (
                   <div
-                    className="relative w-14 h-14 flex pixel-border-4 rounded-xl items-center justify-center hover:opacity-70 cursor-canP"
+                    className="relative w-14 h-14 flex pixel-border-5 rounded-xl items-center justify-center hover:opacity-70 cursor-canP"
                     style={{
                       backgroundColor: item.color,
                     }}

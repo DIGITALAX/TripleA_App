@@ -23,7 +23,7 @@ export default function Animation({ children }: { children: React.ReactNode }) {
       {context?.pageChange ? (
         <>
           <motion.div
-            initial={{ x: "-99%" }}
+            initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             transition={{
               duration: 2,
@@ -41,7 +41,7 @@ export default function Animation({ children }: { children: React.ReactNode }) {
           </motion.div>
           {children}
           <motion.div
-            initial={{ x: "99%" }}
+            initial={{ x: "100%" }}
             animate={{ x: 0}}
             transition={{
               duration: 2,
