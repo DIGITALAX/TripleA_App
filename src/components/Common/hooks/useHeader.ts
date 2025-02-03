@@ -283,7 +283,7 @@ const useHeader = (
       if (auth?.isOk()) {
         const res = await revoke(
           {
-            authenticationId: auth.value?.authentication_id,
+            authenticationId: auth.value?.authenticationId,
           },
           lensConnected?.sessionClient!
         );
