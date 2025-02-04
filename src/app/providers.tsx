@@ -7,6 +7,7 @@ import { chains } from "@lens-network/sdk/viem";
 import { Context, PublicClient, testnet } from "@lens-protocol/client";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import {
+  Fulfiller,
   LensConnected,
   TokenThreshold,
 } from "@/components/Common/types/common.types";
@@ -63,6 +64,8 @@ export const ModalContext = createContext<
       storageClient: StorageClient;
       tokenThresholds: TokenThreshold[];
       setTokenThresholds: (e: SetStateAction<TokenThreshold[]>) => void;
+      fulfillers: Fulfiller[];
+      setFulfillers: (e: SetStateAction<Fulfiller[]>) => void;
     }
   | undefined
 >(undefined);
@@ -81,6 +84,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [lensClient, setLensClient] = useState<PublicClient | undefined>();
+  const [fulfillers, setFulfillers] = useState<Fulfiller[]>([]);
   const storageClient = StorageClient.create(storageTestnet);
 
   useEffect(() => {
@@ -100,7 +104,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           customTheme={{
             "--ck-font-family": '"Jackey2", cursive',
           }}
-        
         >
           <AnimationContext.Provider
             value={{
@@ -130,6 +133,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 setTokenThresholds,
                 agentsLoading,
                 setAgentsLoading,
+                fulfillers,
+                setFulfillers,
               }}
             >
               {children}

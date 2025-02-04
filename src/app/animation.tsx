@@ -31,6 +31,7 @@ export default function Animation({ children }: { children: React.ReactNode }) {
               repeat: 1,
               repeatType: "reverse",
             }}
+            style={{ height: "100%" }}
             className="absolute top-0 left-0 w-1/2 h-full z-100"
           >
             <Image
@@ -39,10 +40,27 @@ export default function Animation({ children }: { children: React.ReactNode }) {
               draggable={false}
             />
           </motion.div>
-          {children}
           <motion.div
+            style={{ height: "100%", width: "100%" }}
+            initial={{ opacity: 1, scale: 1 }}
+            animate={{
+              opacity: context?.pageChange ? 0 : 1,
+              scale: context?.pageChange ? 0.2 : 1,
+              rotate: context?.pageChange ? 10 : 0,
+            }}
+            transition={{
+              duration: 2,
+              ease: "easeInOut",
+              repeat: 1,
+              repeatType: "reverse",
+            }}
+          >
+            {children}
+          </motion.div>
+          <motion.div
+            style={{ height: "100%" }}
             initial={{ x: "100%" }}
-            animate={{ x: 0}}
+            animate={{ x: 0 }}
             transition={{
               duration: 2,
               ease: "easeInOut",

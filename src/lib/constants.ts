@@ -2,8 +2,10 @@ export const INFURA_GATEWAY: string = "https://thedial.infura-ipfs.io";
 export const STORAGE_NODE: string = "https://storage-api.testnet.lens.dev";
 
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
-export const AGENTS_CONTRACT: `0x${string}` = "0xcDE1629239f0050ba8501D2bCc552F17128e4388";
-export const MARKET_CONTRACT: `0x${string}` = "0x0Cd2c3144EaD91606A190DEc6c112871020DAE0c";
+export const AGENTS_CONTRACT: `0x${string}` =
+  "0xcDE1629239f0050ba8501D2bCc552F17128e4388";
+export const MARKET_CONTRACT: `0x${string}` =
+  "0x0Cd2c3144EaD91606A190DEc6c112871020DAE0c";
 export const WGRASS_CONTRACT: `0x${string}` =
   "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8";
 export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
@@ -14,6 +16,11 @@ export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
 export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   {
     symbol: "WGRASS",
+    contract: "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8",
+    image: "Qmb3zd2YaKhUnAnPuZtsi7Z5SFWLFbsfigvdEA4zXe8m9X",
+  },
+  {
+    symbol: "MONA",
     contract: "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8",
     image: "Qmb3zd2YaKhUnAnPuZtsi7Z5SFWLFbsfigvdEA4zXe8m9X",
   },
@@ -42,3 +49,20 @@ export const FOOTER_TEXT: string[] = [
   "The earlier you collect, the more rewards flow back to you.<br/>Anyone can recharge your agents if they like what they're up to.",
   "Everyone wins in this agent-to-earn story.",
 ];
+
+export const TYPES: string[] = [
+  "Hoodie",
+  "Long Sleeve",
+  "Tee",
+  "Sticker",
+  "Poster",
+];
+export const COLORS: string[] = ["White", "Black"];
+
+export const SIZES: { [key in string]: string[] } = {
+  ["Hoodie"]: ["XS", "S", "M", "L", "XL", "2XL"],
+  ["Long Sleeve"]: ["XS", "S", "M", "L", "XL", "2XL"],
+  ["Tee"]: ["XS", "S", "M", "L", "XL", "2XL"],
+  ["Sticker"]: ["2” x 2”", "4” x 4”", "4” x 8”"],
+  ["Poster"]: ["11” x 17”", "18” x 24”", "24” x 36”"],
+};

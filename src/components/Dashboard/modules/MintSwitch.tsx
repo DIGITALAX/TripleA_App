@@ -1,10 +1,15 @@
 import { FunctionComponent, JSX, useContext } from "react";
-import { MintSwitcher, MintSwitchProps } from "../types/dashboard.types";
+import {
+  CollectionType,
+  Format,
+  MintSwitcher,
+  MintSwitchProps,
+} from "../types/dashboard.types";
 import useMint from "../hooks/useMint";
 import Mint from "./Mint";
 import Drop from "./Drop";
 import Image from "next/legacy/image";
-import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
+import { INFURA_GATEWAY, TOKENS, TYPES, SIZES, COLORS } from "@/lib/constants";
 import ChooseAgent from "./ChooseAgent";
 import { createPublicClient, http } from "viem";
 import { useAccount } from "wagmi";
@@ -20,6 +25,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
   allDrops,
   lensConnected,
   tokenThresholds,
+  fulfillers,
 }): JSX.Element => {
   const { address } = useAccount();
   const router = useRouter();
@@ -31,15 +37,26 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
-  const { handleMint, mintLoading, mintData, setMintData, agentsLoading, id } =
-    useMint(
-      agents,
-      setAgents,
-      publicClient,
-      address,
-      setMintSwitcher,
-      lensConnected?.sessionClient!
-    );
+  const {
+    handleMint,
+    mintLoading,
+    mintData,
+    setMintData,
+    agentsLoading,
+    id,
+    remixSearch,
+    handleRemixSearch,
+    remixSearchLoading,
+    title,
+    setTitle,
+  } = useMint(
+    agents,
+    setAgents,
+    publicClient,
+    address,
+    setMintSwitcher,
+    lensConnected?.sessionClient!
+  );
   switch (mintSwitcher) {
     case MintSwitcher.Agent:
       return (
@@ -100,7 +117,286 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
         </div>
       );
 
-    default:
+    case MintSwitcher.Remix:
+      return (
+        <div className="relative w-full h-full flex flex-col gap-10 items-center justify-between">
+          <div className="relative w-full h-fit flex items-center justify-center gap-3 flex-col">
+            <div className="relative w-fit h-fit flex text-xl font-dos">
+              Make your Art Remixable?
+            </div>
+            <div className="relative w-1/2 h-fit text-center flex overflow-y-scroll flex-col gap-3">
+              Gain virality XCopy style by letting anyone CC0 Remix your art.
+              And best yet, you'll get 20% of the sales of any remixes made by
+              agents or hand on TripleA!
+            </div>
+            <div className="relative w-fit h-fit flex flex-row items-center justify-center gap-4">
+              <div
+                className={`relative w-fit px-6 py-1 h-12 cursor-canP hover:opacity-50 text-base rounded-md flex items-center justify-center font-jack ${
+                  mintData.remixable
+                    ? "bg-windows text-viol"
+                    : "opacity-70 bg-viol text-windows border border-windows"
+                }`}
+                onClick={() =>
+                  setMintData({
+                    ...mintData,
+                    remixable: true,
+                  })
+                }
+              >
+                OK!
+              </div>
+              <div
+                className={`relative w-fit px-6 py-1 h-12 cursor-canP hover:opacity-50 text-base rounded-md flex items-center justify-center font-jack ${
+                  !mintData.remixable
+                    ? "bg-windows text-viol"
+                    : "opacity-70 bg-viol text-windows border border-windows"
+                }`}
+                onClick={() =>
+                  setMintData({
+                    ...mintData,
+                    remixable: false,
+                  })
+                }
+              >
+                Next Time
+              </div>
+            </div>
+          </div>
+          <div className="relative w-full h-fit flex items-center justify-center gap-3 flex-col">
+            <div className="relative w-fit h-fit flex text-xl font-dos">
+              Is this Mint a Remix?
+            </div>
+            <div className="relative w-1/2 h-fit text-center flex overflow-y-scroll flex-col gap-3">
+              If so, what collection is being remixed? Search and choose below.
+            </div>
+            <div className="relative w-full h-8 flex flex-row gap-3 text-viol text-sm items-center justify-center">
+              <input
+                className="relative focus:outline-none bg-windows px-1 h-full w-1/2 rounded-md"
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={(e) => e.key == "Enter" && handleRemixSearch()}
+              />
+              <div
+                className="relative w-fit h-full flex bg-windows text-center items-center justify-center px-1 rounded-md"
+                onClick={() => handleRemixSearch()}
+              >
+                Search
+              </div>
+            </div>
+            {remixSearch?.length > 0 && (
+              <div className="relative w-full h-fit flex flex-wrap gap-2 items-start justify-center">
+                {remixSearch?.map((col, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className={`relative w-fit h-fit rounded-md bg-window cursor-canP hover:opacity-50 ${
+                        Number(col.id) == mintData.remixId &&
+                        "opacity-70 border border-windows"
+                      }`}
+                      title={col.title}
+                      onClick={() =>
+                        setMintData({
+                          ...mintData,
+                          remixId: Number(col.id),
+                        })
+                      }
+                    >
+                      <div className="relative w-32 h-32 flex">
+                        <Image
+                          draggable={false}
+                          layout="fill"
+                          className="rounded-md"
+                          objectFit="cover"
+                          src={`${INFURA_GATEWAY}/ipfs/${
+                            col.image?.split("ipfs://")?.[1]
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+
+    case MintSwitcher.Tokens:
+      return (
+        <div className="relative w-full h-full flex flex-col sm:flex-row gap-10 items-start justify-between">
+          <div className="relative w-full h-full flex items-start justify-between flex-col gap-5">
+            <div className="relative w-fit h-fit flex items-start justify-start text-lg">
+              Set Tokens
+            </div>
+            <div className="relative w-full h-full flex overflow-y-scroll flex-col gap-3 items-start justify-start">
+              {TOKENS?.map((token, key: number) => {
+                return (
+                  <div
+                    key={key}
+                    className="relative w-full h-fit flex flex-wrap sm:flex-row gap-3 items-center justify-between"
+                  >
+                    <div className="flex relative w-full h-fit flex-row items-center justify-center gap-2">
+                      <div className="relative w-fit h-fit flex">
+                        <div
+                          className={`relative w-10 h-10`}
+                          title={token.symbol}
+                        >
+                          <Image
+                            src={`${INFURA_GATEWAY}/ipfs/${token.image}`}
+                            layout="fill"
+                            objectFit="contain"
+                            draggable={false}
+                            className="rounded-full"
+                            alt={token.symbol}
+                          />
+                        </div>
+                      </div>
+                      <input
+                        disabled={
+                          !mintData.tokens?.includes(token.contract) ||
+                          mintLoading
+                        }
+                        value={mintData?.prices?.[key]}
+                        type="number"
+                        min={1}
+                        placeholder="1"
+                        step={1}
+                        className="relative flex w-full h-10 pixel-border-7 bg-viol p-1.5 focus:outline-none text-xl text-right"
+                        onChange={(e) =>
+                          setMintData((prev) => {
+                            const newMintData = {
+                              ...prev,
+                            };
+
+                            const index = newMintData.tokens.findIndex(
+                              (tok) => tok == token.contract
+                            );
+
+                            const prices = [...newMintData.prices];
+                            prices[index] = Number(e.target.value);
+
+                            newMintData.prices = prices;
+
+                            return newMintData;
+                          })
+                        }
+                      />
+                      <div className="relative w-fit h-fit flex text-sm">
+                        {token.symbol}
+                      </div>
+                    </div>
+                    <div className="flex relative w-full h-fit items-center justify-center gap-2 flex-row text-sm text-left">
+                      <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                        <div className="relative flex w-fit h-fit">
+                          Token Rent
+                        </div>
+                        <div className="relative flex w-fit h-fit">
+                          {Number(
+                            tokenThresholds?.find(
+                              (t) =>
+                                t.token?.toLowerCase() ==
+                                token.contract?.toLowerCase()
+                            )?.rent || 0
+                          ) /
+                            10 ** 18}
+                          {" " + token.symbol}
+                        </div>
+                      </div>
+                      <div
+                        className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start ${
+                          Number(mintData?.prices?.[0]) * 10 ** 18 >=
+                          Number(
+                            tokenThresholds?.find(
+                              (t) =>
+                                t.token?.toLowerCase() ==
+                                token.contract?.toLowerCase()
+                            )?.threshold || 0
+                          )
+                            ? "text-pink"
+                            : "text-black"
+                        }`}
+                      >
+                        <div className="relative flex w-fit h-fit">
+                          Token Agent Threshold
+                        </div>
+                        <div className="relative flex w-fit h-fit">
+                          {Number(
+                            tokenThresholds?.find(
+                              (t) =>
+                                t.token?.toLowerCase() ==
+                                token.contract?.toLowerCase()
+                            )?.threshold || 0
+                          ) /
+                            10 ** 18}
+                          {" " + token.symbol}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {mintData.collectionType == CollectionType.IRL && (
+            <div className="relative w-full h-full flex items-start justify-between flex-col gap-5">
+              <div className="relative w-fit h-fit flex items-start justify-start text-lg">
+                Choose Fulfiller
+              </div>
+              <div className="relative w-full h-fit overflow-y-scroll flex flex-wrap gap-3 items-start justify-start">
+                {fulfillers?.map((fulfiller, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="relative w-fit h-fit flex flex-col gap-2 items-center justify-center"
+                    >
+                      <div
+                        className="relative w-fit h-fit flex rounded-md bg-windows cursor-canP"
+                        title={fulfiller.title}
+                        onClick={() =>
+                          setMintData({
+                            ...mintData,
+                            fulfiller: Number(fulfiller.id),
+                          })
+                        }
+                      >
+                        <div className="relative w-24 h-24 flex">
+                          <Image
+                            src={`${INFURA_GATEWAY}/ipfs/${
+                              fulfiller.cover?.split("ipfs://")?.[1]
+                            }`}
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-md"
+                            draggable={false}
+                          />
+                        </div>
+                      </div>
+                      <div
+                        className="flex items-center justify-center relative w-fit h-fit cursor-canP hover:opacity-70"
+                        onClick={() => window.open(fulfiller.link)}
+                      >
+                        <svg
+                          fill="none"
+                          className="size-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                        >
+                          {" "}
+                          <path
+                            d="M21 3h-8v2h4v2h2v4h2V3zm-4 4h-2v2h-2v2h2V9h2V7zm-8 8h2v-2H9v2H7v2h2v-2zm-4-2v4h2v2H5h6v2H3v-8h2z"
+                            fill="currentColor"
+                          />{" "}
+                        </svg>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+
+    case MintSwitcher.Collection:
       return (
         <div className="relative w-full h-full flex flex-col sm:flex-row gap-6 items-center justify-center">
           <label
@@ -188,7 +484,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                 }}
               />
               <textarea
-                className="relative flex w-full h-1/2 overflow-y-scroll text-left p-1.5 focus:outline-none text-lg pixel-border-7 bg-viol"
+                className="relative flex w-full h-full overflow-y-scroll text-left p-1.5 focus:outline-none text-lg pixel-border-7 bg-viol"
                 placeholder="Description"
                 onChange={(e) =>
                   setMintData({
@@ -202,119 +498,166 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                   resize: "none",
                 }}
               ></textarea>
-            </div>
-            <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
-              <div className="relative w-fit h-fit flex items-start justify-start">
-                Set Tokens
-              </div>
-              <div>
-                {TOKENS?.map((token, key: number) => {
-                  return (
-                    <div
-                      key={key}
-                      className="relative w-full h-fit flex flex-wrap sm:flex-row gap-3 items-center justify-between"
-                    >
-                      <div className="flex relative w-full h-fit flex-row items-center justify-center gap-2">
-                        <div className="relative w-fit h-fit flex">
+              {mintData.collectionType == CollectionType.IRL && (
+                <>
+                  <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                    <div className="relative w-fit h-fit flex items-start justify-start text-left">
+                      IRL Formats
+                    </div>
+                    <div className="relative w-full h-fit flex flex-row gap-3 text-viol">
+                      {TYPES.map((item, index) => {
+                        return (
                           <div
-                            className={`relative w-10 h-10`}
-                            title={token.symbol}
+                            key={index}
+                            className={`hover:opacity-60 relative bg-windows rounded-md w-fit h-fit flex cursor-canP text-sm flex p-1 items-center justify-center text-center ${
+                              mintData.format == item && "opacity-70"
+                            }`}
+                            onClick={() =>
+                              setMintData({
+                                ...mintData,
+                                format: item,
+                              })
+                            }
                           >
-                            <Image
-                              src={`${INFURA_GATEWAY}/ipfs/${token.image}`}
-                              layout="fill"
-                              objectFit="contain"
-                              draggable={false}
-                              className="rounded-full"
-                              alt={token.symbol}
-                            />
+                            {item}
                           </div>
-                        </div>
-                        <input
-                          disabled={
-                            !mintData.tokens?.includes(token.contract) ||
-                            mintLoading
-                          }
-                          value={mintData?.prices?.[key]}
-                          type="number"
-                          min={1}
-                          placeholder="1"
-                          step={1}
-                          className="relative flex w-full h-10 pixel-border-7 bg-viol p-1.5 focus:outline-none text-xl text-right"
-                          onChange={(e) =>
-                            setMintData((prev) => {
-                              const newMintData = {
-                                ...prev,
-                              };
-
-                              const index = newMintData.tokens.findIndex(
-                                (tok) => tok == token.contract
-                              );
-
-                              const prices = [...newMintData.prices];
-                              prices[index] = Number(e.target.value);
-
-                              newMintData.prices = prices;
-
-                              return newMintData;
-                            })
-                          }
-                        />
-                        <div className="relative w-fit h-fit flex text-sm">
-                          {token.symbol}
-                        </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="relative w-full h-fit flex flex-row gap-3 justify-between">
+                    <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                      <div className="relative w-fit h-fit flex items-start justify-start text-left">
+                        Sizes
                       </div>
-                      <div className="flex relative w-full h-fit items-center justify-center gap-2 flex-row text-sm text-left">
-                        <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
-                          <div className="relative flex w-fit h-fit">
-                            Token Rent
-                          </div>
-                          <div className="relative flex w-fit h-fit">
-                            {Number(
-                              tokenThresholds?.find(
-                                (t) =>
-                                  t.token?.toLowerCase() ==
-                                  token.contract?.toLowerCase()
-                              )?.rent || 0
-                            ) /
-                              10 ** 18}
-                            {" " + token.symbol}
-                          </div>
-                        </div>
-                        <div
-                          className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start ${
-                            Number(mintData?.prices?.[0]) * 10 ** 18 >=
-                            Number(
-                              tokenThresholds?.find(
-                                (t) =>
-                                  t.token?.toLowerCase() ==
-                                  token.contract?.toLowerCase()
-                              )?.threshold || 0
-                            )
-                              ? "text-pink"
-                              : "text-black"
-                          }`}
-                        >
-                          <div className="relative flex w-fit h-fit">
-                            Token Agent Threshold
-                          </div>
-                          <div className="relative flex w-fit h-fit">
-                            {Number(
-                              tokenThresholds?.find(
-                                (t) =>
-                                  t.token?.toLowerCase() ==
-                                  token.contract?.toLowerCase()
-                              )?.threshold || 0
-                            ) /
-                              10 ** 18}
-                            {" " + token.symbol}
-                          </div>
-                        </div>
+                      <div className="relative w-full h-fit flex flex-row gap-3 text-viol">
+                        {SIZES[mintData.format].map((item, index) => {
+                          return (
+                            <div
+                              key={index}
+                              className={`hover:opacity-60 relative bg-windows p-1 w-fit h-fit flex cursor-canP text-sm flex items-center justify-center text-center ${
+                                mintData?.sizes?.includes(item) && "opacity-70"
+                              } ${
+                                mintData?.format == Format.Sticker ||
+                                mintData?.format == Format.Poster
+                                  ? "rounded-md"
+                                  : "rounded-full"
+                              }`}
+                              onClick={() =>
+                                setMintData({
+                                  ...mintData,
+                                  sizes: mintData?.sizes?.includes(item)
+                                    ? mintData?.sizes?.filter((i) => i !== item)
+                                    : [...mintData?.sizes, item],
+                                })
+                              }
+                            >
+                              <div
+                                className={`relative flex items-center justify-center  ${
+                                  mintData?.format == "Sticker" ||
+                                  mintData?.format == "Poster"
+                                    ? "w-fit h-fit"
+                                    : "w-6 h-6 "
+                                }`}
+                              >
+                                {item}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    {mintData.format !== Format.Sticker &&
+                      mintData.format !== Format.Poster && (
+                        <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                          <div className="relative w-fit h-fit flex items-start justify-start text-left">
+                            Colors
+                          </div>
+
+                          <div className="relative w-full h-fit flex flex-row gap-3">
+                            {COLORS.map((item, index) => {
+                              return (
+                                <div
+                                  key={index}
+                                  className={`hover:opacity-60 relative rounded-full w-fit h-fit flex cursor-canP text-sm flex items-center justify-center text-center ${
+                                    mintData?.colors?.includes(item) &&
+                                    "opacity-70"
+                                  }`}
+                                  style={{
+                                    backgroundColor: item,
+                                  }}
+                                  onClick={() =>
+                                    setMintData({
+                                      ...mintData,
+                                      colors: mintData?.colors?.includes(item)
+                                        ? mintData?.colors?.filter(
+                                            (i) => i !== item
+                                          )
+                                        : [...mintData?.colors, item],
+                                    })
+                                  }
+                                >
+                                  <div className="relative w-7 h-7 flex"></div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+
+    default:
+      return (
+        <div className="relative w-full h-full flex flex-row gap-6 items-center justify-center">
+          <div className="relative w-fit h-fit flex">
+            <div
+              className={`"relative w-40 h-40 rounded-md cursor-canP hover:opacity-50 flex bg-windows border border-windows ${
+                mintData.collectionType == CollectionType.IRL && "opacity-70"
+              }`}
+              onClick={() => {
+                setMintData({
+                  ...mintData,
+                  collectionType: CollectionType.IRL,
+                });
+                setMintSwitcher(MintSwitcher.Collection);
+              }}
+              title={CollectionType.IRL}
+            >
+              <Image
+                src={`${INFURA_GATEWAY}/ipfs/`}
+                objectFit="contain"
+                layout="fill"
+                draggable={false}
+              />
+            </div>
+          </div>
+          <div className="relative w-fit h-fit flex">
+            <div
+              className={`"relative w-40 h-40 rounded-md cursor-canP hover:opacity-50 flex bg-windows border border-windows ${
+                mintData.collectionType == CollectionType.Digital &&
+                "opacity-70"
+              }`}
+              onClick={() => {
+                setMintData({
+                  ...mintData,
+                  collectionType: CollectionType.Digital,
+                });
+                setMintSwitcher(MintSwitcher.Collection);
+              }}
+              title={CollectionType.Digital}
+            >
+              <Image
+                src={`${INFURA_GATEWAY}/ipfs/`}
+                objectFit="contain"
+                layout="fill"
+                draggable={false}
+              />
             </div>
           </div>
         </div>

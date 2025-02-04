@@ -1,5 +1,11 @@
 import { SetStateAction, useEffect, useState } from "react";
-import { Agent, MintData, MintSwitcher } from "../types/dashboard.types";
+import {
+  Agent,
+  CollectionType,
+  Format,
+  MintData,
+  MintSwitcher,
+} from "../types/dashboard.types";
 import {
   COLLECTION_MANAGER_CONTRACT,
   INFURA_GATEWAY,
@@ -12,6 +18,8 @@ import { chains } from "@lens-network/sdk/viem";
 import { getAgents } from "../../../../graphql/queries/getAgents";
 import { evmAddress, SessionClient } from "@lens-protocol/client";
 import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
+import { NFTData } from "@/components/Common/types/common.types";
+import { getCollectionSearch } from "../../../../graphql/queries/getCollectionSearch";
 
 const useMint = (
   agents: Agent[],
@@ -24,12 +32,19 @@ const useMint = (
   const [mintLoading, setMintLoading] = useState<boolean>(false);
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [id, setId] = useState<string | undefined>();
+  const [remixSearchLoading, setRemixSearchLoading] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>("");
+  const [remixSearch, setRemixSearch] = useState<
+    {
+      id: string;
+      image: string;
+      title: string;
+    }[]
+  >([]);
   const [mintData, setMintData] = useState<MintData>({
     agents: [],
     prices: [],
-    tokens: [
-      TOKENS[0].contract
-    ],
+    tokens: [TOKENS[0].contract],
     dropId: 0,
     dropCover: undefined,
     dropTitle: "",
@@ -37,6 +52,13 @@ const useMint = (
     description: "",
     image: undefined,
     amount: 2,
+    sizes: [],
+    colors: [],
+    format: Format.Hoodie,
+    collectionType: CollectionType.Digital,
+    fulfiller: 0,
+    remixable: true,
+    remixId: 0,
   });
 
   const handleMint = async () => {
@@ -131,12 +153,25 @@ const useMint = (
             tokens: mintData?.tokens,
             prices: mintData?.prices?.map((price) => Number(price) * 10 ** 18),
             agentIds: mintData?.agents?.map((ag) => Number(ag?.agent?.id)),
-            dailyFrequency: mintData?.agents?.map(
-              (ag) => Number(ag?.dailyFrequency)
-            ),
             metadata: "ipfs://" + responseJSON?.cid,
+            collectionType:
+              mintData.collectionType == CollectionType?.IRL ? 1 : 0,
             amount: Number(mintData?.amount),
+            fulfillerId:
+              mintData.collectionType == CollectionType?.IRL
+                ? mintData.fulfiller
+                : 0,
+            remixId: mintData.remixId,
+            remixable: mintData.remixable,
           },
+          mintData?.agents?.map((ag) => ({
+            publishFrequency: Number(ag.publishFrequency),
+            remixFrequency: Number(ag.remixFrequency),
+            leadFrequency: Number(ag.leadFrequency),
+            publish: ag.publish,
+            remix: ag.remix,
+            lead: ag.lead,
+          })),
           dropMetadata,
           mintData?.dropId,
         ],
@@ -177,6 +212,13 @@ const useMint = (
         description: "",
         image: undefined,
         amount: 2,
+        sizes: [],
+        colors: [],
+        format: Format.Hoodie,
+        collectionType: CollectionType.Digital,
+        fulfiller: 0,
+        remixable: true,
+        remixId: 0,
       });
       setMintSwitcher(MintSwitcher.Success);
     } catch (err: any) {
@@ -245,11 +287,54 @@ const useMint = (
     setAgentsLoading(false);
   };
 
+  const handleRemixSearch = async () => {
+    if (title.trim() == "") return;
+    setRemixSearchLoading(true);
+    try {
+      const data = await getCollectionSearch(title);
+      const colls: {
+        id: string;
+        image: string;
+        title: string;
+      }[] = await Promise.all(
+        data?.data?.collectionCreateds?.map(async (collection: any) => {
+          if (!collection.metadata) {
+            const cadena = await fetch(
+              `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
+            );
+            collection.metadata = await cadena.json();
+          }
+
+          return {
+            id: collection?.collectionId,
+            image: collection?.metadata?.image,
+            title: collection?.metadata?.title,
+          };
+        })
+      );
+
+      setRemixSearch(colls);
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setRemixSearchLoading(false);
+  };
+
   useEffect(() => {
     if (!agents || (agents?.length < 1 && lensClient)) {
       loadAgents();
     }
   }, [lensClient]);
+
+  useEffect(() => {
+    if (mintData.collectionType == CollectionType.IRL) {
+      setMintData({
+        ...mintData,
+        sizes: [],
+        colors: [],
+      });
+    }
+  }, [mintData.format]);
 
   return {
     mintLoading,
@@ -258,6 +343,11 @@ const useMint = (
     setMintData,
     agentsLoading,
     id,
+    remixSearch,
+    handleRemixSearch,
+    remixSearchLoading,
+    title,
+    setTitle
   };
 };
 

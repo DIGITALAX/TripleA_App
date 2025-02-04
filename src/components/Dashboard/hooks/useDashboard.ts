@@ -14,7 +14,7 @@ const useDashboard = (
 ) => {
   const [switcher, setSwitcher] = useState<Switcher>(Switcher.Home);
   const [mintSwitcher, setMintSwitcher] = useState<MintSwitcher>(
-    MintSwitcher.Collection
+    MintSwitcher.Type
   );
   const [allDrops, setAllDrops] = useState<DropInterface[]>([]);
   const [allDropsLoading, setAllDropsLoading] = useState<boolean>(false);

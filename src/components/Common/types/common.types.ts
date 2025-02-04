@@ -39,3 +39,15 @@ export interface TokenThreshold {
   threshold: string;
   rent: string;
 }
+
+export interface Fulfiller {
+  uri: string;
+  cover: string;
+  description: string;
+  title: string;
+  link: string;
+  address: string;
+  id: string;
+  orderHistory: string[];
+  activeOrders: string[];
+}

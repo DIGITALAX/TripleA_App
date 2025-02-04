@@ -98,6 +98,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               allDropsLoading={allDropsLoading}
               lensConnected={context?.lensConnected!}
               tokenThresholds={context?.tokenThresholds!}
+              fulfillers={context?.fulfillers!}
             />
             <div className="relative w-full h-fit flex items-end justify-between flex-row gap-4">
               <div
@@ -131,13 +132,13 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               </div>
               <div
                 className={`relative flex w-fit h-fit  ${
-                  mintSwitcher < 3
+                  mintSwitcher < 6
                     ? "cursor-canP hover:opacity-70"
                     : "opacity-70"
                 }`}
                 onClick={() =>
                   setMintSwitcher(
-                    mintSwitcher < 3 ? mintSwitcher + 1 : mintSwitcher
+                    mintSwitcher < 6 ? mintSwitcher + 1 : mintSwitcher
                   )
                 }
               >
@@ -332,6 +333,9 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
                           `/user/${context?.lensConnected?.profile?.username?.localName}`
                         );
                       } else {
+                        if (item.switcher == Switcher.Mint) {
+                          setMintSwitcher(MintSwitcher.Type);
+                        }
                         setSwitcher(item.switcher);
                       }
                     }}

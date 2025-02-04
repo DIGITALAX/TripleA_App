@@ -1,7 +1,11 @@
 import { FunctionComponent, JSX } from "react";
-import { ChooseAgentProps } from "../types/dashboard.types";
+import {
+  ChooseAgentProps,
+  CollectionWorkerType,
+} from "../types/dashboard.types";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
+import { ImSwitch } from "react-icons/im";
 
 const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
   agents,
@@ -66,7 +70,12 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                           {
                             agent: agent,
                             customInstructions: "",
-                            dailyFrequency: 1,
+                            publishFrequency: 1,
+                            leadFrequency: 1,
+                            remixFrequency: 1,
+                            publish: true,
+                            lead: true,
+                            remix: true,
                           },
                         ];
                       }
@@ -120,47 +129,124 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                         e.stopPropagation();
                       }}
                     >
-                      <input
-                        className="relative w-full h-10 p-1 bg-viol text-sm rounded-md focus:outline-none"
-                        placeholder="1"
-                        type="number"
-                        min={1}
-                        max={3}
-                        step={1}
-                        value={
-                          mintData?.agents?.find(
+                      {[
+                        {
+                          type: CollectionWorkerType.Publish,
+                          value: mintData?.agents?.find(
                             (ag) => ag?.agent?.id == agent?.id
-                          )?.dailyFrequency
-                        }
-                        onChange={(e) => {
-                          let value = Number(e.target.value);
-                          if (value > 3) {
-                            value = 3;
-                          }
-                          (e.target.value as any) = value;
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setMintData((prev) => {
-                            const newMint = { ...prev };
+                          )?.publishFrequency,
+                          key: "publishFrequency",
+                          on: mintData?.agents?.find(
+                            (ag) => ag?.agent?.id == agent?.id
+                          )?.publish,
+                        },
+                        {
+                          type: CollectionWorkerType.Lead,
+                          value: mintData?.agents?.find(
+                            (ag) => ag?.agent?.id == agent?.id
+                          )?.leadFrequency,
+                          key: "leadFrequency",
+                          on: mintData?.agents?.find(
+                            (ag) => ag?.agent?.id == agent?.id
+                          )?.lead,
+                        },
+                        {
+                          type: CollectionWorkerType.Remix,
+                          value: mintData?.agents?.find(
+                            (ag) => ag?.agent?.id == agent?.id
+                          )?.remixFrequency,
+                          key: "remixFrequency",
+                          on: mintData?.agents?.find(
+                            (ag) => ag?.agent?.id == agent?.id
+                          )?.remix,
+                        },
+                      ].map((item, index) => {
+                        return (
+                          <div
+                            className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start  ${
+                              !item.on && "opacity-50"
+                            }`}
+                            key={index}
+                          >
+                            <div className="relative w-full h-fit flex flex-row gap-1 items-center justify-between">
+                              <div className="relative w-fit h-fit flex">
+                                {item.type}
+                              </div>
+                              <div
+                                className={`relative w-fit h-fit flex cursor-canP`}
+                                onClick={() =>
+                                  setMintData((prev) => {
+                                    const data = { ...prev };
 
-                            let newAgents = [...newMint?.agents];
-                            const newIndex = newAgents?.findIndex(
-                              (ag) => ag?.agent?.id == agent?.id
-                            );
+                                    let agents = [...data.agents];
 
-                            newAgents[newIndex] = {
-                              ...newAgents[newIndex],
-                              dailyFrequency: value,
-                            };
+                                    data.agents = agents.map((ag) => {
+                                      if (ag?.agent?.id == agent?.id) {
+                                        (ag as any)[
+                                          item.key.replace(
+                                            "Frequency",
+                                            ""
+                                          ) 
+                                        ] =
+                                          !ag[
+                                            item.key.replace(
+                                              "Frequency",
+                                              ""
+                                            ) as keyof typeof ag
+                                          ] as unknown as boolean;
+                                        return ag;
+                                      } else {
+                                        return ag;
+                                      }
+                                    });
+                                    return data;
+                                  })
+                                }
+                              >
+                                <ImSwitch size={15} color="#CECEFF" />
+                              </div>
+                            </div>
+                            <input
+                              className="relative w-full h-6 p-1 bg-viol text-sm rounded-sm focus:outline-none"
+                              placeholder="1"
+                              type="number"
+                              min={1}
+                              max={3}
+                              step={1}
+                              disabled={!item.on}
+                              value={item.value}
+                              onChange={(e) => {
+                                let value = Number(e.target.value);
+                                if (value > 3) {
+                                  value = 3;
+                                }
+                                (e.target.value as any) = value;
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setMintData((prev) => {
+                                  const newMint = { ...prev };
 
-                            newMint.agents = newAgents;
-                            return newMint;
-                          });
-                        }}
-                      />
+                                  let newAgents = [...newMint?.agents];
+                                  const newIndex = newAgents?.findIndex(
+                                    (ag) => ag?.agent?.id == agent?.id
+                                  );
+
+                                  newAgents[newIndex] = {
+                                    ...newAgents[newIndex],
+                                    [item.key]: value,
+                                  };
+
+                                  newMint.agents = newAgents;
+                                  return newMint;
+                                });
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
                       <textarea
-                        className="relative w-full h-40 flex overflow-y-scroll p-1 bg-viol rounded-md text-sm cursor-text focus:outline-none"
-                        placeholder="Add custom instructions for your agent."
+                        className="relative w-full h-32 flex overflow-y-scroll p-1 bg-viol rounded-sm text-sm cursor-text focus:outline-none"
+                        placeholder="Add custom instructions for your agent to guide it's personality and style when publishing."
                         style={{
                           resize: "none",
                         }}
@@ -204,10 +290,10 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                 t?.token?.toLowerCase() == mintData?.tokens?.[0]?.toLowerCase()
             )?.threshold
           )) && (
-        <div className="absolute top-0 left-0 flex items-center justify-center bg-white/90 w-full h-full font-jackey2 text-black text-center">
+        <div className="absolute top-0 left-0 flex items-center justify-center bg-windows/90 w-full h-full text-white text-center rounded-sm">
           <div className="relative sm:w-1/2 w-full flex items-center justify-center">
-            Set a minimum edition of 3 and a price above the Token Threshold to
-            activate Agents for this collection!
+            Minimum edition of 3 and price above token threshold required to
+            activate Agents for this collection.
           </div>
         </div>
       )}

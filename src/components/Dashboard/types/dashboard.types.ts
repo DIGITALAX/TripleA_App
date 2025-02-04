@@ -1,4 +1,5 @@
 import {
+  Fulfiller,
   LensConnected,
   NFTData,
   TokenThreshold,
@@ -19,11 +20,27 @@ export enum Switcher {
 }
 
 export enum MintSwitcher {
+  Type,
   Collection,
+  Tokens,
   Agent,
   Drop,
+  Remix,
   Mint,
   Success,
+}
+
+export enum CollectionType {
+  Digital = "Digital",
+  IRL = "IRL",
+}
+
+export enum Format {
+  Hoodie = "Hoodie",
+  LongSleeve = "Long Sleeve",
+  Tee = "Tee",
+  Sticker = "Sticker",
+  Poster = "Poster",
 }
 
 export enum DropSwitcher {
@@ -41,6 +58,7 @@ export type MintSwitchProps = {
   allDropsLoading: boolean;
   lensConnected: LensConnected;
   tokenThresholds: TokenThreshold[];
+  fulfillers: Fulfiller[];
 };
 
 export type DropsProps = {
@@ -112,7 +130,12 @@ export type MintData = {
   agents: {
     agent: Agent;
     customInstructions: string;
-    dailyFrequency: number;
+    publishFrequency: number;
+    remixFrequency: number;
+    leadFrequency: number;
+    publish: boolean;
+    remix: boolean;
+    lead: boolean;
   }[];
   prices: number[];
   tokens: string[];
@@ -123,6 +146,13 @@ export type MintData = {
   title: string;
   description: string;
   amount: number;
+  collectionType: CollectionType;
+  format: string;
+  sizes: string[];
+  colors: string[];
+  remixable: boolean;
+  fulfiller: number;
+  remixId: number;
 };
 
 export interface Agent {
@@ -139,12 +169,23 @@ export interface Agent {
   details: {
     collectionId: string;
     instructions: string;
-    dailyFrequency: string;
-  }[]
+    publishFrequency: number;
+    remixFrequency: number;
+    leadFrequency: number;
+    publish: boolean;
+    remix: boolean;
+    lead: boolean;
+  }[];
   profile?: Account;
   ownerProfile?: Account;
   activity?: Post[];
   accountConnected?: string;
+}
+
+export enum CollectionWorkerType {
+  Publish = "Publish",
+  Lead = "Lead Gen",
+  Remix = "Remix",
 }
 
 export interface AgentCollection {
@@ -162,7 +203,7 @@ export interface Balances {
   totalBalance: number;
   dailyFrequency: number;
   collectionId: number;
-  instructions: string
+  instructions: string;
 }
 
 export interface DropInterface {
