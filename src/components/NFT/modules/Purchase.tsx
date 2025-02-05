@@ -15,6 +15,10 @@ import { useRouter } from "next/navigation";
 import { useModal } from "connectkit";
 import useAgentRecharge from "../hooks/useAgentRecharge";
 import { AnimationContext } from "@/app/providers";
+import {
+  CollectionType,
+  Format,
+} from "@/components/Dashboard/types/dashboard.types";
 
 const Purchase: FunctionComponent<PurchaseProps> = ({
   nft,
@@ -32,6 +36,8 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
   tokenThresholds,
   agents,
   handlePosts,
+  setFulfillmentOpen,
+  fulfillers
 }): JSX.Element => {
   const { isConnected, address } = useAccount();
   const router = useRouter();
@@ -53,7 +59,15 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
     collectData,
     screen,
     setScreen,
-  } = usePurchase(nft, setNft, address, publicClient, setNotification);
+  } = usePurchase(
+    nft,
+    setNft,
+    address,
+    publicClient,
+    setNotification,
+    setFulfillmentOpen,
+    fulfillers
+  );
   const {
     rechargeLoading,
     handleRecharge,
@@ -322,9 +336,124 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   )}
                 </div>
               </div>
-              <div className="relative w-full h-fit flex py-4 overflow-y-scroll">
-                <div className="py-3 h-full max-h-full overflow-y-scroll flex relative items-start justify-start text-left text-sm font-nerd">
-                  {nft?.description}
+              {nft?.collectionType == CollectionType.IRL && (
+                <>
+                  <div
+                    className={`hover:opacity-60 relative bg-windows rounded-md w-fit h-fit flex cursor-canP text-sm flex p-1 items-center justify-center text-center font-nerd`}
+                  >
+                    {nft?.format}
+                  </div>
+                  <div className="relative w-full h-fit flex flex-row gap-3 justify-between font-nerd">
+                    <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                      <div className="relative w-fit h-fit flex items-start justify-start text-left">
+                        Sizes
+                      </div>
+                      <div className="relative w-full h-fit flex flex-row gap-3 text-viol">
+                        {nft?.sizes?.map((item, index) => {
+                          return (
+                            <div
+                              key={index}
+                              className={`hover:opacity-60 relative bg-windows p-1 w-fit h-fit flex cursor-canP text-sm flex items-center justify-center text-center ${
+                                collectData.size == item && "opacity-70"
+                              } ${
+                                nft?.format == Format.Sticker ||
+                                nft?.format == Format.Poster
+                                  ? "rounded-md"
+                                  : "rounded-full"
+                              }`}
+                              onClick={() =>
+                                setCollectData({
+                                  ...collectData,
+                                  size: item,
+                                })
+                              }
+                            >
+                              <div
+                                className={`relative flex items-center justify-center  ${
+                                  nft?.format == Format.Sticker ||
+                                  nft?.format == Format.Poster
+                                    ? "w-fit h-fit"
+                                    : "w-6 h-6 "
+                                }`}
+                              >
+                                {item}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    {nft?.format !== Format.Sticker &&
+                      nft?.format !== Format.Poster && (
+                        <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                          <div className="relative w-fit h-fit flex items-start justify-start text-left">
+                            Colors
+                          </div>
+
+                          <div className="relative w-full h-fit flex flex-row gap-3">
+                            {nft?.colors?.map((item, index) => {
+                              return (
+                                <div
+                                  key={index}
+                                  className={`hover:opacity-60 relative rounded-full w-fit h-fit flex cursor-canP text-sm flex items-center justify-center text-center ${
+                                    collectData?.color == item && "opacity-70"
+                                  }`}
+                                  style={{
+                                    backgroundColor: item,
+                                  }}
+                                  onClick={() =>
+                                    setCollectData({
+                                      ...collectData,
+                                      color: item,
+                                    })
+                                  }
+                                >
+                                  <div className="relative w-7 h-7 flex"></div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                </>
+              )}
+              <div className="relative w-full h-full flex flex-col gap-3 items-start justify-between">
+                <div className="relative w-full h-full flex py-4 overflow-y-scroll">
+                  <div className="py-3 h-full max-h-full overflow-y-scroll flex relative items-start justify-start text-left text-sm font-nerd">
+                    {nft?.description}
+                  </div>
+                </div>
+                <div className="relative w-full h-fit flex-col gap-2 flex py-2 items-end justify-end">
+                  <div className="relative w-fit h-fit text-right flex text-sm font-nerd">
+                    {nft?.agent ? "Minted By Agent" : "Minted By Hand"}
+                  </div>
+                  {Number(nft?.remixId) > 0 && (
+                    <div className="w-full h-fit flex relative flex-row justify-between items-center">
+                      <div className="relative w-fit h-fit text-right flex text-sm font-nerd">
+                        Remix Of
+                      </div>
+                      <div className="relative w-fit h-fit text-right flex text-sm font-nerd">
+                        <div
+                          className="relative w-5 h-5 cursor-canP flex rounded-sm border border-windows bg-windows"
+                          onClick={() =>
+                            router.push(
+                              `/nft/${nft?.remix?.profile?.username?.localName}/${nft?.remixId}`
+                            )
+                          }
+                        >
+                          <Image
+                            draggable={false}
+                            src={`${INFURA_GATEWAY}/ipfs/${
+                              nft?.remix?.image?.split("ipfs://")?.[1]
+                            }`}
+                            layout="fill"
+                            objectFit="cover"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </>
@@ -574,7 +703,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                 agent?.details?.find(
                                   (bal) =>
                                     Number(bal?.collectionId) == Number(nft?.id)
-                                )?.dailyFrequency || 0
+                                )?.publishFrequency || 0
                               ) *
                                 (Number(
                                   tokenThresholds?.find(
@@ -598,7 +727,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                               agent?.details?.find(
                                 (bal) =>
                                   Number(bal?.collectionId) == Number(nft?.id)
-                              )?.dailyFrequency || 0
+                              )?.publishFrequency || 0
                             ) *
                               Number(
                                 tokenThresholds?.find(
@@ -615,12 +744,26 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                       Number(nft?.id)
                                   )?.activeBalance || 0
                                 ) /
+                                ((Number(
+                                  agent?.details?.find(
+                                    (bal) =>
+                                      Number(bal?.collectionId) ==
+                                      Number(nft?.id)
+                                  )?.publishFrequency || 0
+                                ) *
+                                  Number(
+                                    tokenThresholds?.find(
+                                      (thr) =>
+                                        thr?.token?.toLowerCase() ==
+                                        nft?.tokens?.[0]?.toLowerCase()
+                                    )?.rent || 0
+                                  ) || 0) +
                                   (Number(
                                     agent?.details?.find(
                                       (bal) =>
                                         Number(bal?.collectionId) ==
                                         Number(nft?.id)
-                                    )?.dailyFrequency || 0
+                                    )?.publishFrequency || 0
                                   ) *
                                     Number(
                                       tokenThresholds?.find(
@@ -628,7 +771,21 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                           thr?.token?.toLowerCase() ==
                                           nft?.tokens?.[0]?.toLowerCase()
                                       )?.rent || 0
-                                    )) || 0
+                                    ) || 0) +
+                                  (Number(
+                                    agent?.details?.find(
+                                      (bal) =>
+                                        Number(bal?.collectionId) ==
+                                        Number(nft?.id)
+                                    )?.publishFrequency || 0
+                                  ) *
+                                    Number(
+                                      tokenThresholds?.find(
+                                        (thr) =>
+                                          thr?.token?.toLowerCase() ==
+                                          nft?.tokens?.[0]?.toLowerCase()
+                                      )?.rent || 0
+                                    ) || 0))
                               } cycles.`
                             : "Agent needs to be recharged to start activity."}
                         </div>

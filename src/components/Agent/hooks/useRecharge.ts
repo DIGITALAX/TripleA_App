@@ -9,11 +9,7 @@ const useRecharge = (
   publicClient: PublicClient,
   address: `0x${string}` | undefined,
   setNotification: (e: SetStateAction<string | undefined>) => void,
-  collections: {
-    collectionId: string;
-    instructions: string;
-    dailyFrequency: string;
-  }[]
+  collections: Agent["details"]
 ) => {
   const [rechargeLoading, setRechargeLoading] = useState<boolean[]>([]);
   const [rechargeAmount, setRechargeAmount] = useState<number[]>([]);

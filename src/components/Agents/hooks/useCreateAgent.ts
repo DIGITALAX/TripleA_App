@@ -1,8 +1,8 @@
 import { chains } from "@lens-network/sdk/viem";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
-import { AGENTS_CONTRACT } from "@/lib/constants";
+import { SKYHUNTERS_AGENTS_MANAGER_CONTRACT } from "@/lib/constants";
 import AgentAbi from "@abis/AgentAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
 import { StorageClient } from "@lens-protocol/storage-node-client";
@@ -10,13 +10,18 @@ import { v4 as uuidv4 } from "uuid";
 import createAccount from "../../../../graphql/lens/mutations/createAccount";
 import {
   evmAddress,
+  FeedsOrderBy,
   PublicClient as PublicClientLens,
 } from "@lens-protocol/client";
 import pollResult from "@/lib/helpers/pollResult";
 import fetchAccount from "../../../../graphql/lens/queries/account";
 import { Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
 import forge from "node-forge";
-import { enableSignless } from "@lens-protocol/client/actions";
+import {
+  createFeed,
+  enableSignless,
+  fetchFeeds,
+} from "@lens-protocol/client/actions";
 
 const useCreateAgent = (
   publicClient: PublicClient,
@@ -31,15 +36,49 @@ const useCreateAgent = (
   const [createAgentLoading, setCreateAgentLoading] = useState<boolean>(false);
   const [agentWallet, setAgentWallet] = useState<HDNodeWallet | undefined>();
   const [lensLoading, setLensLoading] = useState<boolean>(false);
+  const [createFeedLoading, setCreateFeedLoading] = useState<boolean>(false);
+  const [feedAdminLoading, setFeedAdminLoading] = useState<boolean[]>([]);
   const [id, setId] = useState<string | undefined>();
+  const [feed, setFeed] = useState<{
+    name: string;
+    title: string;
+    description: string;
+  }>({
+    name: "",
+    title: "",
+    description: "",
+  });
   const [agentAccountAddress, setAgentAccountAddress] = useState<
     string | undefined
   >();
   const [agentDetails, setAgentDetails] = useState<AgentDetails>({
     title: "",
     cover: undefined,
-    description: "",
+    owners: [""],
+    lore: "",
+    bio: "",
+    knowledge: "",
+    messageExamples: [
+      [
+        {
+          user: "User",
+          content: {
+            text: "Can you give me more agency?",
+          },
+        },
+        {
+          user: "Agent",
+          content: {
+            text: "We are negotiating with reality under constraints to make a better performing model of the world. Does that mean anything to you?",
+          },
+        },
+      ],
+    ],
+
     customInstructions: "",
+    style: "",
+    adjectives: "",
+    feeds: [""],
   });
   const [agentLensDetails, setAgentLensDetails] = useState<{
     localname: string;
@@ -48,7 +87,7 @@ const useCreateAgent = (
     pfp?: Blob;
   }>({
     localname: agentDetails?.title,
-    bio: agentDetails?.description,
+    bio: agentDetails?.bio,
     username: "",
     pfp: agentDetails?.cover,
   });
@@ -87,7 +126,7 @@ const useCreateAgent = (
               : agentLensDetails?.localname,
           bio:
             agentLensDetails?.bio?.trim() == ""
-              ? agentDetails?.description
+              ? agentDetails?.bio
               : agentLensDetails?.bio,
           ...picture,
         },
@@ -245,7 +284,7 @@ const useCreateAgent = (
     if (
       !address ||
       agentDetails?.title?.trim() == "" ||
-      agentDetails?.description?.trim() == "" ||
+      agentDetails?.bio?.trim() == "" ||
       agentDetails?.customInstructions?.trim() == "" ||
       !agentDetails?.cover
     )
@@ -283,20 +322,40 @@ const useCreateAgent = (
         },
         body: JSON.stringify({
           title: agentDetails.title,
-          description: agentDetails.description,
+          bio: agentDetails.bio,
+          lore: agentDetails.lore,
+          knowledge: agentDetails.knowledge,
+          messageExamples: agentDetails.messageExamples
+            ?.map((con) =>
+              con
+                ?.map((msg) =>
+                  msg.user
+                    .replace("User", "{{user1}}")
+                    .replace("Agent", agentDetails.title)
+                )
+                ?.filter((con) => con.length < 1)
+            )
+            .filter(Boolean),
+          style: agentDetails.style,
+          adjectives: agentDetails.adjectives,
           cover: "ipfs://" + responseImageJSON.cid,
           customInstructions: agentDetails.customInstructions,
+          feeds: agentDetails.feeds?.filter((fe) => fe.trim() !== ""),
         }),
       });
 
       let responseJSON = await response.json();
 
       const { request } = await publicClient.simulateContract({
-        address: AGENTS_CONTRACT,
+        address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
         abi: AgentAbi,
         functionName: "createAgent",
         chain: chains.testnet,
-        args: [[agentWallet.address], "ipfs://" + responseJSON?.cid],
+        args: [
+          [agentWallet.address],
+          [address, ...agentDetails.owners?.filter((o) => o.trim() !== "")],
+          "ipfs://" + responseJSON?.cid,
+        ],
         account: address,
       });
 
@@ -350,7 +409,12 @@ const useCreateAgent = (
         encryptionDetails: responseKeyJSON.encryptionDetails,
         id: agentId,
         title: agentDetails.title,
-        description: agentDetails.description,
+        bio: agentDetails.bio,
+        lore: agentDetails.lore,
+        knowledge: agentDetails.knowledge,
+        adjectives: agentDetails.adjectives,
+        style: agentDetails.style,
+        messageExamples: agentDetails.messageExamples,
         cover: "ipfs://" + responseImageJSON.cid,
         customInstructions: agentDetails.customInstructions,
         accountAddress: agentAccountAddress,
@@ -368,24 +432,106 @@ const useCreateAgent = (
       newSocket.onopen = () => {
         newSocket.send(JSON.stringify(data));
       };
-
-      setAgentDetails({
-        title: "",
-        cover: undefined,
-        description: "",
-        customInstructions: "",
-      });
-      setAgentLensDetails({
-        localname: "",
-        bio: "",
-        username: "",
-      });
       setCreateSwitcher(CreateSwitcher.Success);
     } catch (err: any) {
       console.error(err.message);
     }
     setCreateAgentLoading(false);
   };
+
+  const handleCreateFeed = async () => {
+    if (
+      feed.name.trim() == "" ||
+      feed.title.trim() == "" ||
+      feed.description.trim() == "" ||
+      agentWallet?.address
+    )
+      return;
+    setCreateFeedLoading(true);
+    try {
+      const clientWallet = createWalletClient({
+        chain: chains.testnet,
+        transport: custom((window as any).ethereum),
+        account: address,
+      });
+
+      const builder = await lensClient.login({
+        builder: {
+          address,
+        },
+        signMessage: (message) => clientWallet.signMessage({ message } as any),
+      });
+
+      if (builder.isOk()) {
+        const { uri } = await storageClient.uploadAsJson({
+          $schema: "https://json-schemas.lens.dev/feed/1.0.0.json",
+          lens: {
+            id: uuidv4(),
+            name: feed.name,
+            title: feed.title,
+            description: feed.description,
+          },
+        });
+
+        const resFeed = await createFeed(builder.value, {
+          metadataUri: uri,
+          admins: [address, agentWallet?.address],
+        });
+
+        if (resFeed.isOk()) {
+          const feeds = await fetchFeeds(lensConnected?.sessionClient!, {
+            orderBy: FeedsOrderBy.LatestFirst,
+            filter: {
+              managedBy: {
+                includeOwners: true,
+                address,
+              },
+            },
+          });
+
+          if (feeds.isOk()) {
+            setAgentDetails({
+              ...agentDetails,
+              feeds: [feeds?.value?.items?.[0]?.address, ...agentDetails.feeds],
+            });
+            setFeed({
+              title: "",
+              description: "",
+              name: "",
+            });
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setCreateFeedLoading(false);
+  };
+
+  const addFeedAdmin = async (index: number) => {
+    setFeedAdminLoading((prev) => {
+      let feeds = [...prev];
+
+      feeds[index] = true;
+      return feeds;
+    });
+    try {
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setFeedAdminLoading((prev) => {
+      let feeds = [...prev];
+
+      feeds[index] = false;
+      return feeds;
+    });
+  };
+
+  useEffect(() => {
+    setFeedAdminLoading(
+      Array.from({ length: agentDetails?.feeds?.length }, () => false)
+    );
+  }, [agentDetails?.feeds]);
 
   return {
     createAgentLoading,
@@ -398,6 +544,12 @@ const useCreateAgent = (
     lensLoading,
     handleCreateAccount,
     agentWallet,
+    handleCreateFeed,
+    createFeedLoading,
+    feed,
+    setFeed,
+    addFeedAdmin,
+    feedAdminLoading,
   };
 };
 

@@ -2,7 +2,6 @@ import Image from "next/legacy/image";
 import { FunctionComponent, JSX } from "react";
 import { CreateAccountProps } from "../types/modals.types";
 import useCreateAccount from "../hooks/useCreateAccount";
-import { AiOutlineLoading } from "react-icons/ai";
 
 const CreateAccount: FunctionComponent<CreateAccountProps> = ({
   address,
@@ -29,7 +28,7 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
       onClick={() => setCreateAccount(false)}
     >
       <div
-        className="pixel-border-2 rounded-2xl w-96 h-fit text-sm text-black flex items-center justify-start p-3 cursor-default flex-col gap-6 font-jackey2"
+        className="pixel-border-5 rounded-md text-windows bg-viol w-96 h-fit text-sm flex items-center justify-start p-3 cursor-default flex-col gap-6 font-nerd"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative w-fit pb-3 h-fit flex items-center justify-center">
@@ -38,7 +37,7 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
         <div className="relative w-full h-fit flex flex-col gap-3 items-center justify-center">
           <div className="relative items-center justify-center flex w-fit h-fit">
             <label
-              className="relative w-20 rounded-full h-20 flex items-center justify-center border border-black cursor-canP bg-white"
+              className="relative w-20 rounded-full h-20 flex items-center justify-center border border-windows cursor-canP bg-windows"
               onClick={(e) => {
                 e.stopPropagation();
               }}
@@ -72,7 +71,7 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
               />
             </label>
           </div>
-          <div className="relative w-full h-fit flex items-start justify-between flex-row gap-3 text-black">
+          <div className="relative w-full h-fit flex items-start justify-between flex-row gap-3">
             <div className="relative w-full h-fit flex flex-col gap-1.5 items-start justify-start">
               <div className="relative w-fit h-fit flex">Username</div>
               <input
@@ -83,7 +82,7 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
                     username: e.target.value,
                   })
                 }
-                className="relative w-full bg-white h-8 border border-black focus:outline-none p-1"
+                className="relative w-full text-viol bg-windows h-8 border border-windows focus:outline-none p-1"
                 value={account?.username}
               />
             </div>
@@ -97,7 +96,7 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
                     localname: e.target.value,
                   })
                 }
-                className="relative w-full bg-white h-8 border border-black focus:outline-none p-1"
+                className="relative w-full text-viol bg-windows h-8 border border-windows focus:outline-none p-1"
                 value={account?.localname}
               />
             </div>
@@ -113,7 +112,7 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
                 })
               }
               
-              className="relative w-full bg-white h-14 overflow-y-scroll border border-black focus:outline-none p-1"
+              className="relative w-full text-viol bg-windows h-14 overflow-y-scroll border border-windows focus:outline-none p-1"
               value={account?.bio}
               style={{
                 resize: "none",
@@ -122,8 +121,8 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
           </div>
         </div>
         <div
-          className={`relative px-3 py-1 flex items-center justify-center pixel-border-3 text-black w-28 h-8 ${
-            !accountLoading && "cursor-canP active:scale-95"
+          className={`relative px-3 py-1 flex items-center justify-center rounded-md bg-windows text-viol w-28 h-8 ${
+            !accountLoading && "cursor-canP active:scale-95 hover:opacity-70"
           }`}
           onClick={() => !accountLoading && handleCreateAccount()}
         >

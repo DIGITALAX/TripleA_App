@@ -7,6 +7,7 @@ import useInteractions from "@/components/NFT/hooks/useInteractions";
 import Comments from "@/components/NFT/modules/Comments";
 import Post from "@/components/NFT/modules/Post";
 import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
+import { downloadEliza } from "@/lib/helpers/downloadEliza";
 import { chains } from "@lens-network/sdk/viem";
 import { useModal } from "connectkit";
 import moment from "moment";
@@ -226,7 +227,7 @@ export default function Agent() {
                                   0,
                                   10
                                 )
-                              : agent?.owner?.slice(0, 10)}
+                              : agent?.creator?.slice(0, 10)}
                           </div>
                         </div>
                       </div>
@@ -265,7 +266,7 @@ export default function Agent() {
                   </div>
                   <div className="relative w-full h-full max-h-full flex flex-col py-4 overflow-y-scroll">
                     <div className="py-3 h-fit flex relative items-start justify-start text-left text-sm font-nim">
-                      {agent?.description}
+                      {agent?.bio}
                     </div>
                     <div className="relative w-full h-fit flex py-4 flex-col items-start justify-start gap-2 font-nerd">
                       <div className="relative w-fit h-fit flex text-xxs">
@@ -278,6 +279,37 @@ export default function Agent() {
                       </div>
                     </div>
                   </div>
+                  <div className="relative w-full h-fit flex items-center justify-between gap-2">
+                    <div className="relative w-fit h-fit flex font-dos text-sm">
+                      Port To Eliza
+                    </div>
+
+                    <div
+                      onClick={() =>
+                        downloadEliza(
+                          agent?.title!,
+                          agent?.bio!,
+                          agent?.lore!,
+                          agent?.knowledge!,
+                          agent?.messageExamples!,
+                          agent?.style!,
+                          agent?.adjectives!
+                        )
+                      }
+                      className="relative w-fit h-fit flex"
+                    >
+                      <div className="relative w-7 h-7 rounded-full border border-windows cursor-canP">
+                        <Image
+                          draggable={false}
+                          layout="fill"
+                          className="rounded-full"
+                          src={`${INFURA_GATEWAY}/ipfs/QmRGFsZ5Qg6WWKo3761WdwGSoqbDD1ZR9zVV95CTaomqdU`}
+                          objectFit="cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="relative w-full h-fit flex">
                     <div
                       className={`relative w-full h-12 text-viol bg-windows rounded-md hover:opacity-80 text-center font-nerd flex items-center justify-center ${
@@ -683,7 +715,7 @@ export default function Agent() {
                                           (bal) =>
                                             Number(bal?.collectionId) ==
                                             Number(collection?.collectionId)
-                                        )?.dailyFrequency || 0
+                                        )?.publishFrequency || 0
                                       ) *
                                         (Number(
                                           context?.tokenThresholds?.find(
@@ -711,7 +743,7 @@ export default function Agent() {
                                         (bal) =>
                                           Number(bal?.collectionId) ==
                                           Number(collection?.collectionId)
-                                      )?.dailyFrequency || 0
+                                      )?.publishFrequency || 0
                                     ) *
                                       Number(
                                         context?.tokenThresholds?.find(
@@ -735,7 +767,7 @@ export default function Agent() {
                                               (bal) =>
                                                 Number(bal?.collectionId) ==
                                                 Number(collection?.collectionId)
-                                            )?.dailyFrequency || 0
+                                            )?.publishFrequency || 0
                                           ) *
                                             Number(
                                               context?.tokenThresholds?.find(

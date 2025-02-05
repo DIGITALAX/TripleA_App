@@ -114,7 +114,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                       <div
                         className={`relative w-fit overflow-y-scroll max-h-44 flex text-xs`}
                       >
-                        {agent.description}
+                        {agent.bio}
                       </div>
                     )}
                   </div>
@@ -290,7 +290,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                 t?.token?.toLowerCase() == mintData?.tokens?.[0]?.toLowerCase()
             )?.threshold
           )) && (
-        <div className="absolute top-0 left-0 flex items-center justify-center bg-windows/90 w-full h-full text-white text-center rounded-sm">
+        <div className="absolute top-0 left-0 flex items-center justify-center bg-viol/90 w-full h-full text-windows text-center rounded-sm">
           <div className="relative sm:w-1/2 w-full flex items-center justify-center">
             Minimum edition of 3 and price above token threshold required to
             activate Agents for this collection.

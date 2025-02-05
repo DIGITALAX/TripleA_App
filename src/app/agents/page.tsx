@@ -106,7 +106,6 @@ export default function Agents() {
           </div>
           <AgentSwitch
             agentSwitcher={agentSwitcher}
-            setAgentSwitcher={setAgentSwitcher}
             createSwitcher={createSwitcher}
             setCreateSwitcher={setCreateSwitcher}
           />

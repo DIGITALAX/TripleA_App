@@ -1,10 +1,29 @@
 import { LensConnected } from "@/components/Common/types/common.types";
 import { SetStateAction } from "react";
 import { StorageClient } from "@lens-protocol/storage-node-client";
+import { CollectData } from "@/components/NFT/types/nft.types";
 
 export type ImageViewerProps = {
   imageView: string;
   setImageView: (e: SetStateAction<string | undefined>) => void;
+};
+
+export type FulfillmentProps = {
+  address: `0x${string}` | undefined;
+  setFulfillmentOpen: (
+    e: SetStateAction<
+      | (CollectData & {
+          id: number;
+          fulfiller: string;
+        })
+      | undefined
+    >
+  ) => void;
+  details: CollectData & {
+    id: number;
+    fulfiller: string;
+  };
+  setNotification: (e: SetStateAction<string | undefined>) => void;
 };
 
 export type CreateAccountProps = {

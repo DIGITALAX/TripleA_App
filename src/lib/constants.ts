@@ -4,6 +4,8 @@ export const STORAGE_NODE: string = "https://storage-api.testnet.lens.dev";
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
 export const AGENTS_CONTRACT: `0x${string}` =
   "0xcDE1629239f0050ba8501D2bCc552F17128e4388";
+export const SKYHUNTERS_AGENTS_MANAGER_CONTRACT: `0x${string}` =
+  "0xcDE1629239f0050ba8501D2bCc552F17128e4388";
 export const MARKET_CONTRACT: `0x${string}` =
   "0x0Cd2c3144EaD91606A190DEc6c112871020DAE0c";
 export const WGRASS_CONTRACT: `0x${string}` =

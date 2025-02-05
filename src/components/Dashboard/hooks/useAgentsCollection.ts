@@ -17,7 +17,16 @@ const useAgentsCollection = (
   const [editAgentsLoading, setEditAgentsLoading] = useState<boolean>(false);
   const [statusLoading, setStatusLoading] = useState<boolean>(false);
   const [customInstructions, setCustomInstructions] = useState<string[]>([]);
-  const [dailyFrequency, setDailyFrequency] = useState<number[]>([]);
+  const [frequencies, setFrequencies] = useState<
+    {
+      publishFrequency: number;
+      remixFrequency: number;
+      leadFrequency: number;
+      publish: boolean;
+      remix: boolean;
+      lead: boolean;
+    }[]
+  >([]);
   const [priceAdjusted, setPriceAdjusted] = useState<number>(
     Number(collection?.prices?.[0]) / 10 ** 18 || 0
   );
@@ -69,9 +78,9 @@ const useAgentsCollection = (
       const { request } = await publicClient.simulateContract({
         address: COLLECTION_MANAGER_CONTRACT,
         abi: CollectionManagerAbi,
-        functionName: "updateAgentCollectionDetails",
+        functionName: "updateCollectionWorkerAndDetails",
         chain: chains.testnet,
-        args: [customInstructions, dailyFrequency, ids, Number(collection?.id)],
+        args: [frequencies, customInstructions, ids, Number(collection?.id)],
         account: address,
       });
 
@@ -139,15 +148,39 @@ const useAgentsCollection = (
           collection?.agents?.includes(ag?.id)
         );
         if (nftAgents) {
-          setDailyFrequency(
-            nftAgents?.map(
-              (ag) =>
+          setFrequencies(
+            nftAgents?.map((ag) => ({
+              publishFrequency:
                 Number(
                   ag?.details?.find(
                     (col) => Number(col?.collectionId) == Number(collection?.id)
-                  )?.dailyFrequency
-                ) || 0
-            )
+                  )?.publishFrequency
+                ) || 0,
+              remixFrequency:
+                Number(
+                  ag?.details?.find(
+                    (col) => Number(col?.collectionId) == Number(collection?.id)
+                  )?.remixFrequency
+                ) || 0,
+              leadFrequency:
+                Number(
+                  ag?.details?.find(
+                    (col) => Number(col?.collectionId) == Number(collection?.id)
+                  )?.leadFrequency
+                ) || 0,
+              lead:
+                ag?.details?.find(
+                  (col) => Number(col?.collectionId) == Number(collection?.id)
+                )?.lead || false,
+              remix:
+                ag?.details?.find(
+                  (col) => Number(col?.collectionId) == Number(collection?.id)
+                )?.remix || false,
+              publish:
+                ag?.details?.find(
+                  (col) => Number(col?.collectionId) == Number(collection?.id)
+                )?.publish || false,
+            }))
           );
           setCustomInstructions(
             nftAgents?.map(
@@ -169,9 +202,9 @@ const useAgentsCollection = (
     editAgentsLoading,
     priceAdjusted,
     setPriceAdjusted,
-    dailyFrequency,
+    frequencies,
     setCustomInstructions,
-    setDailyFrequency,
+    setFrequencies,
     customInstructions,
     statusLoading,
     handleCollectionStatus,

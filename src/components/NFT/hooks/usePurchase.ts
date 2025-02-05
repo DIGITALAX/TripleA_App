@@ -1,22 +1,32 @@
-import { NFTData } from "@/components/Common/types/common.types";
+import { Fulfiller, NFTData } from "@/components/Common/types/common.types";
 import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
-import { MARKET_CONTRACT, TOKENS, WGRASS_CONTRACT } from "@/lib/constants";
+import { MARKET_CONTRACT, WGRASS_CONTRACT } from "@/lib/constants";
 import { CollectData } from "../types/nft.types";
+import { CollectionType } from "@/components/Dashboard/types/dashboard.types";
 
 const usePurchase = (
   nft: NFTData,
   setNft: (e: SetStateAction<NFTData | undefined>) => void,
   address: `0x${string}` | undefined,
   publicClient: PublicClient,
-  setNotification: (e: SetStateAction<string | undefined>) => void
+  setNotification: (e: SetStateAction<string | undefined>) => void,
+  setFulfillmentOpen: (
+    e: SetStateAction<
+      | (CollectData & {
+          id: number;
+          fulfiller: string;
+        })
+      | undefined
+    >
+  ) => void,
+  fulfillers: Fulfiller[]
 ) => {
   const [purchaseLoading, setPurchaseLoading] = useState<boolean>(false);
   const [collectData, setCollectData] = useState<CollectData>({
     amount: 1,
-    token: TOKENS[0]?.contract,
   });
   const [screen, setScreen] = useState<number>(0);
   const [approved, setApproved] = useState<boolean>(false);
@@ -63,7 +73,7 @@ const usePurchase = (
       ) {
         setApproved(true);
       } else {
-        setApproved(false)
+        setApproved(false);
       }
     } catch (err: any) {
       console.error(err.message);
@@ -167,6 +177,16 @@ const usePurchase = (
 
   const handlePurchase = async () => {
     if (collectData?.amount < 1) return;
+    if (nft?.collectionType == CollectionType.IRL) {
+      setFulfillmentOpen({
+        ...collectData,
+        id: Number(nft.id),
+        fulfiller: fulfillers?.find((ful) => ful.id == nft.fulfillerId)
+          ?.address!,
+      });
+      return;
+    }
+
     setPurchaseLoading(true);
     try {
       const clientWallet = createWalletClient({
@@ -179,7 +199,7 @@ const usePurchase = (
         abi: MarketAbi,
         functionName: "buy",
         chain: chains.testnet,
-        args: [Number(nft.id), collectData?.amount, collectData?.token],
+        args: ["", collectData?.token, Number(nft.id), collectData?.amount],
         account: address,
       });
 
@@ -192,6 +212,10 @@ const usePurchase = (
         amountSold: Number(nft?.amountSold) + Number(collectData?.amount),
       });
       checkAllowance();
+      setCollectData({
+        amount: 1,
+        token: nft?.tokens?.[0],
+      });
     } catch (err: any) {
       if (err?.message?.includes("NotAvailable")) {
         setNotification?.(
@@ -208,6 +232,24 @@ const usePurchase = (
       checkAllowance();
     }
   }, [address, nft, collectData?.amount]);
+
+  useEffect(() => {
+    if (nft) {
+      if (nft?.collectionType == CollectionType.IRL) {
+        setCollectData({
+          ...collectData,
+          size: nft?.sizes?.[0]!,
+          color: nft?.colors?.[0]!,
+          token: nft?.tokens?.[0],
+        });
+      } else {
+        setCollectData({
+          ...collectData,
+          token: nft?.tokens?.[0],
+        });
+      }
+    }
+  }, [nft]);
 
   return {
     purchaseLoading,

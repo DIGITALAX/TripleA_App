@@ -16,6 +16,7 @@ import {
   testnet as storageTestnet,
 } from "@lens-protocol/storage-node-client";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { CollectData } from "@/components/NFT/types/nft.types";
 
 export const config = createConfig(
   getDefaultConfig({
@@ -66,6 +67,21 @@ export const ModalContext = createContext<
       setTokenThresholds: (e: SetStateAction<TokenThreshold[]>) => void;
       fulfillers: Fulfiller[];
       setFulfillers: (e: SetStateAction<Fulfiller[]>) => void;
+      setFulfillmentOpen: (
+        e: SetStateAction<
+          | (CollectData & {
+              id: number;
+              fulfiller: string;
+            })
+          | undefined
+        >
+      ) => void;
+      fulfillmentOpen:
+        | (CollectData & {
+            id: number;
+            fulfiller: string;
+          })
+        | undefined;
     }
   | undefined
 >(undefined);
@@ -85,6 +101,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [lensClient, setLensClient] = useState<PublicClient | undefined>();
   const [fulfillers, setFulfillers] = useState<Fulfiller[]>([]);
+  const [fulfillmentOpen, setFulfillmentOpen] = useState<
+    | (CollectData & {
+        id: number;
+        fulfiller: string;
+      })
+    | undefined
+  >();
   const storageClient = StorageClient.create(storageTestnet);
 
   useEffect(() => {
@@ -113,6 +136,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           >
             <ModalContext.Provider
               value={{
+                fulfillmentOpen,
+                setFulfillmentOpen,
                 imageView,
                 setImageView,
                 agents,

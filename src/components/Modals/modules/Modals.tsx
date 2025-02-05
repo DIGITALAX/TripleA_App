@@ -7,6 +7,7 @@ import CreateAccount from "./CreateAccount";
 import Indexer from "./Indexer";
 import Notification from "./Notification";
 import Signless from "./Signless";
+import Fulfillment from "./Fulfillment";
 
 const Modals: FunctionComponent = (): JSX.Element => {
   const context = useContext(ModalContext);
@@ -31,6 +32,14 @@ const Modals: FunctionComponent = (): JSX.Element => {
           setCreateAccount={context?.setCreateAccount}
           setIndexer={context?.setIndexer}
           storageClient={context?.storageClient!}
+          setNotification={context?.setNotification}
+        />
+      )}
+      {context?.fulfillmentOpen && (
+        <Fulfillment
+          address={address}
+          details={context?.fulfillmentOpen}
+          setFulfillmentOpen={context?.setFulfillmentOpen}
           setNotification={context?.setNotification}
         />
       )}

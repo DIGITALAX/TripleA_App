@@ -160,10 +160,21 @@ export interface Agent {
   cover: string;
   title: string;
   customInstructions: string;
-  description: string;
+  owners: string[];
+  bio: string;
+  lore: string;
+  knowledge: string;
+  style: string;
+  adjectives: string;
+  messageExamples: {
+    user: string;
+    content: {
+      text: string;
+    };
+  }[][];
   wallet: string;
   balance: Balances[];
-  owner: string;
+  creator: string;
   activeCollectionIds: AgentCollection[];
   collectionIdsHistory: AgentCollection[];
   details: {
@@ -201,9 +212,14 @@ export interface Balances {
   token: string;
   activeBalance: number;
   totalBalance: number;
-  dailyFrequency: number;
   collectionId: number;
   instructions: string;
+  publishFrequency: number;
+  remixFrequency: number;
+  leadFrequency: number;
+  publish: boolean;
+  remix: boolean;
+  lead: boolean;
 }
 
 export interface DropInterface {

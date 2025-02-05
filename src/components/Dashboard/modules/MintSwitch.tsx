@@ -554,8 +554,8 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                             >
                               <div
                                 className={`relative flex items-center justify-center  ${
-                                  mintData?.format == "Sticker" ||
-                                  mintData?.format == "Poster"
+                                  mintData?.format == Format.Sticker ||
+                                  mintData?.format == Format.Poster
                                     ? "w-fit h-fit"
                                     : "w-6 h-6 "
                                 }`}
@@ -615,49 +615,62 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
     default:
       return (
         <div className="relative w-full h-full flex flex-row gap-6 items-center justify-center">
-          <div className="relative w-fit h-fit flex">
-            <div
-              className={`"relative w-40 h-40 rounded-md cursor-canP hover:opacity-50 flex bg-windows border border-windows ${
-                mintData.collectionType == CollectionType.IRL && "opacity-70"
-              }`}
-              onClick={() => {
-                setMintData({
-                  ...mintData,
-                  collectionType: CollectionType.IRL,
-                });
-                setMintSwitcher(MintSwitcher.Collection);
-              }}
-              title={CollectionType.IRL}
-            >
-              <Image
-                src={`${INFURA_GATEWAY}/ipfs/`}
-                objectFit="contain"
-                layout="fill"
-                draggable={false}
-              />
+          <div className="relative w-fit h-fit flex flex-col items-center justify-center gap-3">
+            <div className="relative w-fit h-fit flex text-center">
+              {CollectionType.IRL}
+            </div>
+            <div className="relative w-fit h-fit flex">
+              <div
+                className={`relative w-40 h-40 rounded-md cursor-canP hover:opacity-50 flex bg-windows ${
+                  mintData.collectionType == CollectionType.IRL &&
+                  "opacity-70 border border-pink"
+                }`}
+                onClick={() => {
+                  setMintData({
+                    ...mintData,
+                    collectionType: CollectionType.IRL,
+                  });
+                  setMintSwitcher(MintSwitcher.Collection);
+                }}
+                title={CollectionType.IRL}
+              >
+                <Image
+                  src={`${INFURA_GATEWAY}/ipfs/QmWU1dajFnaHuH7oAH57SbE2WiQU1G5pkSDtuzdHXshbCQ`}
+                  objectFit="contain"
+                  layout="fill"
+                  className="rounded-md"
+                  draggable={false}
+                />
+              </div>
             </div>
           </div>
-          <div className="relative w-fit h-fit flex">
-            <div
-              className={`"relative w-40 h-40 rounded-md cursor-canP hover:opacity-50 flex bg-windows border border-windows ${
-                mintData.collectionType == CollectionType.Digital &&
-                "opacity-70"
-              }`}
-              onClick={() => {
-                setMintData({
-                  ...mintData,
-                  collectionType: CollectionType.Digital,
-                });
-                setMintSwitcher(MintSwitcher.Collection);
-              }}
-              title={CollectionType.Digital}
-            >
-              <Image
-                src={`${INFURA_GATEWAY}/ipfs/`}
-                objectFit="contain"
-                layout="fill"
-                draggable={false}
-              />
+          <div className="relative w-fit h-fit flex flex-col items-center justify-center gap-3">
+            <div className="relative w-fit h-fit flex text-center">
+              {CollectionType.Digital}
+            </div>
+            <div className="relative w-fit h-fit flex">
+              <div
+                className={`relative w-40 h-40 rounded-md cursor-canP hover:opacity-50 flex bg-windows ${
+                  mintData.collectionType == CollectionType.Digital &&
+                  "opacity-70 border border-pink"
+                }`}
+                onClick={() => {
+                  setMintData({
+                    ...mintData,
+                    collectionType: CollectionType.Digital,
+                  });
+                  setMintSwitcher(MintSwitcher.Collection);
+                }}
+                title={CollectionType.Digital}
+              >
+                <Image
+                  src={`${INFURA_GATEWAY}/ipfs/QmeJcAuo8Q8zhXXt9Zy9mbDBY2guRpLKSDrudYgi7r8tHP`}
+                  objectFit="contain"
+                  layout="fill"
+                  className="rounded-md"
+                  draggable={false}
+                />
+              </div>
             </div>
           </div>
         </div>

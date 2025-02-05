@@ -41,6 +41,7 @@ export default function NFT() {
         />
         <Purchase
           nft={nft!}
+          setFulfillmentOpen={context?.setFulfillmentOpen!}
           handlePosts={handlePosts}
           tokenThresholds={context?.tokenThresholds!}
           setIndexer={context?.setIndexer!}
@@ -55,6 +56,7 @@ export default function NFT() {
           storageClient={context?.storageClient!}
           setImageView={context?.setImageView!}
           agents={context?.agents!}
+          fulfillers={context?.fulfillers!}
         />
       </div>
       <div className="relative w-full h-fit flex items-center justify-center">

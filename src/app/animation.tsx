@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { AnimationContext } from "./providers";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
@@ -10,8 +10,11 @@ export default function Animation({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (context?.pageChange) {
+      window.scrollTo({ top: 0 , behavior: "instant"});
+      window.document.body.style.overflow = "hidden";
       const timer = setTimeout(() => {
         context?.setPageChange(false);
+        window.document.body.style.overflow = "auto";
       }, 6000);
 
       return () => clearTimeout(timer);

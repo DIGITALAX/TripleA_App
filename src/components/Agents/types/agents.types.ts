@@ -10,7 +10,10 @@ export enum AgentSwitcher {
 
 export enum CreateSwitcher {
   Details,
+  Conversation,
   Profile,
+  Feeds,
+  Owners,
   Create,
   Success,
 }
@@ -27,7 +30,6 @@ export type CreateSwitchProps = {
 
 export type AgentSwitchProps = {
   agentSwitcher: AgentSwitcher;
-  setAgentSwitcher: (e: SetStateAction<AgentSwitcher>) => void;
   createSwitcher: CreateSwitcher;
   setCreateSwitcher: (e: SetStateAction<CreateSwitcher>) => void;
 };
@@ -39,6 +41,18 @@ export type AgentCreateProps = {
 export interface AgentDetails {
   title: string;
   cover: Blob | undefined;
-  description: string;
+  owners: string[];
+  bio: string;
+  lore: string;
+  knowledge: string;
+  style: string;
+  adjectives: string;
+  messageExamples: {
+    user: string;
+    content: {
+      text: string;
+    };
+  }[][];
   customInstructions: string;
+  feeds: string[];
 }

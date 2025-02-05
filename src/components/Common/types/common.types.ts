@@ -1,11 +1,16 @@
+import { CollectionType } from "@/components/Dashboard/types/dashboard.types";
 import { Account, Post, SessionClient } from "@lens-protocol/client";
 
 export interface NFTData {
   id: number;
   image: string;
   title: string;
+  format?: string;
   description: string;
   blocktimestamp: string;
+  collectionType: CollectionType;
+  colors?: string[];
+  sizes?: string[];
   prices: string[];
   tokens: string[];
   agents: string[];
@@ -17,6 +22,13 @@ export interface NFTData {
   collectors?: Collector[];
   agentActivity?: Post[];
   active: boolean;
+  agent: boolean;
+  remixId: string;
+  fulfillerId: string;
+  remix?: {
+    image: string;
+    profile: Account;
+  };
 }
 
 export interface LensConnected {

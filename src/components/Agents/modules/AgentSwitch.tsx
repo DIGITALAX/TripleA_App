@@ -10,7 +10,6 @@ import { ModalContext } from "@/app/providers";
 
 const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
   agentSwitcher,
-  setAgentSwitcher,
   createSwitcher,
   setCreateSwitcher,
 }): JSX.Element => {
@@ -19,7 +18,7 @@ const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
     case AgentSwitcher.Create:
       return (
         <div className="relative w-full h-fit flex items-start justify-end">
-          <div className="relative md:w-3/4 w-full h-[40rem] flex flex-col gap-6 bg-viol rounded-md  p-2">
+          <div className="relative md:w-3/4 w-full h-[40rem] flex flex-col gap-6 bg-viol rounded-md p-2">
             <CreateSwitch
               createSwitcher={createSwitcher}
               setCreateSwitcher={setCreateSwitcher}
@@ -61,13 +60,13 @@ const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
               </div>
               <div
                 className={`relative flex w-fit h-fit  ${
-                  createSwitcher < 2
+                  createSwitcher < 5
                     ? "cursor-canP hover:opacity-70"
                     : "opacity-70"
                 }`}
                 onClick={() =>
                   setCreateSwitcher(
-                    createSwitcher < 2 ? createSwitcher + 1 : createSwitcher
+                    createSwitcher < 5 ? createSwitcher + 1 : createSwitcher
                   )
                 }
               >

@@ -1,4 +1,5 @@
 import {
+  Fulfiller,
   LensConnected,
   NFTData,
   TokenThreshold,
@@ -30,11 +31,23 @@ export type PurchaseProps = {
   storageClient: StorageClient;
   setImageView: (e: SetStateAction<string | undefined>) => void;
   agents: Agent[];
+  setFulfillmentOpen: (
+    e: SetStateAction<
+      | (CollectData & {
+          id: number;
+          fulfiller: string;
+        })
+      | undefined
+    >
+  ) => void;
+  fulfillers: Fulfiller[];
 };
 
 export interface CollectData {
   amount: number;
-  token: string;
+  token?: string;
+  size?: string;
+  color?: string;
 }
 
 export type CommentsProps = {

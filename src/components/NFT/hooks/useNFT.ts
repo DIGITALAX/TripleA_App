@@ -5,7 +5,10 @@ import {
 } from "@/components/Common/types/common.types";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { useEffect, useState } from "react";
-import { getCollection } from "../../../../graphql/queries/getCollection";
+import {
+  getCollection,
+  getCollectionRemix,
+} from "../../../../graphql/queries/getCollection";
 import {
   evmAddress,
   PageSize,
@@ -208,6 +211,37 @@ const useNFT = (
         picture = json.item;
       }
 
+      let remix = undefined;
+
+      if (Number(collection?.remixId) > 0) {
+        const remData = await getCollectionRemix(Number(collection?.remixId));
+
+        let image = remData?.data?.collectionCreateds?.[0]?.metadata?.image;
+        if (!image) {
+          const cadena = await fetch(
+            `${INFURA_GATEWAY}/ipfs/${
+              remData?.data?.collectionCreateds?.[0]?.uri.split("ipfs://")?.[1]
+            }`
+          );
+          const metadata = await cadena.json();
+          image = metadata.image;
+        }
+
+        const accounts = await fetchAccountsAvailable(
+          {
+            managedBy: evmAddress(
+              remData?.data?.collectionCreateds?.[0]?.artist
+            ),
+          },
+          lensConnected?.sessionClient || lensClient
+        );
+
+        remix = {
+          image,
+          profile: (accounts as any)?.[0]?.account,
+        };
+      }
+
       setNft({
         id: Number(collection?.id),
         image: collection?.metadata?.image,
@@ -222,6 +256,9 @@ const useNFT = (
         amountSold: collection?.amountSold,
         tokenIds: collection?.tokenIds,
         amount: collection?.amount,
+        agent: collection?.agent,
+        remixId: collection?.remixId,
+        remix,
         profile: {
           ...(result as any)?.[0]?.account,
           metadata: {
@@ -231,6 +268,10 @@ const useNFT = (
         },
         collectors,
         agentActivity: posts || [],
+        collectionType: collection?.collectionType,
+        format: collection?.metadata?.format,
+        sizes: collection?.metadata?.sizes,
+        colors: collection?.metadata?.colors,
       });
     } catch (err: any) {
       console.error(err.message);

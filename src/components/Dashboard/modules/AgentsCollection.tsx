@@ -1,5 +1,9 @@
 import { FunctionComponent, JSX, useContext } from "react";
-import { DropSwitcher, AgentsCollectionProps } from "../types/dashboard.types";
+import {
+  DropSwitcher,
+  AgentsCollectionProps,
+  CollectionWorkerType,
+} from "../types/dashboard.types";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import { useRouter } from "next/navigation";
@@ -8,6 +12,7 @@ import useAgentsCollection from "../hooks/useAgentsCollection";
 import { useAccount } from "wagmi";
 import { chains } from "@lens-network/sdk/viem";
 import { createPublicClient, http } from "viem";
+import { ImSwitch } from "react-icons/im";
 
 const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
   setDropSwitcher,
@@ -32,9 +37,9 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
     editAgentsLoading,
     priceAdjusted,
     setPriceAdjusted,
-    dailyFrequency,
+    frequencies,
     setCustomInstructions,
-    setDailyFrequency,
+    setFrequencies,
     customInstructions,
     statusLoading,
     handleCollectionStatus,
@@ -50,7 +55,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
 
   return (
     <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
-      <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
+      <div className="relative w-full min-h-[30rem] h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
             className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -76,7 +81,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
         </div>
         <div className="flex relative w-full h-full items-center justify-start overflow-x-scroll">
           <div
-            className={`relative h-80 flex flex-row gap-6 ${
+            className={`relative h-full flex flex-row gap-6 ${
               collection?.agents?.length > 1 ? "w-fit" : "w-full"
             }`}
           >
@@ -97,7 +102,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                   );
                 }}
               >
-                <div className="relative w-60 h-full rounded-md flex pixel-border-7">
+                <div className="relative w-60 h-40 rounded-md flex pixel-border-7">
                   <Image
                     objectFit="cover"
                     layout="fill"
@@ -203,22 +208,22 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                       return (
                         <div
                           key={key}
-                          className={`relative w-60 h-full bg-pink rounded-md flex flex-col items-center justify-between p-2 gap-2`}
+                          className={`relative w-60 h-fit bg-pink rounded-md flex flex-col items-center justify-between p-2 gap-2`}
                         >
                           <div className="relative w-fit h-fit rounded-md flex">
-                            <div className="relative w-20 h-20 pixel-border-7 bg-white rounded-xl flex">
-                            <Image
-                              objectFit="contain"
-                              layout="fill"
-                              draggable={false}
-                              alt={agent?.title}
-                              src={`${INFURA_GATEWAY}/ipfs/${
-                                agent?.cover?.includes("ipfs")
-                                  ? agent?.cover?.split("ipfs://")?.[1]
-                                  : agent?.cover
-                              }`}
-                              className="rounded-md"
-                            />
+                            <div className="relative w-12 h-12 pixel-border-7 bg-white rounded-xl flex">
+                              <Image
+                                objectFit="contain"
+                                layout="fill"
+                                draggable={false}
+                                alt={agent?.title}
+                                src={`${INFURA_GATEWAY}/ipfs/${
+                                  agent?.cover?.includes("ipfs")
+                                    ? agent?.cover?.split("ipfs://")?.[1]
+                                    : agent?.cover
+                                }`}
+                                className="rounded-md"
+                              />
                             </div>
                           </div>
                           <div className="relative w-fit h-fit flex text-lg font-dos uppercase">
@@ -231,34 +236,107 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                               e.stopPropagation();
                             }}
                           >
-                            <input
-                              className="relative w-full h-10 p-1 bg-viol rounded-md text-sm focus:outline-none"
-                              placeholder="1"
-                              type="number"
-                              min={1}
-                              max={3}
-                              step={1}
-                              disabled={editAgentsLoading}
-                              value={dailyFrequency[key]}
-                              onChange={(e) => {
-                                let value = Number(e.target.value);
-                                if (value > 3) {
-                                  value = 3;
-                                }
-                                (e.target.value as any) = value;
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setDailyFrequency((prev) => {
-                                  const freqs = [...prev];
+                            {[
+                              {
+                                type: CollectionWorkerType.Publish,
+                                value: frequencies[key]?.publishFrequency,
+                                key: "publishFrequency",
+                                on: frequencies[key]?.publish,
+                              },
+                              {
+                                type: CollectionWorkerType.Lead,
+                                value: frequencies[key]?.leadFrequency,
+                                key: "leadFrequency",
+                                on: frequencies[key]?.lead,
+                              },
+                              {
+                                type: CollectionWorkerType.Remix,
+                                value: frequencies[key]?.remixFrequency,
+                                key: "remixFrequency",
+                                on: frequencies[key]?.remix,
+                              },
+                            ].map((item, index) => {
+                              return (
+                                <div
+                                  className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start  ${
+                                    !item.on && "opacity-50"
+                                  }`}
+                                  key={index}
+                                >
+                                  <div className="relative w-full h-fit flex flex-row gap-1 items-center justify-between">
+                                    <div className="relative w-fit h-fit flex">
+                                      {item.type}
+                                    </div>
+                                    <div
+                                      className={`relative w-fit h-fit flex cursor-canP`}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setFrequencies((prev) => {
+                                          let freq = [...prev];
+                                          (freq[key] as any)[
+                                            item.key.replace(
+                                              "Frequency",
+                                              ""
+                                            ) as unknown as keyof {
+                                              publish: boolean;
+                                              remix: boolean;
+                                              lead: boolean;
+                                            }
+                                          ] = !freq[key][
+                                            item.key.replace(
+                                              "Frequency",
+                                              ""
+                                            ) as unknown as keyof {
+                                              publish: boolean;
+                                              remix: boolean;
+                                              lead: boolean;
+                                            }
+                                          ] as boolean;
 
-                                  freqs[key] = value;
+                                          return freq;
+                                        });
+                                      }}
+                                    >
+                                      <ImSwitch size={15} color="#CECEFF" />
+                                    </div>
+                                  </div>
+                                  <input
+                                    className="relative w-full h-6 p-1 bg-viol text-sm rounded-sm focus:outline-none"
+                                    placeholder="1"
+                                    type="number"
+                                    min={1}
+                                    max={3}
+                                    step={1}
+                                    disabled={!item.on}
+                                    value={item.value}
+                                    onChange={(e) => {
+                                      let value = Number(e.target.value);
+                                      if (value > 3) {
+                                        value = 3;
+                                      }
+                                      (e.target.value as any) = value;
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setFrequencies((prev) => {
+                                        let freq = [...prev];
+                                        (freq[key] as any)[
+                                          item.key as unknown as keyof {
+                                            publishFrequency: number;
+                                            remixFrequency: number;
+                                            leadFrequency: number;
+                                          }
+                                        ] = value;
 
-                                  return freqs;
-                                });
-                              }}
-                            />
+                                        return freq;
+                                      });
+                                    }}
+                                  />
+                                </div>
+                              );
+                            })}
                             <textarea
-                              className="relative w-full h-full flex overflow-y-scroll p-1 bg-viol text-sm rounded-md cursor-text focus:outline-none"
+                              className="relative w-full h-40 flex overflow-y-scroll p-1 bg-viol text-sm rounded-md cursor-text focus:outline-none"
                               placeholder="Add custom instructions for your agent."
                               style={{
                                 resize: "none",

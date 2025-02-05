@@ -37,7 +37,9 @@ const Mint: FunctionComponent<MintProps> = ({
                       )?.rent || 0
                     ) /
                       10 ** 18) *
-                      Number(agent?.publishFrequency || 0)}
+                      (Number(agent?.publishFrequency || 0) +
+                        Number(agent?.leadFrequency || 0) +
+                        Number(agent?.remixFrequency || 0))}
                   </div>
                   <div className="relative w-fit h-fit flex">
                     {
