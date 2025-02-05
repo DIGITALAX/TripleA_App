@@ -7,7 +7,11 @@ import {
   PublicClient as LensPublicClient,
 } from "viem";
 import { getUserAgents } from "../../../../graphql/queries/getUserAgents";
-import { AGENTS_CONTRACT, INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import {
+  SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
+  INFURA_GATEWAY,
+  STORAGE_NODE,
+} from "@/lib/constants";
 import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { chains } from "@lens-network/sdk/viem";
 import AgentAbi from "@abis/AgentAbi.json";
@@ -24,12 +28,20 @@ const useUserAgents = (
   const [agentMetadata, setAgentMetadata] = useState<{
     cover?: string | Blob;
     title: string;
-    description: string;
+    bio: string;
     customInstructions: string;
+    knowledge: string;
+    style: string;
+    lore: string;
+    adjectives: string;
   }>({
     title: "",
-    description: "",
+    bio: "",
     customInstructions: "",
+    style: "",
+    knowledge: "",
+    adjectives: "",
+    lore: "",
   });
   const [currentAgent, setCurrentAgent] = useState<Agent | undefined>();
 
@@ -102,7 +114,7 @@ const useUserAgents = (
       (typeof agentMetadata.cover == "string" &&
         (agentMetadata.cover as string)?.trim() == "") ||
       agentMetadata.title?.trim() == "" ||
-      agentMetadata.description?.trim() == "" ||
+      agentMetadata.bio?.trim() == "" ||
       agentMetadata.customInstructions?.trim() == ""
     )
       return;
@@ -140,8 +152,12 @@ const useUserAgents = (
         },
         body: JSON.stringify({
           title: agentMetadata.title,
-          description: agentMetadata.description,
+          description: agentMetadata.bio,
           customInstructions: agentMetadata.customInstructions,
+          lore: agentMetadata.lore,
+          adjectives: agentMetadata.adjectives,
+          style: agentMetadata.style,
+          knowledge: agentMetadata.knowledge,
           cover: agentImage,
         }),
       });
@@ -149,15 +165,11 @@ const useUserAgents = (
       const responseJSON = await response.json();
 
       const { request } = await publicClient.simulateContract({
-        address: AGENTS_CONTRACT,
+        address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
         abi: AgentAbi,
         functionName: "editAgent",
         chain: chains.testnet,
-        args: [
-          [currentAgent?.wallet],
-          "ipfs://" + responseJSON?.cid,
-          currentAgent?.id,
-        ],
+        args: ["ipfs://" + responseJSON?.cid, currentAgent?.id],
         account: address,
       });
 

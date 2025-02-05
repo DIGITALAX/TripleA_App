@@ -77,6 +77,7 @@ export type SalesProps = {
 export type CollectsProps = {
   setSwitcher: (e: SetStateAction<Switcher>) => void;
   lensClient: PublicClient;
+  setNotification: (e: SetStateAction<string | undefined>) => void;
 };
 
 export type DropProps = {
@@ -241,6 +242,19 @@ export interface Order {
   transactionHash: string;
   collection: NFTData;
   buyer: string;
+  collectionType: CollectionType;
+  fulfilled: boolean;
+  fulfillment: string;
+  fulfiller: string;
+  fulfillmentDetails?: {
+    color: string;
+    size: string;
+    name: string;
+    address: string;
+    country: string;
+    state: string;
+    zip: string;
+  };
 }
 
 export type DropsSwitchProps = {

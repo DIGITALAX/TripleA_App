@@ -53,7 +53,11 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
 
     case Switcher.Collects:
       return (
-        <Collects lensClient={context?.lensClient!} setSwitcher={setSwitcher} />
+        <Collects
+          setNotification={context?.setNotification!}
+          lensClient={context?.lensClient!}
+          setSwitcher={setSwitcher}
+        />
       );
 
     case Switcher.Agents:

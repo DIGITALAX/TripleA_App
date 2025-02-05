@@ -10,7 +10,7 @@ export default function Animation({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (context?.pageChange) {
-      window.scrollTo({ top: 0 , behavior: "instant"});
+      window.scrollTo({ top: 0, behavior: "instant" });
       window.document.body.style.overflow = "hidden";
       const timer = setTimeout(() => {
         context?.setPageChange(false);
@@ -29,7 +29,7 @@ export default function Animation({ children }: { children: React.ReactNode }) {
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             transition={{
-              duration: 2,
+              duration: 4,
               ease: "easeInOut",
               repeat: 1,
               repeatType: "reverse",
@@ -48,11 +48,10 @@ export default function Animation({ children }: { children: React.ReactNode }) {
             initial={{ opacity: 1, scale: 1 }}
             animate={{
               opacity: context?.pageChange ? 0 : 1,
-              scale: context?.pageChange ? 0.2 : 1,
-              rotate: context?.pageChange ? 10 : 0,
+              scale: context?.pageChange ? 0.1 : 1,
             }}
             transition={{
-              duration: 2,
+              duration: 4,
               ease: "easeInOut",
               repeat: 1,
               repeatType: "reverse",
@@ -65,7 +64,7 @@ export default function Animation({ children }: { children: React.ReactNode }) {
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             transition={{
-              duration: 2,
+              duration: 4,
               ease: "easeInOut",
               repeat: 1,
               repeatType: "reverse",

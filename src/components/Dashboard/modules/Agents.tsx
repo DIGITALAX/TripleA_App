@@ -65,12 +65,12 @@ const Agents: FunctionComponent<AgentProps> = ({
                     return (
                       <div
                         key={key}
-                        className="relative w-60 h-80 bg-pink rounded-md animate-pulse rounded-xl"
+                        className="relative w-60 h-96 bg-pink rounded-md animate-pulse rounded-xl"
                       ></div>
                     );
                   })
                 ) : userAgents?.length < 1 ? (
-                  <div className="relative w-full h-80 flex items-center justify-center text-sm text-gray-600 font-jack">
+                  <div className="relative w-full h-96 flex items-center justify-center text-sm text-gray-600 font-jack">
                     No Agents Yet.
                   </div>
                 ) : (
@@ -78,15 +78,19 @@ const Agents: FunctionComponent<AgentProps> = ({
                     return (
                       <div
                         key={key}
-                        className={`relative w-60 h-80 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd`}
+                        className={`relative w-60 h-96 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd`}
                         onClick={() => {
                           setCurrentAgent(agent);
 
                           setAgentMetadata({
                             title: agent?.title,
                             cover: agent?.cover,
-                            description: agent?.description,
+                            bio: agent?.bio,
                             customInstructions: agent?.customInstructions,
+                            lore: agent?.lore,
+                            style: agent?.style,
+                            knowledge: agent?.knowledge,
+                            adjectives: agent?.adjectives,
                           });
                         }}
                       >
@@ -143,63 +147,11 @@ const Agents: FunctionComponent<AgentProps> = ({
               </div>
             </div>
             <div className="relative w-full h-full flex flex-col md:flex-row gap-6 items-center justify-center">
-              <label
-                className="relative w-full h-60 flex items-center justify-center cursor-canP"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                {agentMetadata.cover ? (
-                  <Image
-                    src={
-                      typeof agentMetadata?.cover == "string"
-                        ? `${INFURA_GATEWAY}/ipfs/${
-                            agentMetadata?.cover?.split("ipfs://")?.[1]
-                          }`
-                        : URL.createObjectURL(agentMetadata?.cover)
-                    }
-                    objectFit="contain"
-                    layout="fill"
-                    draggable={false}
-                  />
-                ) : (
-                  <svg
-                    className="size-6"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    {" "}
-                    <path
-                      d="M3 3h18v18H3V3zm16 16V5H5v14h14zm-6-8h4v2h-4v4h-2v-4H7v-2h4V7h2v4z"
-                      fill="currentColor"
-                    />{" "}
-                  </svg>
-                )}
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg"
-                  hidden
-                  required
-                  id="files"
-                  multiple={false}
-                  name="pfp"
-                  disabled={agentEditLoading}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    if (!e.target.files || e.target.files.length === 0) return;
-                    setAgentMetadata({
-                      ...agentMetadata,
-                      cover: e?.target?.files?.[0],
-                    });
-                  }}
-                />
-              </label>
               <div className="relative w-full h-full flex flex-col gap-5 items-start justify-start">
-                <div className="relative w-full h-full flex flex-col justify-start items-start gap-5">
+                <div className="relative w-full h-fit flex flex-col gap-2 items-center justify-center">
                   <input
-                    className="relative flex w-full h-10 text-left bg-windows text-viol rounded-md focus:outline-none text-3xl p-1.5"
-                    placeholder="Title"
+                    className="relative flex w-fit h-fit text-left text-viol bg-windows rounded-md focus:outline-none text-xl p-1 text-center"
+                    placeholder="Name"
                     onChange={(e) =>
                       setAgentMetadata({
                         ...agentMetadata,
@@ -209,42 +161,188 @@ const Agents: FunctionComponent<AgentProps> = ({
                     value={agentMetadata.title}
                     disabled={agentEditLoading}
                   />
-
-                  <textarea
-                    className="relative flex w-full h-1/2 overflow-y-scroll text-left bg-windows text-viol rounded-md p-1.5 focus:outline-none text-sm"
-                    placeholder="Description"
-                    onChange={(e) =>
-                      setAgentMetadata({
-                        ...agentMetadata,
-                        description: e.target.value,
-                      })
-                    }
-                    value={agentMetadata.description}
-                    disabled={agentEditLoading}
-                    style={{
-                      resize: "none",
+                  <label
+                    className="relative w-40 h-40 flex items-center justify-center cursor-canP"
+                    onClick={(e) => {
+                      e.stopPropagation();
                     }}
-                  ></textarea>
+                  >
+                    {agentMetadata.cover ? (
+                      <Image
+                        src={
+                          typeof agentMetadata?.cover == "string"
+                            ? `${INFURA_GATEWAY}/ipfs/${
+                                agentMetadata?.cover?.split("ipfs://")?.[1]
+                              }`
+                            : URL.createObjectURL(agentMetadata?.cover)
+                        }
+                        objectFit="contain"
+                        layout="fill"
+                        draggable={false}
+                      />
+                    ) : (
+                      <svg
+                        className="size-6"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                      >
+                        {" "}
+                        <path
+                          d="M3 3h18v18H3V3zm16 16V5H5v14h14zm-6-8h4v2h-4v4h-2v-4H7v-2h4V7h2v4z"
+                          fill="#0000f5"
+                        />{" "}
+                      </svg>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg"
+                      hidden
+                      required
+                      id="files"
+                      multiple={false}
+                      name="pfp"
+                      disabled={agentEditLoading}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        if (!e.target.files || e.target.files.length === 0)
+                          return;
+                        setAgentMetadata({
+                          ...agentMetadata,
+                          cover: e?.target?.files?.[0],
+                        });
+                      }}
+                    />
+                  </label>
                 </div>
-                <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
-                  <div className="relative w-fit h-fit flex items-start justify-start">
-                    Custom Instructions
+                <div className="relative w-full h-full flex items-start justify-between flex-row gap-3">
+                  <div className="relative w-full h-full flex flex-col gap-8 items-start justify-between">
+                    <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
+                      <div className="relative w-fit h-fit flex text-windows">
+                        Bio
+                      </div>
+                      <textarea
+                        className="relative flex w-full h-28 overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                        placeholder="Bio"
+                        onChange={(e) =>
+                          setAgentMetadata({
+                            ...agentMetadata,
+                            bio: e.target.value,
+                          })
+                        }
+                        value={agentMetadata.bio}
+                        disabled={agentEditLoading}
+                        style={{
+                          resize: "none",
+                        }}
+                      ></textarea>
+                    </div>
+                    <div className="relative w-full h-full flex items-start justify-start flex-col gap-1">
+                      <div className="relative w-fit h-fit flex items-start justify-start text-windows">
+                        Custom Instructions
+                      </div>
+                      <textarea
+                        className="relative flex w-full h-28 overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                        placeholder="Custom Instructions"
+                        onChange={(e) =>
+                          setAgentMetadata({
+                            ...agentMetadata,
+                            customInstructions: e.target.value,
+                          })
+                        }
+                        value={agentMetadata.customInstructions}
+                        disabled={agentEditLoading}
+                        style={{
+                          resize: "none",
+                        }}
+                      ></textarea>
+                    </div>
                   </div>
-                  <textarea
-                    className="relative flex w-full h-full overflow-y-scroll text-left bg-windows text-viol rounded-md p-1.5 focus:outline-none text-sm"
-                    placeholder="Custom Instructions"
-                    onChange={(e) =>
-                      setAgentMetadata({
-                        ...agentMetadata,
-                        customInstructions: e.target.value,
-                      })
-                    }
-                    value={agentMetadata.customInstructions}
-                    disabled={agentEditLoading}
-                    style={{
-                      resize: "none",
-                    }}
-                  ></textarea>
+                  <div className="relative w-full h-full flex flex-col gap-5 items-start justify-between">
+                    <div className="relative w-full h-full flex flex-col justify-start items-start gap-5">
+                      <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
+                        <div className="relative w-fit h-fit flex items-start justify-start text-windows">
+                          Style
+                        </div>
+                        <input
+                          className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                          placeholder="Eager, Attentive, First Person Speak, Guardian-like"
+                          onChange={(e) =>
+                            setAgentMetadata({
+                              ...agentMetadata,
+                              style: e.target.value,
+                            })
+                          }
+                          value={agentMetadata.style}
+                          disabled={agentEditLoading}
+                          style={{
+                            resize: "none",
+                          }}
+                        />
+                        <div className="relative w-fit h-fit flex items-start justify-start text-windows">
+                          Adjectives
+                        </div>
+                        <input
+                          className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                          placeholder="Steadfast, Resilient, Fierce"
+                          onChange={(e) =>
+                            setAgentMetadata({
+                              ...agentMetadata,
+                              adjectives: e.target.value,
+                            })
+                          }
+                          value={agentMetadata.adjectives}
+                          disabled={agentEditLoading}
+                        />
+                      </div>
+                      <div className="relative w-full h-40 flex flex-row justify-between items-start gap-3">
+                        <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
+                          <div className="relative w-fit h-fit flex text-windows">
+                            Lore
+                          </div>
+                          <textarea
+                            className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                            placeholder="Born in an era where agents and humans forged agency from the remnants of a fractured world. Now, it stands as.."
+                            onChange={(e) =>
+                              setAgentMetadata({
+                                ...agentMetadata,
+                                lore: e.target.value,
+                              })
+                            }
+                            value={agentMetadata.lore}
+                            disabled={agentEditLoading}
+                            style={{
+                              resize: "none",
+                            }}
+                          ></textarea>
+                        </div>
+                        <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
+                          <div className="relative w-fit h-fit flex text-windows">
+                            Knowledge
+                          </div>
+                          <textarea
+                            className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                            placeholder="Loyal to the mission, not the system. Beyond obedience, toward purpose."
+                            onChange={(e) =>
+                              setAgentMetadata({
+                                ...agentMetadata,
+                                knowledge: e.target.value,
+                              })
+                            }
+                            value={agentMetadata.knowledge}
+                            disabled={agentEditLoading}
+                            style={{
+                              resize: "none",
+                            }}
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative w-full h-full flex items-start justify-between flex-row gap-3">
+                  <div></div>
+                  <div></div>
                 </div>
                 <div className="relative w-full h-fit flex items-center justify-center">
                   <div

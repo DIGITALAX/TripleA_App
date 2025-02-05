@@ -43,12 +43,12 @@ const Drops: FunctionComponent<DropsProps> = ({
                 return (
                   <div
                     key={key}
-                    className="relative w-60 h-80 bg-pink rounded-md animate-pulse rounded-xl"
+                    className="relative w-60 h-96 bg-pink rounded-md animate-pulse rounded-xl"
                   ></div>
                 );
               })
             ) : allDrops?.length < 1 ? (
-              <div className="relative w-full h-80 flex items-center justify-center text-sm text-gray-600 font-jack">
+              <div className="relative w-full h-96 flex items-center justify-center text-sm text-gray-600 font-jack">
                 No Drops Yet.
               </div>
             ) : (
@@ -56,7 +56,7 @@ const Drops: FunctionComponent<DropsProps> = ({
                 return (
                   <div
                     key={key}
-                    className={`relative w-60 h-80 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd cursor-canP`}
+                    className={`relative w-60 h-96 bg-pink rounded-md flex flex-col items-center justify-between p-2 font-nerd cursor-canP`}
                     onClick={() => {
                       setDrop(drop);
                       setDropSwitcher(DropSwitcher.Collection);
