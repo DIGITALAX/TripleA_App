@@ -1,5 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
-import { Agent } from "../types/dashboard.types";
+import { Agent, AgentEditSwitcher } from "../types/dashboard.types";
 import { evmAddress, PublicClient } from "@lens-protocol/client";
 import {
   createWalletClient,
@@ -25,6 +25,9 @@ const useUserAgents = (
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [agentEditLoading, setAgentEditLoading] = useState<boolean>(false);
   const [userAgents, setUserAgents] = useState<Agent[]>([]);
+  const [agentEdit, setAgentEdit] = useState<AgentEditSwitcher>(
+    AgentEditSwitcher.Profile
+  );
   const [agentMetadata, setAgentMetadata] = useState<{
     cover?: string | Blob;
     title: string;
@@ -44,6 +47,168 @@ const useUserAgents = (
     lore: "",
   });
   const [currentAgent, setCurrentAgent] = useState<Agent | undefined>();
+  const [agentOwners, setAgentOwners] = useState<string[]>([]);
+  const [agentFeeds, setAgentFeeds] = useState<string[]>([]);
+  const [addLoading, setAddLoading] = useState<boolean[]>([]);
+  const [revokeLoading, setRevokeLoading] = useState<boolean[]>([]);
+  const [feedsLoading, setFeedsLoading] = useState<boolean>(false);
+  const [adminLoading, setAdminLoading] = useState<boolean[]>([]);
+  const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
+
+  const changeFeedAdmin = async (index: number) => {
+    setAdminLoading((prev) => {
+      let arr = [...prev];
+      arr[index] = true;
+      return arr;
+    });
+    try {
+      if (isAdmin?.[index]) {
+        setAgentFeeds(agentFeeds?.filter((_, i) => i !== index));
+        setNotification?.("Success! Admin Revoked.");
+      } else {
+        setNotification?.("Success! Admin Update.");
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setAdminLoading((prev) => {
+      let arr = [...prev];
+      arr[index] = false;
+      return arr;
+    });
+  };
+
+  const handleNewFeeds = async () => {
+    if (agentFeeds?.filter((fe) => fe.trim() !== "")?.length < 1) return;
+    if (isAdmin?.filter((a) => a == false).length > 0) {
+      setNotification?.("Agent must be Feed admin to publish.");
+      return;
+    }
+
+    setFeedsLoading(true);
+    try {
+      const clientWallet = createWalletClient({
+        chain: chains.testnet,
+        transport: custom((window as any).ethereum),
+      });
+
+      const response = await fetch("/api/ipfs", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          title: currentAgent?.title,
+          description: currentAgent?.bio,
+          customInstructions: currentAgent?.customInstructions,
+          lore: currentAgent?.lore,
+          adjectives: currentAgent?.adjectives,
+          style: currentAgent?.style,
+          knowledge: currentAgent?.knowledge,
+          cover: currentAgent?.cover,
+          messageExamples: currentAgent?.messageExamples,
+          feeds: agentFeeds?.filter((f) => f.trim() !== ""),
+        }),
+      });
+
+      const responseJSON = await response.json();
+
+      const { request } = await publicClient.simulateContract({
+        address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
+        abi: AgentAbi,
+        functionName: "editAgent",
+        chain: chains.testnet,
+        args: ["ipfs://" + responseJSON?.cid, currentAgent?.id],
+        account: address,
+      });
+
+      const res = await clientWallet.writeContract(request);
+      await publicClient.waitForTransactionReceipt({
+        hash: res,
+      });
+
+      setNotification?.("Success! Feeds Updated.");
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setFeedsLoading(false);
+  };
+
+  const addOwner = async (index: number) => {
+    if (agentOwners?.[index]?.trim() == "") return;
+    setAddLoading((prev) => {
+      let arr = [...prev];
+      arr[index] = true;
+      return arr;
+    });
+    try {
+      const clientWallet = createWalletClient({
+        chain: chains.testnet,
+        transport: custom((window as any).ethereum),
+      });
+
+      const { request } = await publicClient.simulateContract({
+        address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
+        abi: AgentAbi,
+        functionName: "addOwner",
+        chain: chains.testnet,
+        args: [agentOwners?.[index], currentAgent?.id],
+        account: address,
+      });
+
+      const res = await clientWallet.writeContract(request);
+      await publicClient.waitForTransactionReceipt({
+        hash: res,
+      });
+
+      setNotification?.("Success! Owner Added.");
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setAddLoading((prev) => {
+      let arr = [...prev];
+      arr[index] = false;
+      return arr;
+    });
+  };
+
+  const revokeOwner = async (index: number) => {
+    if (agentOwners?.[index]?.trim() == "") return;
+    setRevokeLoading((prev) => {
+      let arr = [...prev];
+      arr[index] = true;
+      return arr;
+    });
+    try {
+      const clientWallet = createWalletClient({
+        chain: chains.testnet,
+        transport: custom((window as any).ethereum),
+      });
+
+      const { request } = await publicClient.simulateContract({
+        address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
+        abi: AgentAbi,
+        functionName: "revokeOwner",
+        chain: chains.testnet,
+        args: [agentOwners?.[index], currentAgent?.id],
+        account: address,
+      });
+
+      const res = await clientWallet.writeContract(request);
+      await publicClient.waitForTransactionReceipt({
+        hash: res,
+      });
+
+      setNotification?.("Success! Owner Revoked.");
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setRevokeLoading((prev) => {
+      let arr = [...prev];
+      arr[index] = false;
+      return arr;
+    });
+  };
 
   const handleUserAgents = async () => {
     if (!address) return;
@@ -159,6 +324,8 @@ const useUserAgents = (
           style: agentMetadata.style,
           knowledge: agentMetadata.knowledge,
           cover: agentImage,
+          messageExamples: currentAgent?.messageExamples,
+          feeds: currentAgent?.feeds,
         }),
       });
 
@@ -200,6 +367,21 @@ const useUserAgents = (
     agentEditLoading,
     agentMetadata,
     setAgentMetadata,
+    agentEdit,
+    setAgentEdit,
+    setAgentOwners,
+    addLoading,
+    addOwner,
+    agentOwners,
+    revokeLoading,
+    revokeOwner,
+    feedsLoading,
+    handleNewFeeds,
+    setAgentFeeds,
+    agentFeeds,
+    adminLoading,
+    changeFeedAdmin,
+    isAdmin,
   };
 };
 

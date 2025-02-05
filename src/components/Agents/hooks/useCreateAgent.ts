@@ -281,6 +281,7 @@ const useCreateAgent = (
   };
 
   const handleCreateAgent = async () => {
+    
     if (
       !address ||
       agentDetails?.title?.trim() == "" ||

@@ -192,6 +192,7 @@ export interface Agent {
   ownerProfile?: Account;
   activity?: Post[];
   accountConnected?: string;
+  feeds: string[];
 }
 
 export enum CollectionWorkerType {
@@ -281,4 +282,51 @@ export type AgentsCollectionProps = {
   collection: NFTData;
   setCollection: (e: SetStateAction<NFTData | undefined>) => void;
   setNotification: (e: SetStateAction<string | undefined>) => void;
+};
+
+export enum AgentEditSwitcher {
+  Profile,
+  Wallets,
+  Feeds,
+}
+
+export type AgentEditSwitchProps = {
+  agentEdit: AgentEditSwitcher;
+  handleEditAgent: () => Promise<void>;
+  agentEditLoading: boolean;
+  agentMetadata: {
+    cover?: string | Blob;
+    title: string;
+    bio: string;
+    customInstructions: string;
+    knowledge: string;
+    style: string;
+    lore: string;
+    adjectives: string;
+  };
+  agentOwners: string[];
+  revokeOwner: (index: number) => Promise<void>;
+  addOwner: (index: number) => Promise<void>;
+  setAgentOwners: (e: SetStateAction<string[]>) => void;
+  revokeLoading: boolean[];
+  addLoading: boolean[];
+  setAgentMetadata: (
+    e: SetStateAction<{
+      cover?: string | Blob;
+      title: string;
+      bio: string;
+      customInstructions: string;
+      knowledge: string;
+      style: string;
+      lore: string;
+      adjectives: string;
+    }>
+  ) => void;
+  feedsLoading: boolean;
+  handleNewFeeds: () => Promise<void>;
+  agentFeeds: string[];
+  setAgentFeeds: (e: SetStateAction<string[]>) => void;
+  adminLoading: boolean[];
+  changeFeedAdmin: (index: number) => Promise<void>;
+  isAdmin: boolean[];
 };

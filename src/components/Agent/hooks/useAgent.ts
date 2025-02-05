@@ -416,6 +416,7 @@ const useAgent = (
         collectionIdsHistory,
         accountConnected: (result as any)?.[0]?.account?.address,
         ownerProfile,
+        feeds: metadata?.feeds
       });
     } catch (err: any) {
       console.error(err.message);
