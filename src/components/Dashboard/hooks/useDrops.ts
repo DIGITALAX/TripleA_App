@@ -4,7 +4,7 @@ import { DropInterface } from "../types/dashboard.types";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { getDrop } from "../../../../graphql/queries/getDrop";
 import { evmAddress, PublicClient } from "@lens-protocol/client";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useDrops = (
   drop: DropInterface | undefined,
@@ -29,17 +29,21 @@ const useDrops = (
             collection.metadata = await cadena.json();
           }
 
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(collection?.artist),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(collection?.artist),
+          });
+
+          if (result.isErr()) {
+            setCollectionsLoading(false);
+            return;
+          }
 
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split("lens://")?.[1]
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
+                "lens://"
+              )?.[1]
             }`
           );
 
@@ -60,9 +64,9 @@ const useDrops = (
             amountSold: collection?.amountSold,
             amount: collection?.amount,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },

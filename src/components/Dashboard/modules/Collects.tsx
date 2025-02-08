@@ -379,6 +379,13 @@ const Collects: FunctionComponent<CollectsProps> = ({
                           className="relative w-full h-full flex cursor-canP pixel-border-7"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
+                            router.prefetch(
+                              `/nft/${
+                                (
+                                  collect as any
+                                )?.profile?.username?.value?.split("lens/")?.[1]
+                              }/${collect?.collection?.id}`
+                            );
                             router.push(
                               `/nft/${
                                 (

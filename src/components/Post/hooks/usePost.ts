@@ -6,9 +6,8 @@ import {
   PublicClient,
 } from "@lens-protocol/client";
 import { useEffect, useState } from "react";
-import fetchPostReferences from "../../../../graphql/lens/queries/postReferences";
 import { STORAGE_NODE } from "@/lib/constants";
-import fetchPost from "../../../../graphql/lens/queries/post";
+import { fetchPost, fetchPostReferences } from "@lens-protocol/client/actions";
 
 const usePost = (
   lensConnected: LensConnected | undefined,
@@ -21,11 +20,12 @@ const usePost = (
   const [postDataLoading, setPostDataLoading] = useState<boolean>(false);
   const [activityCursor, setActivityCursor] = useState<string | undefined>();
 
-  const handleActivity = async (reset: boolean) => {
+  const handleActivity = async () => {
     if (!postId) return;
     setActivityLoading(true);
     try {
       const postsRes = await fetchPostReferences(
+        lensConnected?.sessionClient || lensClient,
         {
           pageSize: PageSize.Fifty,
           referencedPost: postId,
@@ -33,17 +33,21 @@ const usePost = (
             PostReferenceType.CommentOn,
             PostReferenceType.QuoteOf,
           ],
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
+
+      if (postsRes.isErr()) {
+        setActivityLoading(false);
+        return;
+      }
 
       let posts: Post[] = [];
 
-      if ((postsRes as any)?.items?.length > 0) {
-        posts = (postsRes as any)?.items;
+      if (postsRes.value?.items?.length > 0) {
+        posts = postsRes.value?.items as Post[];
       }
-      if ((postsRes as any)?.pageInfo?.next) {
-        setActivityCursor((postsRes as any)?.pageInfo?.next);
+      if (postsRes.value?.pageInfo?.next) {
+        setActivityCursor(postsRes.value?.pageInfo?.next);
       }
 
       posts = await Promise.all(
@@ -86,6 +90,7 @@ const usePost = (
     if (!activityCursor || !postId) return;
     try {
       const postsRes = await fetchPostReferences(
+        lensConnected?.sessionClient || lensClient,
         {
           pageSize: PageSize.Fifty,
           referencedPost: postId,
@@ -94,17 +99,20 @@ const usePost = (
             PostReferenceType.QuoteOf,
           ],
           cursor: activityCursor,
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
+
+      if (postsRes.isErr()) {
+        return;
+      }
 
       let posts: Post[] = [];
 
-      if ((postsRes as any)?.items?.length > 0) {
-        posts = (postsRes as any)?.items;
+      if (postsRes.value?.items?.length > 0) {
+        posts = postsRes?.value.items as Post[];
       }
-      if ((postsRes as any)?.pageInfo?.next) {
-        setActivityCursor((postsRes as any)?.pageInfo?.next);
+      if (postsRes.value?.pageInfo?.next) {
+        setActivityCursor(postsRes?.value?.pageInfo?.next);
       }
 
       posts = await Promise.all(
@@ -146,19 +154,23 @@ const usePost = (
   const handlePostData = async () => {
     setPostDataLoading(true);
     try {
-      const res = await fetchPost(
-        {
-          post: postId,
-        },
-        lensConnected?.sessionClient || lensClient
-      );
+      const res = await fetchPost(lensConnected?.sessionClient || lensClient, {
+        post: postId,
+      });
 
-      let picture = res?.author?.metadata?.picture;
+      if (res.isErr()) {
+        setPostDataLoading(false);
+        return;
+      }
 
-      if (res?.author?.metadata?.picture) {
+      let picture = (res.value as Post)?.author?.metadata?.picture;
+
+      if ((res.value as Post)?.author?.metadata?.picture) {
         const cadena = await fetch(
           `${STORAGE_NODE}/${
-            res?.author?.metadata?.picture?.split("lens://")?.[1]
+            (res.value as Post)?.author?.metadata?.picture?.split(
+              "lens://"
+            )?.[1]
           }`
         );
 
@@ -168,15 +180,15 @@ const usePost = (
         }
       }
 
-      await handleActivity(false);
+      await handleActivity();
 
       setPostData([
         {
-          ...res,
+          ...(res.value as Post),
           author: {
-            ...res?.author,
+            ...(res.value as Post)?.author,
             metadata: {
-              ...res?.author?.metadata,
+              ...(res.value as Post)?.author?.metadata!,
               picture,
             },
           },

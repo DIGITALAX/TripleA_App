@@ -418,6 +418,29 @@ export default function Agent() {
                                       className="relative w-fit h-fit flex items-center justify-center cursor-canP"
                                       onClick={() => {
                                         animationContext?.setPageChange?.(true);
+                                        router.prefetch(
+                                          `/nft/${
+                                            agent?.collectionIdsHistory
+                                              ?.find(
+                                                (col) =>
+                                                  Number(col?.collectionId) ==
+                                                  Number(
+                                                    rent?.collectionIds[index]
+                                                  )
+                                              )
+                                              ?.profile?.username?.value?.split(
+                                                "lens/"
+                                              )?.[1]
+                                          }/${
+                                            agent?.collectionIdsHistory?.find(
+                                              (col) =>
+                                                Number(col?.collectionId) ==
+                                                Number(
+                                                  rent?.collectionIds[index]
+                                                )
+                                            )?.collectionId
+                                          }`
+                                        );
                                         router.push(
                                           `/nft/${
                                             agent?.collectionIdsHistory
@@ -502,6 +525,25 @@ export default function Agent() {
                             className="relative w-full h-fit flex justify-between items-center flex-row gap-2 cursor-canP"
                             onClick={() => {
                               animationContext?.setPageChange?.(true);
+                              router.prefetch(
+                                `/nft/${
+                                  (agent?.details as any[])
+                                    ?.find(
+                                      (col) =>
+                                        Number(col?.collectionId) ==
+                                        Number(balance?.collectionId)
+                                    )
+                                    ?.profile?.username?.value?.split(
+                                      "lens/"
+                                    )?.[1]
+                                }/${
+                                  agent?.collectionIdsHistory?.find(
+                                    (col) =>
+                                      Number(col?.collectionId) ==
+                                      Number(balance?.collectionId)
+                                  )?.collectionId
+                                }`
+                              );
                               router.push(
                                 `/nft/${
                                   (agent?.details as any[])
@@ -584,6 +626,15 @@ export default function Agent() {
                                       className="relative w-fit h-fit flex cursor-canP"
                                       onClick={() => {
                                         animationContext?.setPageChange?.(true);
+                                        router.prefetch(
+                                          `/nft/${
+                                            (
+                                              collection as any
+                                            )?.profile?.username?.value?.split(
+                                              "lens/"
+                                            )?.[1]
+                                          }/${collection?.collectionId}`
+                                        );
                                         router.push(
                                           `/nft/${
                                             (
@@ -811,6 +862,13 @@ export default function Agent() {
                             className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2"
                             onClick={() => {
                               animationContext?.setPageChange?.(true);
+                              router.prefetch(
+                                `/nft/${
+                                  collection?.profile?.username?.value?.split(
+                                    "lens/"
+                                  )?.[1]
+                                }/${collection?.collectionId}`
+                              );
                               router.push(
                                 `/nft/${
                                   collection?.profile?.username?.value?.split(
@@ -895,6 +953,7 @@ export default function Agent() {
                           className="relative cursor-canP flex w-56 h-56 rounded-md bg-pink p-4"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
+                            router.prefetch(`/agent/${agent?.id}`);
                             router.push(`/agent/${agent?.id}`);
                           }}
                         >

@@ -2,63 +2,61 @@ import { aaaClient } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const AGENT = gql`
-  query ($AAAAgents_id: Int!) {
-    agentCreateds(where: { AAAAgents_id: $AAAAgents_id }, first: 1) {
+  query ($SkyhuntersAgentManager_id: Int!) {
+    agentCreateds(where: { SkyhuntersAgentManager_id: $SkyhuntersAgentManager_id }, first: 1) {
+      owners
       metadata {
         title
-        description
-        cover
+        style
+        messageExamples
+        lore
+        knowledge
+        feeds
         customInstructions
+        cover
+        bio
+        adjectives
       }
       creator
-      blockTimestamp
+      collectionIdsHistory
       balances {
-        activeBalance
-        totalBalance
-        collectionId
         token
-        dailyFrequency
+        rentBalance
         instructions
-      }
-      owner
-      activeCollectionIds {
+        historicalRentBalance
+        historicalBonusBalance
         collectionId
-        metadata {
-          image
-          title
-        }
-        artist
+        bonusBalance
       }
-      collectionIdsHistory {
-        collectionId
-        metadata {
-          image
-          title
-        }
-        artist
-      }
-      details {
-        collectionId
-        dailyFrequency
-        instructions
-      }
-      blockNumber
-      AAAAgents_id
+      activeCollectionIds
+      scoreNegative
+      scorePositive
       transactionHash
       uri
       wallets
+      blockNumber
+      blockTimestamp
+      SkyhuntersAgentManager_id
+      workers {
+        remixFrequency
+        remix
+        publishFrequency
+        publish
+        leadFrequency
+        lead
+      }
     }
   }
 `;
 
 export const getAgent = async (
-  AAAAgents_id: number
+  SkyhuntersAgentManager_id: number
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
   const queryPromise = aaaClient.query({
     query: AGENT,
     variables: {
-      AAAAgents_id,
+      SkyhuntersAgentManager_id,
     },
     fetchPolicy: "no-cache",
     errorPolicy: "all",

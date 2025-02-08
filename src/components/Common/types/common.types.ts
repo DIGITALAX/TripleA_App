@@ -11,9 +11,8 @@ export interface NFTData {
   collectionType: CollectionType;
   colors?: string[];
   sizes?: string[];
-  prices: string[];
-  tokens: string[];
-  agents: string[];
+  prices: { price: string; token: string }[];
+  agentIds: string[];
   artist: string;
   amountSold: number;
   tokenIds: string[];
@@ -58,8 +57,8 @@ export interface Fulfiller {
   description: string;
   title: string;
   link: string;
-  address: string;
-  id: string;
+  wallet: string;
+  fulfillerId: string;
   orderHistory: string[];
   activeOrders: string[];
 }

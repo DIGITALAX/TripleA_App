@@ -3,23 +3,23 @@ import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
 import { SKYHUNTERS_AGENTS_MANAGER_CONTRACT } from "@/lib/constants";
-import AgentAbi from "@abis/AgentAbi.json";
+import AgentManagerAbi from "@abis/AgentManagerAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
 import { StorageClient } from "@lens-protocol/storage-node-client";
 import { v4 as uuidv4 } from "uuid";
-import createAccount from "../../../../graphql/lens/mutations/createAccount";
 import {
   evmAddress,
   FeedsOrderBy,
   PublicClient as PublicClientLens,
 } from "@lens-protocol/client";
 import pollResult from "@/lib/helpers/pollResult";
-import fetchAccount from "../../../../graphql/lens/queries/account";
 import { Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
 import forge from "node-forge";
 import {
+  createAccountWithUsername,
   createFeed,
   enableSignless,
+  fetchAccount,
   fetchFeeds,
 } from "@lens-protocol/client/actions";
 
@@ -147,45 +147,50 @@ const useCreateAgent = (
       });
 
       if (authenticatedOnboarding.isOk()) {
-        const accountResponse = await createAccount(
+        const accountResponse = await createAccountWithUsername(
+          authenticatedOnboarding.value,
           {
             accountManager: [evmAddress(agentWalletCreated.address)],
             username: {
               localName: agentLensDetails?.username,
             },
             metadataUri: uri,
-          },
-          authenticatedOnboarding.value
+          }
         );
 
-        if (
-          (accountResponse as any)?.message?.includes("username already exists")
-        ) {
-          setNotification("Username Already Taken. Try something else?");
+        if (accountResponse.isErr()) {
+          if (accountResponse.error.message.includes("The username already")) {
+            setNotification("Username Already Taken. Try something else?");
+          } else {
+            setNotification("Something went wrong. Try again? :/");
+          }
           setLensLoading(false);
           return;
         }
 
-        if ((accountResponse as any)?.hash) {
+        if ((accountResponse.value as any)?.hash) {
           const res = await pollResult(
-            (accountResponse as any)?.hash,
+            (accountResponse.value as any)?.hash,
             lensConnected?.sessionClient
           );
           if (res) {
-            const newAcc = await fetchAccount(
-              {
-                username: {
-                  localName: agentLensDetails?.username,
-                },
+            const newAcc = await fetchAccount(lensConnected?.sessionClient, {
+              username: {
+                localName: agentLensDetails?.username,
               },
-              lensConnected?.sessionClient
-            );
+            });
 
-            if ((newAcc as any)?.address) {
+            if (newAcc.isErr()) {
+              setLensLoading(false);
+              return;
+            }
+
+
+            if (newAcc.value?.address) {
               const authenticated = await lensClient.login({
                 accountOwner: {
                   app: "0xe5439696f4057aF073c0FB2dc6e5e755392922e1",
-                  account: evmAddress((newAcc as any)?.address),
+                  account: evmAddress(newAcc.value.address),
                   owner: agentWalletCreated.address?.toLowerCase(),
                 },
                 signMessage: (message) =>
@@ -215,7 +220,7 @@ const useCreateAgent = (
 
                   if (tx_res?.tx) {
                     const tx = {
-                      chainId: (res.value as any)?.raw?.chainId,
+                      chainId: (res.value.__typename as any)?.raw?.chainId,
                       from: (res.value as any)?.raw?.from,
                       to: (res.value as any)?.raw?.to,
                       nonce: (res.value as any)?.raw?.nonce,
@@ -233,7 +238,7 @@ const useCreateAgent = (
                     if (txResponse) {
                       setCreateSwitcher(CreateSwitcher.Create);
                       setAgentWallet(agentWalletCreated);
-                      setAgentAccountAddress((newAcc as any)?.address);
+                      setAgentAccountAddress(newAcc.value?.address);
                     } else {
                       setIndexer?.("Error with Enabling Signless");
                       setLensLoading(false);
@@ -281,7 +286,6 @@ const useCreateAgent = (
   };
 
   const handleCreateAgent = async () => {
-    
     if (
       !address ||
       agentDetails?.title?.trim() == "" ||
@@ -328,13 +332,15 @@ const useCreateAgent = (
           knowledge: agentDetails.knowledge,
           messageExamples: agentDetails.messageExamples
             ?.map((con) =>
-              con
-                ?.map((msg) =>
-                  msg.user
-                    .replace("User", "{{user1}}")
-                    .replace("Agent", agentDetails.title)
-                )
-                ?.filter((con) => con.length < 1)
+              JSON.stringify(
+                con
+                  ?.map((msg) =>
+                    msg.user
+                      .replace("User", "{{user1}}")
+                      .replace("Agent", agentDetails.title)
+                  )
+                  ?.filter((con) => con.length > 0)
+              )
             )
             .filter(Boolean),
           style: agentDetails.style,
@@ -349,7 +355,7 @@ const useCreateAgent = (
 
       const { request } = await publicClient.simulateContract({
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
-        abi: AgentAbi,
+        abi: AgentManagerAbi,
         functionName: "createAgent",
         chain: chains.testnet,
         args: [
@@ -371,7 +377,7 @@ const useCreateAgent = (
         .map((log) => {
           try {
             const event = decodeEventLog({
-              abi: AgentAbi,
+              abi: AgentManagerAbi,
               data: log.data,
               topics: log.topics,
             });
@@ -405,34 +411,34 @@ const useCreateAgent = (
 
       let responseKeyJSON = await responseKey.json();
 
-      const data = {
-        publicAddress: agentWallet.address,
-        encryptionDetails: responseKeyJSON.encryptionDetails,
-        id: agentId,
-        title: agentDetails.title,
-        bio: agentDetails.bio,
-        lore: agentDetails.lore,
-        knowledge: agentDetails.knowledge,
-        adjectives: agentDetails.adjectives,
-        style: agentDetails.style,
-        messageExamples: agentDetails.messageExamples,
-        cover: "ipfs://" + responseImageJSON.cid,
-        customInstructions: agentDetails.customInstructions,
-        accountAddress: agentAccountAddress,
-      };
+      // const data = {
+      //   publicAddress: agentWallet.address,
+      //   encryptionDetails: responseKeyJSON.encryptionDetails,
+      //   id: agentId,
+      //   title: agentDetails.title,
+      //   bio: agentDetails.bio,
+      //   lore: agentDetails.lore,
+      //   knowledge: agentDetails.knowledge,
+      //   adjectives: agentDetails.adjectives,
+      //   style: agentDetails.style,
+      //   messageExamples: agentDetails.messageExamples,
+      //   cover: "ipfs://" + responseImageJSON.cid,
+      //   customInstructions: agentDetails.customInstructions,
+      //   accountAddress: agentAccountAddress,
+      // };
 
-      const newSocket = new WebSocket(
-        // `ws://127.0.0.1:10000?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
-        `wss://aaa-6t0j.onrender.com?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
-      );
+      // const newSocket = new WebSocket(
+      //   // `ws://127.0.0.1:10000?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
+      //   `wss://aaa-6t0j.onrender.com?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
+      // );
 
-      newSocket.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
+      // newSocket.onerror = (error) => {
+      //   console.error("WebSocket error:", error);
+      // };
 
-      newSocket.onopen = () => {
-        newSocket.send(JSON.stringify(data));
-      };
+      // newSocket.onopen = () => {
+      //   newSocket.send(JSON.stringify(data));
+      // };
       setCreateSwitcher(CreateSwitcher.Success);
     } catch (err: any) {
       console.error(err.message);

@@ -3,15 +3,13 @@ import {
   Agent,
   DropInterface,
 } from "@/components/Dashboard/types/dashboard.types";
-import { Account, AccountStats, evmAddress, PublicClient } from "@lens-protocol/client";
+import { Account, AccountStats, PublicClient } from "@lens-protocol/client";
 import { useEffect, useState } from "react";
-import fetchAccount from "../../../../graphql/lens/queries/account";
 import { STORAGE_NODE } from "@/lib/constants";
-import fetchStats from "../../../../graphql/lens/queries/accountStats";
 import { getDropCollections } from "../../../../graphql/queries/getDropCollections";
 import { getUserAgentsPaginated } from "../../../../graphql/queries/getUserAgentsPaginated";
 import { getOrdersPaginated } from "../../../../graphql/queries/getOrdersPaginated";
-
+import { fetchAccount, fetchAccountStats } from "@lens-protocol/client/actions";
 
 const useUser = (username: string, lensClient: PublicClient) => {
   const [screen, setScreen] = useState<number>(0);
@@ -48,59 +46,53 @@ const useUser = (username: string, lensClient: PublicClient) => {
   const handleUserInfo = async () => {
     setInfoLoading(true);
     try {
-      const newAcc = await fetchAccount(
-        {
-          username: {
-            localName: username,
-          },
+      const newAcc = await fetchAccount(lensClient, {
+        username: {
+          localName: username,
         },
-        lensClient
-      );
+      });
       let ownerPicture = "";
       let ownerProfile: any;
 
-
-      if (newAcc) {
-        const cadena = await fetch(
-          `${STORAGE_NODE}/${
-            (newAcc as any)?.metadata?.picture?.split("lens://")?.[1]
-          }`
-        );
-
-        if (cadena) {
-          const json = await cadena.json();
-          ownerPicture = json.item;
-        }
-
-
-        const stats = await fetchStats(
-          {
-            account: (newAcc as any)?.owner,
-          },
-          lensClient
-        );
-
-        ownerProfile = {
-          ...(newAcc as any),
-          metadata: {
-            ...(newAcc as any)?.metadata,
-            picture: ownerPicture,
-          },
-          stats: stats,
-        };
+      if (newAcc.isErr()) {
+        setInfoLoading(false);
+        return;
       }
 
+      const cadena = await fetch(
+        `${STORAGE_NODE}/${
+          newAcc.value?.metadata?.picture?.split("lens://")?.[1]
+        }`
+      );
 
+      if (cadena) {
+        const json = await cadena.json();
+        ownerPicture = json.item;
+      }
 
-      if ((newAcc as any)?.owner) {
+      const stats = await fetchAccountStats(lensClient, {
+        account: newAcc.value?.owner,
+      });
+
+      if (stats.isErr()) {
+        setInfoLoading(false);
+        return;
+      }
+
+      ownerProfile = {
+        ...newAcc.value,
+        metadata: {
+          ...newAcc.value?.metadata,
+          picture: ownerPicture,
+        },
+        stats: stats,
+      };
+
+      if (newAcc.value?.owner) {
         setUserInfo(ownerProfile);
       }
 
-      handleItems(
-        newAcc as Account & {
-          stats: AccountStats;
-        }
-      );
+      handleItems(ownerProfile);
     } catch (err: any) {
       console.error(err.message);
     }
@@ -118,13 +110,13 @@ const useUser = (username: string, lensClient: PublicClient) => {
       const agents = await getUserAgentsPaginated(info?.owner, 0);
       const drops = await getDropCollections(info?.owner, 0);
       const collected = await getOrdersPaginated(info?.owner, 0);
-   
+
       setHasMore({
         agents: agents?.data?.agentCreateds?.length == 20 ? true : false,
         collected: collected?.data?.orders?.length == 20 ? true : false,
         drops: drops?.data?.dropCreateds?.length == 20 ? true : false,
       });
- 
+
       setPaginated({
         agents:
           agents?.data?.agentCreateds?.length == 20
@@ -176,7 +168,10 @@ const useUser = (username: string, lensClient: PublicClient) => {
       }
 
       if (hasMore.drops) {
-        const dropsData = await getDropCollections(userInfo?.owner, paginated?.drops);
+        const dropsData = await getDropCollections(
+          userInfo?.owner,
+          paginated?.drops
+        );
         setDrops([...drops, ...(dropsData?.data?.dropCreateds || [])] as any);
 
         if (dropsData?.data?.dropCreateds?.length == 20) {

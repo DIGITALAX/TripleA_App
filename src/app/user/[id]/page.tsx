@@ -75,9 +75,11 @@ export default function User() {
       </div>
 
       <div className="flex relative w-full h-full items-start justify-start overflow-y-scroll">
-        <div className={`relative w-full h-full flex flex-wrap gap-6 items-start ${
-          itemsLoading ? "justify-between" : "justify-start"
-        }`}>
+        <div
+          className={`relative w-full h-full flex flex-wrap gap-6 items-start ${
+            itemsLoading ? "justify-between" : "justify-start"
+          }`}
+        >
           {itemsLoading ? (
             Array.from({ length: 10 }).map((_, key) => {
               return (
@@ -120,7 +122,12 @@ export default function User() {
                         className={`relative w-60 h-80 rounded-md bg-pink flex flex-col items-center justify-between p-2 cursor-canP`}
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
-                          router.push(`/agent/${(item as any)?.AAAAgents_id}`);
+                          router.prefetch(
+                            `/agent/${(item as any)?.SkyhuntersAgentManager_id}`
+                          );
+                          router.push(
+                            `/agent/${(item as any)?.SkyhuntersAgentManager_id}`
+                          );
                         }}
                       >
                         <div className="relative w-full h-full border border-windows bg-white rounded-md flex">
@@ -150,6 +157,11 @@ export default function User() {
                         className={`relative w-60 h-80 rounded-md bg-pink flex flex-col items-center justify-between p-2 cursor-canP`}
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
+                          router.prefetch(
+                            `/nft/${userInfo?.username?.localName}/${
+                              (item as any)?.collection?.id
+                            }`
+                          );
                           router.push(
                             `/nft/${userInfo?.username?.localName}/${
                               (item as any)?.collection?.id
@@ -228,6 +240,11 @@ export default function User() {
                                   className="relative w-fit h-fit flex rounded-md items-center justify-center cursor-canP"
                                   onClick={() => {
                                     animationContext?.setPageChange?.(true);
+                                    router.prefetch(
+                                      `/nft/${userInfo?.username?.localName}/${
+                                        (col as any)?.collectionId
+                                      }`
+                                    );
                                     router.push(
                                       `/nft/${userInfo?.username?.localName}/${
                                         (col as any)?.collectionId

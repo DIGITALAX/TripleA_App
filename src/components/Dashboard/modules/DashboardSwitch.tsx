@@ -333,6 +333,9 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
 
                       if (item.switcher == Switcher.Page) {
                         animationContext?.setPageChange?.(true);
+                        router.prefetch(
+                          `/user/${context?.lensConnected?.profile?.username?.localName}`
+                        );
                         router.push(
                           `/user/${context?.lensConnected?.profile?.username?.localName}`
                         );

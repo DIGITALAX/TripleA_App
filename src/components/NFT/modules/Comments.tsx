@@ -32,7 +32,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
         return (
           <div
             key={key}
-            className={`"relative w-full gap-3 flex-col flex flex shadow-lg item-start p-2 ${
+            className={`relative w-full gap-3 flex-col flex flex shadow-lg item-start p-2 ${
               post ? "h-full justify-between" : "h-fit justify-start"
             }`}
           >
@@ -59,6 +59,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
                   className="flex items-center justify-center relative w-fit h-fit cursor-canP hover:opacity-70"
                   onClick={() => {
                     animationContext?.setPageChange?.(true);
+                    router.prefetch(`/post/${activity?.id}`);
                     router.push(`/post/${activity?.id}`);
                   }}
                 >

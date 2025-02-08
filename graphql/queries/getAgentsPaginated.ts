@@ -6,19 +6,26 @@ const AGENTS_PAGINATED = gql`
     agentCreateds(first: 20, skip: $skip) {
       metadata {
         title
-        description
-        cover
+        style
+        messageExamples
+        lore
+        knowledge
+        feeds
         customInstructions
+        cover
+        bio
+        adjectives
       }
       creator
       blockTimestamp
       balances {
-        activeBalance
-        totalBalance
-        collectionId
         token
-        dailyFrequency
+        rentBalance
         instructions
+        historicalRentBalance
+        historicalBonusBalance
+        collectionId
+        bonusBalance
       }
       activeCollectionIds {
         collectionId
@@ -36,13 +43,8 @@ const AGENTS_PAGINATED = gql`
           title
         }
       }
-      details {
-        collectionId
-        dailyFrequency
-        instructions
-      }
       blockNumber
-      AAAAgents_id
+      SkyhuntersAgentManager_id
       transactionHash
       uri
       wallets

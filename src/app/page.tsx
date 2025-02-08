@@ -19,6 +19,7 @@ export default function Home() {
             className="relative w-fit h-fit flex cursor-canP hover:text-ama"
             onClick={() => {
               animationContext?.setPageChange?.(true);
+              router.prefetch("/gallery");
               router.push("/gallery");
             }}
           >
@@ -28,6 +29,7 @@ export default function Home() {
             className="relative w-fit h-fit flex cursor-canP hover:text-ama"
             onClick={() => {
               animationContext?.setPageChange?.(true);
+              router.prefetch("/agents");
               router.push("/agents");
             }}
           >

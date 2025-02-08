@@ -6,24 +6,26 @@ const AGENTS = gql`
     agentCreateds(first: 50) {
       metadata {
         title
-        description
-        cover
+        style
+        messageExamples
+        lore
+        knowledge
+        feeds
         customInstructions
+        cover
+        bio
+        adjectives
       }
       creator
       blockTimestamp
       balances {
-        activeBalance
-        totalBalance
-        collectionId
         token
-        dailyFrequency
+        rentBalance
         instructions
-      }
-      details {
+        historicalRentBalance
+        historicalBonusBalance
         collectionId
-        dailyFrequency
-        instructions
+        bonusBalance
       }
       activeCollectionIds {
         collectionId
@@ -42,7 +44,7 @@ const AGENTS = gql`
         }
       }
       blockNumber
-      AAAAgents_id
+      SkyhuntersAgentManager_id
       transactionHash
       uri
       wallets

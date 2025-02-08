@@ -85,7 +85,7 @@ const Drop: FunctionComponent<DropProps> = ({
                 ...mintData,
                 dropId: 0,
               });
-              setMintSwitcher(MintSwitcher.Mint);
+              setMintSwitcher(MintSwitcher.Remix);
             }}
           >
             Use Drop

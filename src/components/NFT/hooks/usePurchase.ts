@@ -69,7 +69,15 @@ const usePurchase = (
 
       if (
         data >=
-        BigInt(Number(Number(nft?.prices[0]) * collectData?.amount).toFixed(0))
+        BigInt(
+          Number(
+            Number(
+              nft?.prices?.find(
+                (tok) => tok.token?.toLowerCase() == collectData?.token
+              )?.price
+            ) * collectData?.amount
+          ).toFixed(0)
+        )
       ) {
         setApproved(true);
       } else {
@@ -114,7 +122,15 @@ const usePurchase = (
 
       if (
         balance <
-        BigInt(Number(Number(nft?.prices[0]) * collectData?.amount).toFixed(0))
+        BigInt(
+          Number(
+            Number(
+              nft?.prices?.find(
+                (tok) => tok.token?.toLowerCase() == collectData?.token
+              )?.price
+            ) * collectData?.amount
+          ).toFixed(0)
+        )
       ) {
         setNotification?.("Not Enough Tokens in Your Wallet :(");
         setPurchaseLoading(false);
@@ -159,7 +175,13 @@ const usePurchase = (
         args: [
           MARKET_CONTRACT,
           BigInt(
-            Number(Number(nft?.prices[0]) * collectData?.amount).toFixed(0)
+            Number(
+              Number(
+                nft?.prices?.find(
+                  (tok) => tok.token?.toLowerCase() == collectData?.token
+                )?.price
+              ) * collectData?.amount
+            ).toFixed(0)
           ),
         ],
         account: address,
@@ -181,8 +203,8 @@ const usePurchase = (
       setFulfillmentOpen({
         ...collectData,
         id: Number(nft.id),
-        fulfiller: fulfillers?.find((ful) => ful.id == nft.fulfillerId)
-          ?.address!,
+        fulfiller: fulfillers?.find((ful) => ful.fulfillerId == nft.fulfillerId)
+          ?.wallet!,
       });
       return;
     }
@@ -214,7 +236,7 @@ const usePurchase = (
       checkAllowance();
       setCollectData({
         amount: 1,
-        token: nft?.tokens?.[0],
+        token: nft?.prices?.[0]?.token,
       });
     } catch (err: any) {
       if (err?.message?.includes("NotAvailable")) {
@@ -240,12 +262,12 @@ const usePurchase = (
           ...collectData,
           size: nft?.sizes?.[0]!,
           color: nft?.colors?.[0]!,
-          token: nft?.tokens?.[0],
+          token: nft?.prices?.[0]?.token,
         });
       } else {
         setCollectData({
           ...collectData,
-          token: nft?.tokens?.[0],
+          token: nft?.prices?.[0]?.token,
         });
       }
     }

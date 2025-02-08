@@ -17,9 +17,8 @@ import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { chains } from "@lens-network/sdk/viem";
 import { getAgents } from "../../../../graphql/queries/getAgents";
 import { evmAddress, SessionClient } from "@lens-protocol/client";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
-import { NFTData } from "@/components/Common/types/common.types";
 import { getCollectionSearch } from "../../../../graphql/queries/getCollectionSearch";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useMint = (
   agents: Agent[],
@@ -43,8 +42,8 @@ const useMint = (
   >([]);
   const [mintData, setMintData] = useState<MintData>({
     agents: [],
-    prices: [],
-    tokens: [TOKENS[0].contract],
+    prices: Array.from({ length: TOKENS.length }, () => 0),
+    tokens: TOKENS?.map((item) => item.contract),
     dropId: 0,
     dropCover: undefined,
     dropTitle: "",
@@ -135,10 +134,18 @@ const useMint = (
           title: mintData.title,
           description: mintData.description,
           image: "ipfs://" + responseImageJSON.cid,
+          sizes: mintData.sizes,
+          colors: mintData.colors,
+          format: mintData.format,
         }),
       });
 
       let responseJSON = await response.json();
+
+      const filteredTokensAndPrices =
+        mintData?.prices
+          ?.map((price, index) => ({ price, token: mintData?.tokens?.[index] }))
+          ?.filter(({ price }) => price > 0) ?? [];
 
       const { request } = await publicClient.simulateContract({
         address: COLLECTION_MANAGER_CONTRACT,
@@ -150,8 +157,10 @@ const useMint = (
             customInstructions: mintData?.agents?.map(
               (ag) => ag?.customInstructions
             ),
-            tokens: mintData?.tokens,
-            prices: mintData?.prices?.map((price) => Number(price) * 10 ** 18),
+            tokens: filteredTokensAndPrices.map(({ token }) => token),
+            prices: filteredTokensAndPrices.map(
+              ({ price }) => Number(price) * 10 ** 18
+            ),
             agentIds: mintData?.agents?.map((ag) => Number(ag?.agent?.id)),
             metadata: "ipfs://" + responseJSON?.cid,
             collectionType:
@@ -203,8 +212,8 @@ const useMint = (
 
       setMintData({
         agents: [],
-        prices: [],
-        tokens: [],
+        prices: Array.from({ length: TOKENS.length }, () => 0),
+        tokens: TOKENS?.map((item) => item.contract),
         dropId: 0,
         dropCover: undefined,
         dropTitle: "",
@@ -241,17 +250,19 @@ const useMint = (
             agent.metadata = await cadena.json();
           }
 
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(agent?.wallets?.[0]),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(agent?.wallets?.[0]),
+          });
+
+          if (result.isErr()) {
+            setAgentsLoading(false);
+            return;
+          }
 
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -263,16 +274,16 @@ const useMint = (
           }
 
           return {
-            id: agent?.AAAAgents_id,
+            id: agent?.SkyhuntersAgentManager_id,
             cover: agent?.metadata?.cover,
             title: agent?.metadata?.title,
             description: agent?.metadata?.description,
             wallet: agent?.wallets?.[0],
             balance: agent?.balances,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },
@@ -347,7 +358,7 @@ const useMint = (
     handleRemixSearch,
     remixSearchLoading,
     title,
-    setTitle
+    setTitle,
   };
 };
 

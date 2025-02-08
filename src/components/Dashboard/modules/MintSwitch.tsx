@@ -37,6 +37,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
+
   const {
     handleMint,
     mintLoading,
@@ -102,11 +103,14 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
               className={`relative w-fit px-6 py-1 h-12 bg-windows text-viol cursor-canP hover:opacity-70 text-base rounded-md flex items-center justify-center font-jack`}
               onClick={() => {
                 animationContext?.setPageChange?.(true);
+                router.prefetch(
+                  `/nft/${
+                    lensConnected?.profile?.username?.value?.split("lens/")?.[1]
+                  }/${id}`
+                );
                 router.push(
                   `/nft/${
-                    lensConnected?.profile?.username?.value?.split(
-                      "lens://"
-                    )?.[1]
+                    lensConnected?.profile?.username?.value?.split("lens/")?.[1]
                   }/${id}`
                 );
               }}
@@ -173,6 +177,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
               <input
                 className="relative focus:outline-none bg-windows px-1 h-full w-1/2 rounded-md"
                 onChange={(e) => setTitle(e.target.value)}
+                value={title}
                 onKeyDown={(e) => e.key == "Enter" && handleRemixSearch()}
               />
               <div
@@ -252,7 +257,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                       </div>
                       <input
                         disabled={
-                          !mintData.tokens?.includes(token.contract) ||
+                          // !mintData.tokens?.includes(token.contract) ||
                           mintLoading
                         }
                         value={mintData?.prices?.[key]}
@@ -267,14 +272,13 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                               ...prev,
                             };
 
-                            const index = newMintData.tokens.findIndex(
-                              (tok) => tok == token.contract
-                            );
-
                             const prices = [...newMintData.prices];
-                            prices[index] = Number(e.target.value);
+                            const tokens = [...newMintData.tokens];
+                            prices[key] = Number(e.target.value);
+                            tokens[key] = token.contract;
 
                             newMintData.prices = prices;
+                            newMintData.tokens = tokens;
 
                             return newMintData;
                           })
@@ -346,15 +350,18 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                   return (
                     <div
                       key={index}
-                      className="relative w-fit h-fit flex flex-col gap-2 items-center justify-center"
+                      className={`relative w-fit h-fit flex flex-col gap-2 items-center justify-center`}
                     >
                       <div
-                        className="relative w-fit h-fit flex rounded-md bg-windows cursor-canP"
+                        className={`relative w-fit h-fit flex rounded-md bg-windows cursor-canP ${
+                          mintData.fulfiller == Number(fulfiller.fulfillerId) &&
+                          "border border-windows opacity-70"
+                        }`}
                         title={fulfiller.title}
                         onClick={() =>
                           setMintData({
                             ...mintData,
-                            fulfiller: Number(fulfiller.id),
+                            fulfiller: Number(fulfiller.fulfillerId),
                           })
                         }
                       >
@@ -510,7 +517,8 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                           <div
                             key={index}
                             className={`hover:opacity-60 relative bg-windows rounded-md w-fit h-fit flex cursor-canP text-sm flex p-1 items-center justify-center text-center ${
-                              mintData.format == item && "opacity-70"
+                              mintData.format == item &&
+                              "opacity-70 border border-white"
                             }`}
                             onClick={() =>
                               setMintData({
@@ -536,7 +544,8 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                             <div
                               key={index}
                               className={`hover:opacity-60 relative bg-windows p-1 w-fit h-fit flex cursor-canP text-sm flex items-center justify-center text-center ${
-                                mintData?.sizes?.includes(item) && "opacity-70"
+                                mintData?.sizes?.includes(item) &&
+                                "opacity-70 border border-white"
                               } ${
                                 mintData?.format == Format.Sticker ||
                                 mintData?.format == Format.Poster
@@ -581,7 +590,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                                   key={index}
                                   className={`hover:opacity-60 relative rounded-full w-fit h-fit flex cursor-canP text-sm flex items-center justify-center text-center ${
                                     mintData?.colors?.includes(item) &&
-                                    "opacity-70"
+                                    "opacity-70 border border-windows"
                                   }`}
                                   style={{
                                     backgroundColor: item,

@@ -109,6 +109,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
               className={`relative w-fit px-6 py-1 h-12 cursor-canP hover:opacity-70 text-base rounded-md flex items-center justify-center font-jack text-viol bg-windows`}
               onClick={() => {
                 animationContext?.setPageChange?.(true);
+                router.prefetch(`/agent/${id}`);
                 router.push(`/agent/${id}`);
                 setAgentDetails({
                   title: "",

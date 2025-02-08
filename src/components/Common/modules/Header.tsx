@@ -37,7 +37,9 @@ const Header: FunctionComponent = (): JSX.Element => {
     context?.setIndexer,
     context?.setCreateAccount,
     context?.setLensConnected,
-    context?.lensConnected
+    context?.lensConnected,
+    context?.setFulfillers!,
+    context?.fulfillers!
   );
 
   useAgents(

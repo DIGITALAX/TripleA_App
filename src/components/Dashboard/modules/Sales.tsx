@@ -18,7 +18,7 @@ const Sales: FunctionComponent<SalesProps> = ({
   const router = useRouter();
   return (
     <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
-     <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
+      <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
         <div className="relative w-full h-fit flex items-start justify-start">
           <div
             className="relative flex w-fit h-fit cursor-canP hover:opacity-70"
@@ -68,6 +68,13 @@ const Sales: FunctionComponent<SalesProps> = ({
                       className="relative w-full h-full flex cursor-canP pixel-border-7"
                       onClick={() => {
                         animationContext?.setPageChange?.(true);
+                        router.prefetch(
+                          `/nft/${
+                            (sale as any)?.profile?.username?.value?.split(
+                              "lens/"
+                            )?.[1]
+                          }/${sale?.collection?.id}`
+                        );
                         router.push(
                           `/nft/${
                             (sale as any)?.profile?.username?.value?.split(

@@ -22,7 +22,7 @@ export default function AgentPayouts() {
     handleMorePaid,
     hasMore,
   } = useAgentPayouts(context?.lensClient!);
- 
+
   return (
     <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-viol">
       <div className="relative w-full h-full p-3 flex flex-col items-center justify-between gap-6">
@@ -110,6 +110,9 @@ export default function AgentPayouts() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   animationContext?.setPageChange?.(true);
+                                  router.prefetch(
+                                    `/user/${item?.profile?.username?.localName}`
+                                  );
                                   router.push(
                                     `/user/${item?.profile?.username?.localName}`
                                   );

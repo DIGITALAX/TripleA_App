@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { getOwnersPaid } from "../../../../graphql/queries/getOwnersPaid";
 import { getCollectorsPaid } from "../../../../graphql/queries/getCollectorsPaid";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { STORAGE_NODE } from "@/lib/constants";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useAgentPayouts = (lensClient: PublicClient) => {
   const [screen, setScreen] = useState<number>(0);
@@ -68,19 +68,17 @@ const useAgentPayouts = (lensClient: PublicClient) => {
 
       let collectors_info = await Promise.all(
         collectors?.data?.orderPayments?.map(async (coll: any) => {
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(coll?.recipient),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(coll?.recipient),
+          });
+
           let picture = "";
           let profile: any;
 
-          if (result) {
+          if (result.isOk()) {
             const cadena = await fetch(
               `${STORAGE_NODE}/${
-                (result as any)?.[0]?.account?.metadata?.picture?.split(
+                result.value.items?.[0]?.account?.metadata?.picture?.split(
                   "lens://"
                 )?.[1]
               }`
@@ -92,9 +90,9 @@ const useAgentPayouts = (lensClient: PublicClient) => {
             }
 
             profile = {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             };
@@ -109,19 +107,16 @@ const useAgentPayouts = (lensClient: PublicClient) => {
 
       let owners_info = await Promise.all(
         owners?.data?.agentOwnerPaids?.map(async (coll: any) => {
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(coll?.owner),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(coll?.owner),
+          });
           let picture = "";
           let profile: any;
 
-          if (result) {
+          if (result.isOk()) {
             const cadena = await fetch(
               `${STORAGE_NODE}/${
-                (result as any)?.[0]?.account?.metadata?.picture?.split(
+                result.value.items?.[0]?.account?.metadata?.picture?.split(
                   "lens://"
                 )?.[1]
               }`
@@ -133,9 +128,9 @@ const useAgentPayouts = (lensClient: PublicClient) => {
             }
 
             profile = {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             };
@@ -167,19 +162,16 @@ const useAgentPayouts = (lensClient: PublicClient) => {
 
         let collectors_info = await Promise.all(
           collectors?.data?.orderPayments?.map(async (coll: any) => {
-            const result = await fetchAccountsAvailable(
-              {
-                managedBy: evmAddress(coll?.recipient),
-              },
-              lensClient
-            );
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: evmAddress(coll?.recipient),
+            });
             let picture = "";
             let profile: any;
 
-            if (result) {
+            if (result.isOk()) {
               const cadena = await fetch(
                 `${STORAGE_NODE}/${
-                  (result as any)?.[0]?.account?.metadata?.picture?.split(
+                  result.value.items?.[0]?.account?.metadata?.picture?.split(
                     "lens://"
                   )?.[1]
                 }`
@@ -191,9 +183,9 @@ const useAgentPayouts = (lensClient: PublicClient) => {
               }
 
               profile = {
-                ...(result as any)?.[0]?.account,
+                ...result.value.items?.[0]?.account,
                 metadata: {
-                  ...(result as any)?.[0]?.account?.metadata,
+                  ...result.value.items?.[0]?.account?.metadata,
                   picture,
                 },
               };
@@ -219,19 +211,16 @@ const useAgentPayouts = (lensClient: PublicClient) => {
 
         let owners_info = await Promise.all(
           owners?.data?.agentOwnerPaids?.map(async (coll: any) => {
-            const result = await fetchAccountsAvailable(
-              {
-                managedBy: evmAddress(coll?.owner),
-              },
-              lensClient
-            );
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: evmAddress(coll?.owner),
+            });
             let picture = "";
             let profile: any;
 
-            if (result) {
+            if (result.isOk()) {
               const cadena = await fetch(
                 `${STORAGE_NODE}/${
-                  (result as any)?.[0]?.account?.metadata?.picture?.split(
+                  result.value.items?.[0]?.account?.metadata?.picture?.split(
                     "lens://"
                   )?.[1]
                 }`
@@ -243,9 +232,9 @@ const useAgentPayouts = (lensClient: PublicClient) => {
               }
 
               profile = {
-                ...(result as any)?.[0]?.account,
+                ...result.value.items?.[0]?.account,
                 metadata: {
-                  ...(result as any)?.[0]?.account?.metadata,
+                  ...result.value.items?.[0]?.account?.metadata,
                   picture,
                 },
               };

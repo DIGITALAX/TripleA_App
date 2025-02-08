@@ -16,14 +16,16 @@ import {
   PublicClient,
   TextOnlyMetadata,
 } from "@lens-protocol/client";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { getCollectors } from "../../../../graphql/queries/getCollectors";
-import fetchPosts from "../../../../graphql/lens/queries/posts";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import {
   getCollectionsArtist,
   getCollectionsArtistNot,
 } from "../../../../graphql/queries/getGallery";
+import {
+  fetchAccountsAvailable,
+  fetchPosts,
+} from "@lens-protocol/client/actions";
 
 const useNFT = (
   id: string,
@@ -46,6 +48,7 @@ const useNFT = (
   ): Promise<Post[] | void> => {
     try {
       const postsRes = await fetchPosts(
+        lensConnected?.sessionClient || lensClient,
         {
           pageSize: PageSize.Fifty,
           filter: {
@@ -58,34 +61,39 @@ const useNFT = (
               },
             },
           },
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
+
+      if (postsRes.isErr()) {
+        return;
+      }
 
       let posts: Post[] = [];
 
-      if ((postsRes as any)?.items?.length > 0) {
-        posts = (postsRes as any)?.items;
+      if (postsRes.value?.items?.length > 0) {
+        posts = postsRes?.value.items as Post[];
       } else {
         const postsRes = await fetchPosts(
+          lensConnected?.sessionClient || lensClient,
           {
             pageSize: PageSize.Fifty,
-          },
-          lensConnected?.sessionClient || lensClient
+          }
         );
-
-        posts = (postsRes as any)?.items?.filter(
-          (pos: Post) =>
+        if (postsRes.isErr()) {
+          return;
+        }
+        posts = postsRes.value?.items?.filter(
+          (pos: any) =>
             (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA") &&
             (pos?.metadata as TextOnlyMetadata)?.tags?.includes(
               (title || nft?.title?.replaceAll(" ", "")?.toLowerCase())!
             )
-        );
+        ) as Post[];
       }
 
-      if ((postsRes as any)?.pageInfo?.next) {
+      if (postsRes.value?.pageInfo?.next) {
         setHasMore(true);
-        setActivityCursor((postsRes as any)?.pageInfo?.next);
+        setActivityCursor(postsRes.value?.pageInfo?.next);
       } else {
         setHasMore(false);
       }
@@ -149,11 +157,16 @@ const useNFT = (
       }
 
       const result = await fetchAccountsAvailable(
+        lensConnected?.sessionClient || lensClient,
         {
           managedBy: evmAddress(collection?.artist),
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
+
+      if (result.isErr()) {
+        setNftLoading(false);
+        return;
+      }
 
       const res = await getCollectors(Number(id));
 
@@ -161,16 +174,21 @@ const useNFT = (
 
       for (let i = 0; i < res?.data?.orders?.length; i++) {
         const accounts = await fetchAccountsAvailable(
+          lensConnected?.sessionClient || lensClient,
           {
             managedBy: evmAddress(res?.data?.orders?.[i]?.buyer),
-          },
-          lensConnected?.sessionClient || lensClient
+          }
         );
+
+        if (accounts.isErr()) {
+          setNftLoading(false);
+          return;
+        }
 
         let picture = "";
         const cadena = await fetch(
           `${STORAGE_NODE}/${
-            (accounts as any)?.[0]?.account?.metadata?.picture?.split(
+            accounts.value.items?.[0]?.account?.metadata?.picture?.split(
               "lens://"
             )?.[1]
           }`
@@ -187,8 +205,8 @@ const useNFT = (
           amount: res?.data?.orders?.[i]?.amount,
           address: res?.data?.orders?.[i]?.buyer,
           pfp: picture,
-          localName: (accounts as any)?.[0]?.account?.username?.localName,
-          name: (accounts as any)?.[0]?.account?.metadata?.name,
+          localName: accounts.value.items?.[0]?.account?.username?.localName,
+          name: accounts.value.items?.[0]?.account?.metadata?.name!,
         });
       }
 
@@ -200,7 +218,7 @@ const useNFT = (
       let picture = "";
       const cadena = await fetch(
         `${STORAGE_NODE}/${
-          (result as any)?.[0]?.account?.metadata?.picture?.split(
+          result.value.items?.[0]?.account?.metadata?.picture?.split(
             "lens://"
           )?.[1]
         }`
@@ -214,13 +232,15 @@ const useNFT = (
       let remix = undefined;
 
       if (Number(collection?.remixId) > 0) {
-        const remData = await getCollectionRemix(Number(collection?.remixId));
-
-        let image = remData?.data?.collectionCreateds?.[0]?.metadata?.image;
+        let image =
+          collData?.data?.collectionCreateds?.[0]?.remixCollection?.metadata
+            ?.image;
         if (!image) {
           const cadena = await fetch(
             `${INFURA_GATEWAY}/ipfs/${
-              remData?.data?.collectionCreateds?.[0]?.uri.split("ipfs://")?.[1]
+              collData?.data?.collectionCreateds?.[0]?.remixCollection?.uri.split(
+                "ipfs://"
+              )?.[1]
             }`
           );
           const metadata = await cadena.json();
@@ -228,17 +248,22 @@ const useNFT = (
         }
 
         const accounts = await fetchAccountsAvailable(
+          lensConnected?.sessionClient || lensClient,
           {
             managedBy: evmAddress(
-              remData?.data?.collectionCreateds?.[0]?.artist
+              collData?.data?.collectionCreateds?.[0]?.remixCollection?.artist
             ),
-          },
-          lensConnected?.sessionClient || lensClient
+          }
         );
+
+        if (accounts.isErr()) {
+          setNftLoading(false);
+          return;
+        }
 
         remix = {
           image,
-          profile: (accounts as any)?.[0]?.account,
+          profile: accounts.value.items?.[0]?.account,
         };
       }
 
@@ -250,8 +275,7 @@ const useNFT = (
         blocktimestamp: collection?.blockTimestamp,
         active: collection?.active,
         prices: collection?.prices,
-        tokens: collection?.tokens,
-        agents: collection?.agents,
+        agentIds: collection?.agents,
         artist: collection?.artist,
         amountSold: collection?.amountSold,
         tokenIds: collection?.tokenIds,
@@ -260,9 +284,9 @@ const useNFT = (
         remixId: collection?.remixId,
         remix,
         profile: {
-          ...(result as any)?.[0]?.account,
+          ...result.value.items?.[0]?.account,
           metadata: {
-            ...(result as any)?.[0]?.account?.metadata,
+            ...result.value.items?.[0]?.account?.metadata!,
             picture,
           },
         },
@@ -272,6 +296,7 @@ const useNFT = (
         format: collection?.metadata?.format,
         sizes: collection?.metadata?.sizes,
         colors: collection?.metadata?.colors,
+        fulfillerId: collection?.fulfillerId,
       });
     } catch (err: any) {
       console.error(err.message);
@@ -284,6 +309,7 @@ const useNFT = (
     setAgentLoading(true);
     try {
       const postsRes = await fetchPosts(
+        lensConnected?.sessionClient || lensClient,
         {
           pageSize: PageSize.Fifty,
           cursor: activityCursor,
@@ -297,33 +323,42 @@ const useNFT = (
               },
             },
           },
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
+
+      if (postsRes.isErr()) {
+        setAgentLoading(false);
+        return;
+      }
 
       let posts: Post[] = [];
 
-      if ((postsRes as any)?.items?.length > 0) {
-        posts = (postsRes as any)?.items;
+      if (postsRes.value?.items?.length > 0) {
+        posts = postsRes.value.items as Post[];
       } else {
         const postsRes = await fetchPosts(
+          lensConnected?.sessionClient || lensClient,
           {
             pageSize: PageSize.Fifty,
-          },
-          lensConnected?.sessionClient || lensClient
+          }
         );
-        posts = (postsRes as any)?.items?.filter(
-          (pos: Post) =>
+        if (postsRes.isErr()) {
+          setAgentLoading(false);
+          return;
+        }
+
+        posts = postsRes.value.items?.filter(
+          (pos: any) =>
             (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA") &&
             (pos?.metadata as TextOnlyMetadata)?.tags?.includes(
               nft?.title?.replaceAll(" ", "")?.toLowerCase()!
             )
-        );
+        ) as Post[];
       }
 
-      if ((postsRes as any)?.pageInfo?.next) {
+      if (postsRes.value?.pageInfo?.next) {
         setHasMore(true);
-        setActivityCursor((postsRes as any)?.pageInfo?.next);
+        setActivityCursor(postsRes.value?.pageInfo?.next);
       } else {
         setHasMore(false);
         setActivityCursor(undefined);
@@ -391,16 +426,21 @@ const useNFT = (
           }
 
           const result = await fetchAccountsAvailable(
+            lensConnected?.sessionClient || lensClient,
             {
               managedBy: evmAddress(col?.artist),
-            },
-            lensConnected?.sessionClient || lensClient
+            }
           );
+
+          if (result.isErr()) {
+            setMoreCollectionsLoading(false);
+            return;
+          }
 
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -416,9 +456,9 @@ const useNFT = (
             image: col?.metadata?.image,
             artist: col?.artist,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },

@@ -43,7 +43,7 @@ const USER_AGENTS = gql`
         }
       }
       blockNumber
-      AAAAgents_id
+      SkyhuntersAgentManager_id
       transactionHash
       uri
       wallets

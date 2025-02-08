@@ -1,36 +1,29 @@
 import { aaaClient } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
-const DROP = gql`
-  query ($dropId: Int!) {
-    collectionCreateds(where: { dropId: $dropId }) {
-      collectionId
-      artist
-      uri
-      tokens
-      prices
-      agentIds
-        prices {
-          price
-          token
-        }
-      active
-      amountSold
-      amount
+const FULFILLERS = gql`
+  query {
+    fulfillerCreateds {
       metadata {
-        image
-        title
         description
+        cover
+        title
+        link
       }
+      orderHistory
+      uri
+      wallet
+      fulfillerId
+      activeOrders
     }
   }
 `;
 
-export const getDrop = async (dropId: number): Promise<FetchResult | void> => {
+export const getFulfillers = async (): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
   const queryPromise = aaaClient.query({
-    query: DROP,
-    variables: { dropId },
+    query: FULFILLERS,
+
     fetchPolicy: "no-cache",
     errorPolicy: "all",
   });

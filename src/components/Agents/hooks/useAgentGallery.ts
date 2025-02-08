@@ -1,12 +1,9 @@
-import {
-  Agent,
-  AgentProps,
-} from "@/components/Dashboard/types/dashboard.types";
+import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { evmAddress, PublicClient } from "@lens-protocol/client";
 import { SetStateAction, useEffect, useState } from "react";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { getAgentsPaginated } from "../../../../graphql/queries/getAgentsPaginated";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useAgentGallery = (
   agents: Agent[] | undefined,
@@ -40,16 +37,17 @@ const useAgentGallery = (
             agent.metadata = await cadena.json();
           }
 
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(agent?.wallets?.[0]),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(agent?.wallets?.[0]),
+          });
           let picture = "";
+          if (result.isErr()) {
+            setAgentGalleryLoading(false);
+            return;
+          }
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -61,7 +59,7 @@ const useAgentGallery = (
           }
 
           return {
-            id: agent?.AAAAgents_id,
+            id: agent?.SkyhuntersAgentManager_id,
             cover: agent?.metadata?.cover,
             title: agent?.metadata?.title,
             description: agent?.metadata?.description,
@@ -71,9 +69,9 @@ const useAgentGallery = (
             activeCollectionIds: agent?.activeCollectionIds,
             collectionIdHistory: agent?.collectionIdHistory,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },

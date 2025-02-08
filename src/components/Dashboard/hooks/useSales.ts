@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Order } from "../types/dashboard.types";
 import { getSales } from "../../../../graphql/queries/getSales";
 import { evmAddress, PublicClient } from "@lens-protocol/client";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { STORAGE_NODE } from "@/lib/constants";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useSales = (
   address: `0x${string}` | undefined,
@@ -20,17 +20,21 @@ const useSales = (
 
       const sales: Order[] = await Promise.all(
         data?.data?.orders?.map(async (sale: any) => {
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(sale?.collection?.artist),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(sale?.collection?.artist),
+          });
+
+          if (result.isErr()) {
+            setSalesLoading(false);
+            return;
+          }
 
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split("lens://")?.[1]
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
+                "lens://"
+              )?.[1]
             }`
           );
 
@@ -64,9 +68,9 @@ const useSales = (
             },
             buyer: sale?.buyer,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },

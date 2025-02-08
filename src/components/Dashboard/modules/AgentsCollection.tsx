@@ -82,7 +82,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
         <div className="flex relative w-full h-full items-center justify-start overflow-x-scroll">
           <div
             className={`relative h-full flex flex-row gap-6 ${
-              collection?.agents?.length > 1 ? "w-fit" : "w-full"
+              collection?.agentIds?.length > 1 ? "w-fit" : "w-full"
             }`}
           >
             <div className="relative w-fit h-full flex items-center justify-between flex-col gap-4">
@@ -95,6 +95,11 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                 className="relative w-fit h-full flex cursor-canP"
                 onClick={() => {
                   animationContext?.setPageChange?.(true);
+                  router.prefetch(
+                    `/nft/${
+                      collection?.profile?.username?.value?.split("lens/")?.[1]
+                    }/${collection?.id}`
+                  );
                   router.push(
                     `/nft/${
                       collection?.profile?.username?.value?.split("lens/")?.[1]
@@ -129,7 +134,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                     TOKENS?.find(
                       (tok) =>
                         tok.contract.toLowerCase() ==
-                        collection?.tokens?.[0]?.toLowerCase()
+                        collection?.prices?.[0]?.token?.toLowerCase()
                     )?.symbol
                   }
                 </div>
@@ -189,21 +194,21 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
             </div>
             <div
               className={`relative w-full h-full flex items-start flex-col gap-3 justify-start relative  ${
-                collection?.agents?.length > 1 && "overflow-x-scroll"
+                collection?.agentIds?.length > 1 && "overflow-x-scroll"
               }`}
             >
               <div
                 className={`relative h-full flex flex-row gap-6 ${
-                  collection?.agents?.length > 1 ? "w-fit" : "w-full"
+                  collection?.agentIds?.length > 1 ? "w-fit" : "w-full"
                 }`}
               >
-                {collection?.agents?.length < 1 ? (
+                {collection?.agentIds?.length < 1 ? (
                   <div className="relative w-full flex items-center justify-center text-white text-xs h-full">
                     No Agents Assigned.
                   </div>
                 ) : (
                   agents
-                    ?.filter((ag) => collection?.agents?.includes(ag?.id))
+                    ?.filter((ag) => collection?.agentIds?.includes(ag?.id))
                     ?.map((agent, key) => {
                       return (
                         <div
@@ -361,7 +366,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                     })
                 )}
               </div>
-              {collection?.agents?.length > 0 && (
+              {collection?.agentIds?.length > 0 && (
                 <div className="relative w-full h-fit flex">
                   <div
                     className={`relative w-full h-8 rounded-md bg-windows text-viol hover:opacity-80 flex items-center justify-center text-xxs font-start ${

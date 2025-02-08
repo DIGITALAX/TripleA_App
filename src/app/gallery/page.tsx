@@ -113,6 +113,7 @@ export default function Gallery() {
                           className="relative cursor-canP flex w-56 h-56 rounded-md bg-pink p-4"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
+                            router.prefetch(`/agent/${agent.id}`);
                             router.push(`/agent/${agent.id}`);
                           }}
                         >

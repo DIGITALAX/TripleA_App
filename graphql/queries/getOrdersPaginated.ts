@@ -7,7 +7,7 @@ const ORDERS = gql`
       where: { buyer_contains: $buyer }
       orderDirection: desc
       orderBy: blockTimestamp
-      first: 20,
+      first: 20
       skip: $skip
     ) {
       totalPrice
@@ -23,9 +23,11 @@ const ORDERS = gql`
         }
         id
         artist
-        agents
-        prices
-        tokens
+        agentIds
+        prices {
+          price
+          token
+        }
         tokenIds
         amountSold
         amount
@@ -37,7 +39,10 @@ const ORDERS = gql`
   }
 `;
 
-export const getOrdersPaginated = async (buyer: string, skip: number): Promise<FetchResult | void> => {
+export const getOrdersPaginated = async (
+  buyer: string,
+  skip: number
+): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
   const queryPromise = aaaClient.query({
     query: ORDERS,

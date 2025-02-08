@@ -13,15 +13,17 @@ import {
   TextOnlyMetadata,
 } from "@lens-protocol/client";
 import { SetStateAction, useEffect, useState } from "react";
-import fetchPosts from "../../../../graphql/lens/queries/posts";
 import { getAgent } from "../../../../graphql/queries/getAgent";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
-import fetchStats from "../../../../graphql/lens/queries/accountStats";
-import unfollow from "../../../../graphql/lens/mutations/unfollow";
-import follow from "../../../../graphql/lens/mutations/follow";
 import { getAgentRent } from "../../../../graphql/queries/getAgentRent";
 import { getCollectionArtist } from "../../../../graphql/queries/getCollectionArtist";
+import {
+  fetchAccountsAvailable,
+  fetchAccountStats,
+  fetchPosts,
+  follow,
+  unfollow,
+} from "@lens-protocol/client/actions";
 
 const useAgent = (
   id: string | undefined,
@@ -52,20 +54,23 @@ const useAgent = (
     setFollowLoading(true);
     try {
       if (agent?.profile?.operations?.isFollowedByMe) {
-        const res = await unfollow(
-          {
-            account: evmAddress(agent?.profile?.address),
-          },
-          lensConnected?.sessionClient
-        );
+        const res = await unfollow(lensConnected?.sessionClient, {
+          account: evmAddress(agent?.profile?.address),
+        });
+
+        if (res.isErr()) {
+          setNotification("Something went wrong. Try again? :/");
+          setFollowLoading(false);
+          return;
+        }
 
         if (
-          (res as any)?.reason?.includes(
+          (res.value as any)?.reason?.includes(
             "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
           )
         ) {
           setSignless?.(true);
-        } else if ((res as any)?.hash) {
+        } else if ((res.value as any)?.hash) {
           setNotification("Unfollowed!");
           setStats({
             ...stats!,
@@ -89,20 +94,24 @@ const useAgent = (
           });
         }
       } else {
-        const res = await follow(
-          {
-            account: evmAddress(agent?.profile?.address),
-          },
-          lensConnected?.sessionClient
-        );
+        const res = await follow(lensConnected?.sessionClient, {
+          account: evmAddress(agent?.profile?.address),
+        });
+
+        if (res.isErr()) {
+          setNotification("Something went wrong. Try again? :/");
+          setFollowLoading(false);
+
+          return;
+        }
 
         if (
-          (res as any)?.reason?.includes(
+          (res.value as any)?.reason?.includes(
             "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
           )
         ) {
           setSignless?.(true);
-        } else if ((res as any)?.hash) {
+        } else if ((res.value as any)?.hash) {
           setNotification("Followed!");
           setStats({
             ...stats!,
@@ -135,6 +144,7 @@ const useAgent = (
   ): Promise<Post[] | void> => {
     try {
       const postsRes = await fetchPosts(
+        lensConnected?.sessionClient || lensClient,
         {
           pageSize: PageSize.Fifty,
           filter: {
@@ -145,27 +155,34 @@ const useAgent = (
               },
             },
           },
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
+
+      if (postsRes.isErr()) {
+        return;
+      }
 
       let posts: Post[] = [];
 
-      if ((postsRes as any)?.items?.length > 0) {
-        posts = (postsRes as any)?.items;
+      if (postsRes?.value?.items?.length > 0) {
+        posts = postsRes?.value?.items as Post[];
       } else {
         const postsRes = await fetchPosts(
+          lensConnected?.sessionClient || lensClient,
           {
             pageSize: PageSize.Fifty,
             filter: {
               authors: [agentInput ? agentInput : agent?.profile?.address],
             },
-          },
-          lensConnected?.sessionClient || lensClient
+          }
         );
-        posts = (postsRes as any)?.items?.filter((pos: Post) =>
+        if (postsRes.isErr()) {
+          return;
+        }
+
+        posts = postsRes?.value?.items?.filter((pos: any) =>
           (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA")
-        );
+        ) as Post[];
       }
 
       posts = await Promise.all(
@@ -198,9 +215,9 @@ const useAgent = (
         })
       );
 
-      if ((postsRes as any)?.pageInfo?.next) {
+      if (postsRes.value?.pageInfo?.next) {
         setHasMore(true);
-        setActivityCursor((postsRes as any)?.pageInfo?.next);
+        setActivityCursor(postsRes.value?.pageInfo?.next);
       } else {
         setHasMore(false);
         setActivityCursor(undefined);
@@ -227,7 +244,7 @@ const useAgent = (
       const res = await getAgent(Number(id));
       let metadata: any = res?.data?.agentCreateds?.[0]?.metadata;
 
-      if (!res?.data?.agentCreateds?.[0]?.metadata) {
+      if (!metadata) {
         const cadena = await fetch(
           `${INFURA_GATEWAY}/ipfs/${
             res?.data?.agentCreateds?.[0]?.uri?.includes("ipfs://")
@@ -239,50 +256,51 @@ const useAgent = (
       }
 
       const result = await fetchAccountsAvailable(
+        lensConnected?.sessionClient || lensClient,
         {
           managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.wallets?.[0]),
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
       let picture = "";
       let profile: any;
 
-      if (result) {
-        const cadena = await fetch(
-          `${STORAGE_NODE}/${
-            (result as any)?.[0]?.account?.metadata?.picture?.split(
-              "lens://"
-            )?.[1]
-          }`
-        );
-
-        if (cadena) {
-          const json = await cadena.json();
-          picture = json.item;
-        }
-
-        profile = {
-          ...(result as any)?.[0]?.account,
-          metadata: {
-            ...(result as any)?.[0]?.account?.metadata,
-            picture,
-          },
-        };
+      if (result.isErr()) {
+        setAgentLoading(false);
+        return;
       }
 
-      const resultOwner = await fetchAccountsAvailable(
-        {
-          managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.owner),
+      const cadena = await fetch(
+        `${STORAGE_NODE}/${
+          result.value.items?.[0]?.account?.metadata?.picture?.split(
+            "lens://"
+          )?.[1]
+        }`
+      );
+
+      if (cadena) {
+        const json = await cadena.json();
+        picture = json.item;
+      }
+
+      profile = {
+        ...result.value.items?.[0]?.account,
+        metadata: {
+          ...result.value.items?.[0]?.account?.metadata,
+          picture,
         },
-        lensConnected?.sessionClient || lensClient
+      };
+      const resultOwner = await fetchAccountsAvailable(
+        lensConnected?.sessionClient || lensClient,
+        {
+          managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.creator),
+        }
       );
       let ownerPicture = "";
       let ownerProfile: any;
-
-      if (resultOwner) {
+      if (resultOwner.isOk()) {
         const cadena = await fetch(
           `${STORAGE_NODE}/${
-            (resultOwner as any)?.[0]?.account?.metadata?.picture?.split(
+            resultOwner.value.items?.[0]?.account?.metadata?.picture?.split(
               "lens://"
             )?.[1]
           }`
@@ -294,9 +312,9 @@ const useAgent = (
         }
 
         ownerProfile = {
-          ...(resultOwner as any)?.[0]?.account,
+          ...resultOwner.value.items?.[0]?.account,
           metadata: {
-            ...(resultOwner as any)?.[0]?.account?.metadata,
+            ...resultOwner.value.items?.[0]?.account?.metadata,
             picture: ownerPicture,
           },
         };
@@ -304,64 +322,72 @@ const useAgent = (
 
       const posts = await handleActivity(
         false,
-        (result as any)?.[0]?.account?.address
+        result.value.items?.[0]?.account?.address
       );
 
-      let activeCollectionIds: AgentCollection[] = [];
-      let collectionIdsHistory: AgentCollection[] = [];
-      let details: any[] = [];
+      let activeCollectionIds: AgentCollection[] =
+        res?.data?.agentCreateds?.[0]?.activeCollectionIds || [];
+      let collectionIdsHistory: AgentCollection[] =
+        res?.data?.agentCreateds?.[0]?.collectionIdsHistory || [];
+      let details: any[] = res?.data?.agentCreateds?.[0]?.details || [];
 
       await Promise.all(
-        res?.data?.agentCreateds?.[0]?.activeCollectionIds?.map(
-          async (id: any) => {
-            const result = await fetchAccountsAvailable(
-              {
-                managedBy: evmAddress(id?.artist),
-              },
-              lensClient
-            );
+        activeCollectionIds?.map(async (id: any) => {
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(id?.artist),
+          });
 
-            activeCollectionIds.push({
-              profile: (result as any)?.[0]?.account as Account,
-              collectionId: id?.collectionId,
-              metadata: id?.metadata,
-            });
+          if (result.isErr()) {
+            setAgentLoading(false);
+            return;
           }
-        )
+
+          activeCollectionIds.push({
+            profile: result?.value.items[0]?.account as Account,
+            collectionId: id?.collectionId,
+            metadata: id?.metadata,
+          });
+        })
       );
 
       await Promise.all(
-        res?.data?.agentCreateds?.[0]?.collectionIdsHistory?.map(
-          async (id: any) => {
-            const result = await fetchAccountsAvailable(
-              {
-                managedBy: evmAddress(id?.artist),
-              },
-              lensConnected?.sessionClient || lensClient
-            );
-
-            collectionIdsHistory.push({
-              profile: (result as any)?.[0]?.account as Account,
-              collectionId: id?.collectionId,
-              metadata: id?.metadata,
-            });
+        collectionIdsHistory?.map(async (id: any) => {
+          const result = await fetchAccountsAvailable(
+            lensConnected?.sessionClient || lensClient,
+            {
+              managedBy: evmAddress(id?.artist),
+            }
+          );
+          if (result.isErr()) {
+            setAgentLoading(false);
+            return;
           }
-        )
+
+          collectionIdsHistory.push({
+            profile: result?.value.items[0]?.account as Account,
+            collectionId: id?.collectionId,
+            metadata: id?.metadata,
+          });
+        })
       );
 
       await Promise.all(
-        res?.data?.agentCreateds?.[0]?.details?.map(async (id: any) => {
+        details?.map(async (id: any) => {
           const col = await getCollectionArtist(Number(id?.collectionId));
 
           const result = await fetchAccountsAvailable(
+            lensConnected?.sessionClient || lensClient,
             {
               managedBy: evmAddress(col?.data?.collectionCreateds?.[0]?.artist),
-            },
-            lensConnected?.sessionClient || lensClient
+            }
           );
 
+          if (result.isErr()) {
+            setAgentLoading(false);
+            return;
+          }
           details.push({
-            profile: (result as any)?.[0]?.account as Account,
+            profile: result?.value.items[0]?.account as Account,
             collectionId: id?.collectionId,
             instructions: id?.instructions,
             publishFrequency: Number(id?.publishFrequency),
@@ -379,23 +405,28 @@ const useAgent = (
         })
       );
 
-      const stats = await fetchStats(
+      const stats = await fetchAccountStats(
+        lensConnected?.sessionClient || lensClient,
         {
-          account: (result as any)?.[0]?.account?.owner,
-        },
-        lensConnected?.sessionClient || lensClient
+          account: result.value.items?.[0]?.account?.owner,
+        }
       );
 
-      setStats(stats as AccountStats);
+      if (stats.isErr()) {
+        setAgentLoading(false);
+        return;
+      }
+
+      setStats(stats.value as AccountStats);
 
       const rent = await getAgentRent(
-        Number(res?.data?.agentCreateds?.[0]?.AAAAgents_id)
+        Number(res?.data?.agentCreateds?.[0]?.SkyhuntersAgentManager_id)
       );
 
       setAgentRent(rent?.data?.rentPaids);
 
       setAgent({
-        id: res?.data?.agentCreateds?.[0]?.AAAAgents_id,
+        id: res?.data?.agentCreateds?.[0]?.SkyhuntersAgentManager_id,
         cover: metadata?.cover,
         title: metadata?.title,
         customInstructions: metadata?.customInstructions,
@@ -404,7 +435,9 @@ const useAgent = (
         style: metadata?.style,
         lore: metadata?.lore,
         knowledge: metadata?.knowledge,
-        messageExamples: metadata?.messageExamples,
+        messageExamples: metadata?.messageExamples?.map(
+          (messageExamples: string) => JSON.parse(messageExamples)
+        ),
         wallet: res?.data?.agentCreateds?.[0]?.wallets?.[0],
         balance: res?.data?.agentCreateds?.[0]?.balances,
         owners: res?.data?.agentCreateds?.[0]?.owners,
@@ -414,9 +447,9 @@ const useAgent = (
         activity: posts || [],
         activeCollectionIds,
         collectionIdsHistory,
-        accountConnected: (result as any)?.[0]?.account?.address,
+        accountConnected: result?.value.items[0]?.account?.address,
         ownerProfile,
-        feeds: metadata?.feeds
+        feeds: metadata?.feeds,
       });
     } catch (err: any) {
       console.error(err.message);
@@ -429,6 +462,7 @@ const useAgent = (
     setAgentLoading(true);
     try {
       const postsRes = await fetchPosts(
+        lensConnected?.sessionClient || lensClient,
         {
           pageSize: PageSize.Fifty,
           cursor: activityCursor,
@@ -442,32 +476,42 @@ const useAgent = (
 
             // authors: [agent?.accountConnected],
           },
-        },
-        lensConnected?.sessionClient || lensClient
+        }
       );
+
+      if (postsRes.isErr()) {
+        setAgentLoading(false);
+        return;
+      }
 
       let posts: Post[] = [];
 
-      if ((postsRes as any)?.items?.length > 0) {
-        posts = (postsRes as any)?.items;
+      if (postsRes?.value.items?.length > 0) {
+        posts = postsRes?.value.items as Post[];
       } else {
         const postsRes = await fetchPosts(
+          lensConnected?.sessionClient || lensClient,
           {
             pageSize: PageSize.Fifty,
             filter: {
               authors: [agent?.profile?.address],
             },
-          },
-          lensConnected?.sessionClient || lensClient
+          }
         );
-        posts = (postsRes as any)?.items?.filter((pos: Post) =>
+
+        if (postsRes.isErr()) {
+          setAgentLoading(false);
+          return;
+        }
+
+        posts = postsRes.value?.items?.filter((pos: any) =>
           (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA")
-        );
+        ) as Post[];
       }
 
-      if ((postsRes as any)?.pageInfo?.next) {
+      if (postsRes?.value.pageInfo?.next) {
         setHasMore(true);
-        setActivityCursor((postsRes as any)?.pageInfo?.next);
+        setActivityCursor(postsRes?.value.pageInfo?.next);
       } else {
         setHasMore(false);
         setActivityCursor(undefined);

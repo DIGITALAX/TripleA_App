@@ -1,11 +1,13 @@
 import { LensConnected } from "@/components/Common/types/common.types";
 import { SetStateAction, useState } from "react";
 import pollResult from "@/lib/helpers/pollResult";
-import updateAccount from "../../../../graphql/lens/mutations/updateAccount";
 import { v4 as uuidv4 } from "uuid";
 import { StorageClient } from "@lens-protocol/storage-node-client";
-import fetchAccount from "../../../../graphql/lens/queries/account";
 import { STORAGE_NODE } from "@/lib/constants";
+import {
+  fetchAccount,
+  setAccountMetadata,
+} from "@lens-protocol/client/actions";
 
 const useAccount = (
   lensConnected: LensConnected | undefined,
@@ -57,31 +59,38 @@ const useAccount = (
         },
       });
 
-      const accountResponse = await updateAccount(
+      const accountResponse = await setAccountMetadata(
+        lensConnected?.sessionClient,
         {
           metadataUri: uri,
-        },
-        lensConnected?.sessionClient
+        }
       );
 
-      if ((accountResponse as any)?.hash) {
+      if (accountResponse.isErr()) {
+        setAccountLoading(false);
+        return;
+      }
+
+      if ((accountResponse.value as any)?.hash) {
         if (
           await pollResult(
-            (accountResponse as any)?.hash,
+            (accountResponse.value as any)?.hash,
             lensConnected?.sessionClient
           )
         ) {
-          const result = await fetchAccount(
-            {
-              address: lensConnected?.profile?.address,
-            },
-            lensConnected?.sessionClient
-          );
+          const result = await fetchAccount(lensConnected?.sessionClient, {
+            address: lensConnected?.profile?.address,
+          });
+
+          if (result.isErr()) {
+            setAccountLoading(false);
+            return;
+          }
 
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.metadata?.picture?.split("lens://")?.[1]
+              result.value?.metadata?.picture?.split("lens://")?.[1]
             }`
           );
 
@@ -90,13 +99,13 @@ const useAccount = (
             picture = json.item;
           }
 
-          if ((result as any)?.__typename == "Account") {
+          if (result.value?.__typename == "Account") {
             setLensConnected?.({
               ...lensConnected,
               profile: {
-                ...(result as any),
+                ...result.value,
                 metadata: {
-                  ...(result as any)?.metadata,
+                  ...result.value?.metadata!,
                   picture,
                 },
               },

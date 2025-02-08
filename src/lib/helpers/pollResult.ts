@@ -1,30 +1,33 @@
 import { PublicClient, SessionClient } from "@lens-protocol/client";
-import poll from "../../../graphql/lens/queries/poll";
+import { transactionStatus } from "@lens-protocol/client/actions";
 
 const pollResult = async (
   txHash: string,
   client: SessionClient | PublicClient
 ): Promise<boolean> => {
-  const MAX_RETRIES = 5;
+  const MAX_RETRIES = 20;
   let retries = 0;
 
   try {
     while (retries < MAX_RETRIES) {
-      const res = await poll(
-        {
-          txHash,
-        },
-        client
-      );
+      const res = await transactionStatus(client, {
+        txHash,
+      });
 
-      switch ((res as any).__typename) {
-        case "FinishedTransactionStatus":
-          return true;
-        case "FailedTransactionStatus":
-          return false;
-        default:
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-          retries++;
+      if (res.isOk()) {
+
+        switch (res.value.__typename) {
+          case "FinishedTransactionStatus":
+            return true;
+          case "FailedTransactionStatus":
+            return false;
+          default:
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            retries++;
+        }
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        retries++;
       }
     }
 

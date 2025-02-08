@@ -20,14 +20,30 @@ const COLLECTION = gql`
       dropId
       amountSold
       amount
-      agents
+      agentIds
       tokenIds
       active
-      tokens
+      collectionType
       transactionHash
       uri
-      prices
+      prices {
+        price
+        token
+      }
       blockTimestamp
+      isAgent
+      remixId
+      remixable
+      fulfillerId
+      collectionType
+      remixCollection {
+        artist
+        uri
+        metadata {
+          image
+          title
+        }
+      }
     }
   }
 `;

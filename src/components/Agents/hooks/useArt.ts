@@ -2,8 +2,8 @@ import { LensConnected, NFTData } from "@/components/Common/types/common.types";
 import { useEffect, useState } from "react";
 import { getCollections } from "../../../../graphql/queries/getGallery";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { evmAddress, PublicClient } from "@lens-protocol/client";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useArt = (lensClient: PublicClient, lensConnected: LensConnected) => {
   const [moreArtLoading, setMoreArtLoading] = useState<boolean>(false);
@@ -24,37 +24,24 @@ const useArt = (lensClient: PublicClient, lensConnected: LensConnected) => {
           }
 
           const result = await fetchAccountsAvailable(
+            lensConnected?.sessionClient || lensClient,
             {
               managedBy: evmAddress(col?.artist),
-            },
-            lensConnected?.sessionClient || lensClient
+            }
           );
 
-          let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
+          if (result.isErr()) {
+            setMoreArtLoading(false);
 
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+            return;
           }
+
+        
 
           return {
             id: Number(col?.id),
             image: col?.metadata?.image,
             artist: col?.artist,
-            profile: {
-              ...(result as any)?.[0]?.account,
-              metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
-                picture,
-              },
-            },
           };
         })
       );

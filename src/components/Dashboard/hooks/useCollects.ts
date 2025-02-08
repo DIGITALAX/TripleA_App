@@ -5,7 +5,6 @@ import {
   evmAddress,
   PublicClient as PublicLensClient,
 } from "@lens-protocol/client";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { MARKET_CONTRACT, STORAGE_NODE } from "@/lib/constants";
 import {
   checkAndSignAuthMessage,
@@ -16,6 +15,7 @@ import {
 import { chains } from "@lens-network/sdk/viem";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useCollects = (
   address: `0x${string}` | undefined,
@@ -51,17 +51,19 @@ const useCollects = (
       const data = await getOrders(address);
       const collects: Order[] = await Promise.all(
         data?.data?.orders?.map(async (collect: any) => {
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(collect?.collection?.artist),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(collect?.collection?.artist),
+          });
+
+          if (result.isErr()) {
+            setCollectsLoading(false);
+            return;
+          }
 
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -100,9 +102,9 @@ const useCollects = (
             fulfilled: collect?.fulfilled,
             fulfillment: collect?.fulfillmentDetails,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata!,
                 picture,
               },
             },

@@ -21,9 +21,11 @@ const ORDERS = gql`
         }
         id
         artist
-        agents
-        prices
-        tokens
+        agentIds
+        prices {
+          price
+          token
+        }
         tokenIds
         amountSold
         amount

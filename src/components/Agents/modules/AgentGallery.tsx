@@ -50,6 +50,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
                           className="relative w-full h-full flex bg-mochi cursor-canP"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
+                            router.prefetch(`/agent/${(agent as Agent)?.id}`);
                             router.push(`/agent/${(agent as Agent)?.id}`);
                           }}
                         >
@@ -96,6 +97,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
                       className="relative flex w-fit h-fit pixel-border-5 font-start text-xxs p-1 cursor-canP bg-white text-black rounded-xl"
                       onClick={() => {
                         animationContext?.setPageChange?.(true);
+                        router.prefetch(`/agent/${(agent as Agent)?.id}`);
                         router.push(`/agent/${(agent as Agent)?.id}`);
                       }}
                     >

@@ -3,8 +3,8 @@ import { NFTData } from "../types/common.types";
 import { getCollections } from "../../../../graphql/queries/getGallery";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { evmAddress, PublicClient } from "@lens-protocol/client";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { FetchResult } from "@apollo/client";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useGallery = (lensClient: PublicClient, choice: string) => {
   const [nfts, setNfts] = useState<NFTData[]>([]);
@@ -25,8 +25,9 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
         );
       }
 
+
       const gallery: NFTData[] = await Promise.all(
-        data?.data?.collectionCreateds.map(async (collection: any) => {
+        data?.data?.collectionCreateds?.map(async (collection: any) => {
           if (!collection.metadata) {
             const cadena = await fetch(
               `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
@@ -34,16 +35,17 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             collection.metadata = await cadena.json();
           }
 
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(collection?.artist),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(collection?.artist),
+          });
+          if (result.isErr()) {
+            setGalleryLoading(false);
+            return;
+          }
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -61,16 +63,15 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             description: collection?.metadata?.description,
             blocktimestamp: collection?.blockTimestamp,
             prices: collection?.prices,
-            tokens: collection?.tokens,
-            agents: collection?.agents,
+            agentIds: collection?.agents,
             artist: collection?.artist,
             amountSold: collection?.amountSold,
             tokenIds: collection?.tokenIds,
             amount: collection?.amount,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },
@@ -108,7 +109,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
       }
 
       const gallery: NFTData[] = await Promise.all(
-        data?.data?.collectionCreateds.map(async (collection: any) => {
+        data?.data?.collectionCreateds?.map(async (collection: any) => {
           if (!collection.metadata) {
             const cadena = await fetch(
               `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
@@ -116,17 +117,18 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             collection.metadata = await cadena.json();
           }
 
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(collection?.artist),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(collection?.artist),
+          });
 
+          if (result.isErr()) {
+            setGalleryLoading(false);
+            return;
+          }
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
+              (result.value.items)?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -151,9 +153,9 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             tokenIds: collection?.tokenIds,
             amount: collection?.amount,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...(result.value.items)?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...(result.value.items)?.[0]?.account?.metadata,
                 picture,
               },
             },

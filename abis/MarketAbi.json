@@ -13,7 +13,16 @@
         "type": "address",
         "internalType": "address payable"
       },
-      { "name": "_agents", "type": "address", "internalType": "address" }
+      {
+        "name": "_agents",
+        "type": "address",
+        "internalType": "address payable"
+      },
+      {
+        "name": "_fulfillerManager",
+        "type": "address",
+        "internalType": "address"
+      }
     ],
     "stateMutability": "payable"
   },
@@ -25,7 +34,7 @@
       {
         "name": "",
         "type": "address",
-        "internalType": "contract AAAAccessControls"
+        "internalType": "contract TripleAAccessControls"
       }
     ],
     "stateMutability": "view"
@@ -35,7 +44,11 @@
     "name": "agents",
     "inputs": [],
     "outputs": [
-      { "name": "", "type": "address", "internalType": "contract AAAAgents" }
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract TripleAAgents"
+      }
     ],
     "stateMutability": "view"
   },
@@ -43,9 +56,14 @@
     "type": "function",
     "name": "buy",
     "inputs": [
+      {
+        "name": "fulfillmentDetails",
+        "type": "string",
+        "internalType": "string"
+      },
+      { "name": "paymentToken", "type": "address", "internalType": "address" },
       { "name": "collectionId", "type": "uint256", "internalType": "uint256" },
-      { "name": "amount", "type": "uint256", "internalType": "uint256" },
-      { "name": "paymentToken", "type": "address", "internalType": "address" }
+      { "name": "amount", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -58,20 +76,29 @@
       {
         "name": "",
         "type": "address",
-        "internalType": "contract AAACollectionManager"
+        "internalType": "contract TripleACollectionManager"
       }
     ],
     "stateMutability": "view"
   },
   {
     "type": "function",
-    "name": "devTreasury",
+    "name": "fulfillIRLOrder",
+    "inputs": [
+      { "name": "orderId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "fulfillerManager",
     "inputs": [],
     "outputs": [
       {
         "name": "",
         "type": "address",
-        "internalType": "contract AAADevTreasury"
+        "internalType": "contract TripleAFulfillerManager"
       }
     ],
     "stateMutability": "view"
@@ -125,6 +152,24 @@
   },
   {
     "type": "function",
+    "name": "getOrderFulfillmentDetails",
+    "inputs": [
+      { "name": "orderId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getOrderIsFulfilled",
+    "inputs": [
+      { "name": "orderId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "getOrderMintedTokens",
     "inputs": [
       { "name": "orderId", "type": "uint256", "internalType": "uint256" }
@@ -157,7 +202,7 @@
     "name": "nft",
     "inputs": [],
     "outputs": [
-      { "name": "", "type": "address", "internalType": "contract AAANFT" }
+      { "name": "", "type": "address", "internalType": "contract TripleANFT" }
     ],
     "stateMutability": "view"
   },
@@ -178,7 +223,11 @@
     "type": "function",
     "name": "setAgents",
     "inputs": [
-      { "name": "_agents", "type": "address", "internalType": "address" }
+      {
+        "name": "_agents",
+        "type": "address",
+        "internalType": "address payable"
+      }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -198,18 +247,19 @@
   },
   {
     "type": "function",
-    "name": "setDevTreasury",
+    "name": "setNFT",
     "inputs": [
-      { "name": "_devTreasury", "type": "address", "internalType": "address" }
+      { "name": "_nft", "type": "address", "internalType": "address" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "setNFT",
+    "name": "updateFulfillmentDetails",
     "inputs": [
-      { "name": "_nft", "type": "address", "internalType": "address" }
+      { "name": "fulfillment", "type": "string", "internalType": "string" },
+      { "name": "orderId", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -219,9 +269,21 @@
     "name": "CollectionPurchased",
     "inputs": [
       {
+        "name": "buyer",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "paymentToken",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
         "name": "orderId",
         "type": "uint256",
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256"
       },
       {
@@ -237,16 +299,47 @@
         "internalType": "uint256"
       },
       {
-        "name": "buyer",
-        "type": "address",
+        "name": "artistShare",
+        "type": "uint256",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "uint256"
       },
       {
-        "name": "paymentToken",
-        "type": "address",
+        "name": "fulfillerShare",
+        "type": "uint256",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "uint256"
+      },
+      {
+        "name": "agentShare",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "remixShare",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "FulfillmentUpdated",
+    "inputs": [
+      {
+        "name": "fulfillment",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "orderId",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
       }
     ],
     "anonymous": false
@@ -255,6 +348,7 @@
   { "type": "error", "name": "InsufficientBalance", "inputs": [] },
   { "type": "error", "name": "NotAdmin", "inputs": [] },
   { "type": "error", "name": "NotAvailable", "inputs": [] },
+  { "type": "error", "name": "OnlyFulfillerManager", "inputs": [] },
   { "type": "error", "name": "PaymentFailed", "inputs": [] },
   { "type": "error", "name": "TokenNotAccepted", "inputs": [] }
 ]

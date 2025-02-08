@@ -31,6 +31,7 @@ export default function NFT() {
     context?.lensConnected
   );
 
+
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-10 gap-24">
       <div className="relative w-full h-[60rem] md:h-[40rem] flex flex-col md:flex-row items-center justify-between gap-4 pb-10 px-6 pt-6">
@@ -105,6 +106,13 @@ export default function NFT() {
                           className="relative cursor-canP flex w-56 h-56 bg-white pixel-border-6 rounded-3xl p-3"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
+                            router.prefetch(
+                              `/nft/${
+                                coll?.profile?.username?.value?.split(
+                                  "lens/"
+                                )?.[1]
+                              }/${coll?.id}`
+                            );
                             router.push(
                               `/nft/${
                                 coll?.profile?.username?.value?.split(

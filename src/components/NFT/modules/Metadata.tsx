@@ -21,7 +21,7 @@ const Metadata: FunctionComponent<MetadataProps> = ({
             className={`relative w-full flex items-center justify-center h-full`}
           >
             <div
-              className={`"relative flex items-start justify-start cursor-canP ${
+              className={`relative flex items-start justify-start cursor-canP ${
                 post ? " w-full sm:w-1/2 h-full" : "w-full h-60"
               }`}
               onClick={() =>

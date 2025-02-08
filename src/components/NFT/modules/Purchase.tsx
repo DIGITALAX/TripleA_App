@@ -37,7 +37,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
   agents,
   handlePosts,
   setFulfillmentOpen,
-  fulfillers
+  fulfillers,
 }): JSX.Element => {
   const { isConnected, address } = useAccount();
   const router = useRouter();
@@ -76,7 +76,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
     handleApproveRecharge,
     approvedRecharge,
   } = useAgentRecharge(
-    nft?.agents,
+    nft?.agentIds,
     publicClient,
     address,
     setNotification,
@@ -121,7 +121,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 setScreen(
                   screen > 0
                     ? screen - 1
-                    : Number(nft?.agents?.length || 0) > 0
+                    : Number(nft?.agentIds?.length || 0) > 0
                     ? 3
                     : 1
                 )
@@ -141,7 +141,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               </svg>
             </div>
             <div className="text-sm relative flex w-fit h-fit text-center uppercase font-nerd">
-              {Number(nft?.agents?.length || 0) > 0
+              {Number(nft?.agentIds?.length || 0) > 0
                 ? screen < 1
                   ? "Collect"
                   : screen == 1
@@ -157,7 +157,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
               onClick={() =>
                 setScreen(
-                  screen < (Number(nft?.agents?.length || 0) > 0 ? 3 : 1)
+                  screen < (Number(nft?.agentIds?.length || 0) > 0 ? 3 : 1)
                     ? screen + 1
                     : 0
                 )
@@ -193,6 +193,9 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         animationContext?.setPageChange?.(true);
+                        router.prefetch(
+                          `/user/${nft?.profile?.username?.localName}`
+                        );
                         router.push(
                           `/user/${nft?.profile?.username?.localName}`
                         );
@@ -239,44 +242,123 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 />
                 <div className="relative w-fit h-fit justify-end flex text-sm">
                   {(
-                    (Number(nft?.prices?.[0]) / 10 ** 18) *
+                    (Number(
+                      nft?.prices?.find(
+                        (tok) => tok.token?.toLowerCase() == collectData?.token
+                      )?.price
+                    ) /
+                      10 ** 18) *
                     Number(collectData?.amount)
                   )?.toFixed(2)}{" "}
                   {
                     TOKENS?.find(
-                      (tok) =>
-                        nft?.tokens?.[0]?.toLowerCase() ==
-                        tok.contract?.toLowerCase()
+                      (tok) => collectData?.token == tok.contract?.toLowerCase()
                     )?.symbol
                   }
                 </div>
               </div>
+              {nft?.prices?.length > 0 && (
+                <div className="relative w-full h-fit flex items-center justify-center flex flex-row gap-2">
+                  {nft?.prices?.map((item, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="relative w-fit h-fit flex items-center justify-center"
+                      >
+                        <div
+                          className={`relative w-6 h-6 rounded-full border cursor-canP ${
+                            collectData?.token == item?.token?.toLowerCase()
+                              ? "opacity-70 border-windows"
+                              : "border-black"
+                          }`}
+                          onClick={() =>
+                            setCollectData({
+                              ...collectData,
+                              token: item.token?.toLowerCase(),
+                            })
+                          }
+                          title={
+                            TOKENS.find(
+                              (tok) =>
+                                tok.contract?.toLowerCase() ==
+                                item.token?.toLowerCase()
+                            )?.symbol
+                          }
+                        >
+                          <Image
+                            src={`${INFURA_GATEWAY}/ipfs/${
+                              TOKENS.find(
+                                (tok) =>
+                                  tok.contract?.toLowerCase() ==
+                                  item.token?.toLowerCase()
+                              )?.image
+                            }`}
+                            layout="fill"
+                            objectFit="cover"
+                            draggable={false}
+                            className="rounded-full"
+                            alt={
+                              TOKENS.find(
+                                (tok) =>
+                                  tok.contract?.toLowerCase() ==
+                                  item.token?.toLowerCase()
+                              )?.symbol
+                            }
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               <div className="relative w-full h-fit flex text-xxs text-pink items-start justify-start text-left font-nim">
-                {Number(nft?.agents?.length || 0) <= 0
+                {Number(nft?.agentIds?.length || 0) <= 0
                   ? "No Agents Assigned To this Collection."
                   : (Number(nft?.amountSold || 0) > 1 &&
                       Number(nft?.amount || 0) > 2 &&
-                      Number(nft?.agents?.length || 0) > 0 &&
-                      Number(nft?.prices?.[0]) >=
+                      Number(nft?.agentIds?.length || 0) > 0 &&
+                      Number(
+                        nft?.prices?.find(
+                          (tok) =>
+                            tok.token?.toLowerCase() == collectData?.token
+                        )?.price
+                      ) >=
                         Number(
                           tokenThresholds?.find(
                             (t) =>
                               t?.token?.toLowerCase() ==
-                              nft?.tokens?.[0]?.toLowerCase()
+                              nft?.prices
+                                ?.find(
+                                  (tok) =>
+                                    tok.token?.toLowerCase() ==
+                                    collectData?.token
+                                )
+                                ?.token?.toLowerCase()
                           )?.threshold
                         )) ||
-                    (Number(nft?.agents?.length || 0) > 0 &&
+                    (Number(nft?.agentIds?.length || 0) > 0 &&
                       Number(nft?.amount || 0) > 2 &&
-                      Number(nft?.prices?.[0]) >=
+                      Number(
+                        nft?.prices?.find(
+                          (tok) =>
+                            tok.token?.toLowerCase() == collectData?.token
+                        )?.price
+                      ) >=
                         Number(
                           tokenThresholds?.find(
                             (t) =>
                               t?.token?.toLowerCase() ==
-                              nft?.tokens?.[0]?.toLowerCase()
+                              nft?.prices
+                                ?.find(
+                                  (tok) =>
+                                    tok.token?.toLowerCase() ==
+                                    collectData?.token
+                                )
+                                ?.token?.toLowerCase()
                           )?.threshold
                         ) &&
                       agents
-                        ?.filter((ag) => nft?.agents?.includes(ag?.id))
+                        ?.filter((ag) => nft?.agentIds?.includes(ag?.id))
                         ?.map((bal) =>
                           bal?.balance?.filter(
                             (b) =>
@@ -287,14 +369,23 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                         ?.filter((arr) => arr?.length > 0)?.length > 0)
                   ? "Agents Activated!"
                   : Number(nft?.amountSold || 0) == 1 &&
-                    Number(nft?.agents?.length || 0) > 0 &&
+                    Number(nft?.agentIds?.length || 0) > 0 &&
                     Number(nft?.amount || 0) > 2 &&
-                    Number(nft?.prices?.[0]) >=
+                    Number(
+                      nft?.prices?.find(
+                        (tok) => tok.token?.toLowerCase() == collectData?.token
+                      )?.price
+                    ) >=
                       Number(
                         tokenThresholds?.find(
                           (t) =>
                             t?.token?.toLowerCase() ==
-                            nft?.tokens?.[0]?.toLowerCase()
+                            nft?.prices
+                              ?.find(
+                                (tok) =>
+                                  tok.token?.toLowerCase() == collectData?.token
+                              )
+                              ?.token?.toLowerCase()
                         )?.threshold
                       )
                   ? "Agents Not Yet Activated for this Collection. One more sale needed! Or recharge now!"
@@ -436,11 +527,15 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       <div className="relative w-fit h-fit text-right flex text-sm font-nerd">
                         <div
                           className="relative w-5 h-5 cursor-canP flex rounded-sm border border-windows bg-windows"
-                          onClick={() =>
+                          onClick={() => {
+                            animationContext?.setPageChange?.(true);
+                            router.prefetch(
+                              `/nft/${nft?.remix?.profile?.username?.localName}/${nft?.remixId}`
+                            );
                             router.push(
                               `/nft/${nft?.remix?.profile?.username?.localName}/${nft?.remixId}`
-                            )
-                          }
+                            );
+                          }}
                         >
                           <Image
                             draggable={false}
@@ -483,6 +578,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               animationContext?.setPageChange?.(true);
+                              router.prefetch(`/user/${collector?.localName}`);
                               router.push(`/user/${collector?.localName}`);
                             }}
                           >
@@ -579,7 +675,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
             <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start">
               <div className="relative w-full h-fit flex flex-col items-start justify-start  gap-3">
                 {agents
-                  ?.filter((ag) => nft?.agents?.includes(ag?.id))
+                  ?.filter((ag) => nft?.agentIds?.includes(ag?.id))
                   ?.map((agent, key) => {
                     return (
                       <div
@@ -593,6 +689,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               animationContext?.setPageChange?.(true);
+                              router.prefetch(`/agent/${agent?.id}`);
                               router.push(`/agent/${agent?.id}`);
                             }}
                           >
@@ -631,8 +728,8 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             {
                               TOKENS?.find(
                                 (tok) =>
-                                  tok.contract?.toLowerCase() ==
-                                  nft?.tokens?.[0]?.toLowerCase()
+                                  collectData?.token ==
+                                  tok.contract?.toLowerCase()
                               )?.symbol
                             }
                           </div>
@@ -650,7 +747,11 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                   } else if (approvedRecharge[key]) {
                                     handleRecharge(
                                       key,
-                                      nft?.tokens?.[0],
+                                      nft?.prices?.find(
+                                        (tok) =>
+                                          tok.token?.toLowerCase() ==
+                                          collectData?.token
+                                      )?.token!,
                                       Number(agent?.id)
                                     );
                                   } else {
@@ -709,7 +810,13 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                   tokenThresholds?.find(
                                     (thr) =>
                                       thr?.token?.toLowerCase() ==
-                                      nft?.tokens?.[0]?.toLowerCase()
+                                      nft?.prices
+                                        ?.find(
+                                          (tok) =>
+                                            tok.token?.toLowerCase() ==
+                                            collectData?.token
+                                        )
+                                        ?.token?.toLowerCase()
                                   )?.rent || 0
                                 ) /
                                   10 ** 18)}
@@ -733,7 +840,13 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                 tokenThresholds?.find(
                                   (thr) =>
                                     thr?.token?.toLowerCase() ==
-                                    nft?.tokens?.[0]?.toLowerCase()
+                                    nft?.prices
+                                      ?.find(
+                                        (tok) =>
+                                          tok.token?.toLowerCase() ==
+                                          collectData?.token
+                                      )
+                                      ?.token?.toLowerCase()
                                 )?.rent || 0
                               )) || 0 > 0
                             ? `If not recharged, Agent will run out in ${
@@ -755,7 +868,13 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                     tokenThresholds?.find(
                                       (thr) =>
                                         thr?.token?.toLowerCase() ==
-                                        nft?.tokens?.[0]?.toLowerCase()
+                                        nft?.prices
+                                          ?.find(
+                                            (tok) =>
+                                              tok.token?.toLowerCase() ==
+                                              collectData?.token
+                                          )
+                                          ?.token?.toLowerCase()
                                     )?.rent || 0
                                   ) || 0) +
                                   (Number(
@@ -769,7 +888,13 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                       tokenThresholds?.find(
                                         (thr) =>
                                           thr?.token?.toLowerCase() ==
-                                          nft?.tokens?.[0]?.toLowerCase()
+                                          nft?.prices
+                                            ?.find(
+                                              (tok) =>
+                                                tok.token?.toLowerCase() ==
+                                                collectData?.token
+                                            )
+                                            ?.token?.toLowerCase()
                                       )?.rent || 0
                                     ) || 0) +
                                   (Number(
@@ -783,7 +908,13 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                       tokenThresholds?.find(
                                         (thr) =>
                                           thr?.token?.toLowerCase() ==
-                                          nft?.tokens?.[0]?.toLowerCase()
+                                          nft?.prices
+                                            ?.find(
+                                              (tok) =>
+                                                tok.token?.toLowerCase() ==
+                                                collectData?.token
+                                            )
+                                            ?.token?.toLowerCase()
                                       )?.rent || 0
                                     ) || 0))
                               } cycles.`

@@ -3,17 +3,17 @@ export const STORAGE_NODE: string = "https://storage-api.testnet.lens.dev";
 
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
 export const AGENTS_CONTRACT: `0x${string}` =
-  "0xcDE1629239f0050ba8501D2bCc552F17128e4388";
+  "0x93f12014B6bE2121b451536B05bD5c8ae65D173E";
 export const SKYHUNTERS_AGENTS_MANAGER_CONTRACT: `0x${string}` =
-  "0xcDE1629239f0050ba8501D2bCc552F17128e4388";
+  "0x77c64743E42A99FA0c916C12Ab17B85c8c8458c7";
 export const MARKET_CONTRACT: `0x${string}` =
-  "0x0Cd2c3144EaD91606A190DEc6c112871020DAE0c";
+  "0x703A1F27c2ae703044F2896435b9e340bEaa95dF";
 export const WGRASS_CONTRACT: `0x${string}` =
   "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8";
 export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
-  "0xE112A7Eb684Ae26a01C301A3df4b049BECAEF7E1";
+  "0xf29244D172dc0e54deB100D4E180e6A643bc76f3";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
-  "0x317ed314b5Acf661b40Fb4A568530D1DF3af00fd";
+  "0x852FcD7a7782d3609e61E0A5fDe9A3328D8c0303";
 
 export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   {
@@ -23,8 +23,8 @@ export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   },
   {
     symbol: "MONA",
-    contract: "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8",
-    image: "Qmb3zd2YaKhUnAnPuZtsi7Z5SFWLFbsfigvdEA4zXe8m9X",
+    contract: "0x68d0b8fa9288f84fa6e48e0d8ee92b22d514de26",
+    image: "QmQnuDcLaAkuG92xwaBxRzWk4Qb3heLzdGavG354K4tSWf",
   },
 ];
 

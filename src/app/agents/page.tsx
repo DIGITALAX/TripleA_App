@@ -157,6 +157,13 @@ export default function Agents() {
                           className="relative cursor-canP flex w-56 h-56 bg-white pixel-border-6 rounded-3xl p-3"
                           onClick={() => {
                             animationContext?.setPageChange?.(true);
+                            router.prefetch(
+                              `/nft/${
+                                art?.profile?.username?.value?.split(
+                                  "lens/"
+                                )?.[1]
+                              }/${art?.id}`
+                            );
                             router.push(
                               `/nft/${
                                 art?.profile?.username?.value?.split(

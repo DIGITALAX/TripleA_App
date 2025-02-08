@@ -2,7 +2,7 @@ import { aaaClient } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const COLLECTIONS_AGENT = gql`
-  query ($skip: Int!, $agent: Bool!) {
+  query ($skip: Int!, $isAgent: Bool!) {
     collectionCreateds(
       first: 40
       skip: $skip
@@ -21,14 +21,16 @@ const COLLECTIONS_AGENT = gql`
       dropId
       amountSold
       amount
-      agents
+      agentIds
       tokenIds
-      tokens
       transactionHash
       uri
-      prices
+      prices {
+        price
+        token
+      }
+      isAgent
       blockTimestamp
-      agent
     }
   }
 `;
@@ -52,12 +54,14 @@ const COLLECTIONS = gql`
       dropId
       amountSold
       amount
-      agents
+      agentIds
       tokenIds
-      tokens
       transactionHash
       uri
-      prices
+      prices {
+        price
+        token
+      }
       blockTimestamp
     }
   }
@@ -91,12 +95,12 @@ const COLLECTIONS_ARTIST_NOT = gql`
 
 export const getCollections = async (
   skip: number,
-  agent?: boolean
+  isAgent?: boolean
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
   const queryPromise = aaaClient.query({
-    query: agent !== undefined ? COLLECTIONS_AGENT : COLLECTIONS,
-    variables: agent !== undefined ? { skip, agent } : { skip },
+    query: isAgent !== undefined ? COLLECTIONS_AGENT : COLLECTIONS,
+    variables: isAgent !== undefined ? { skip, isAgent } : { skip },
     fetchPolicy: "no-cache",
     errorPolicy: "all",
   });

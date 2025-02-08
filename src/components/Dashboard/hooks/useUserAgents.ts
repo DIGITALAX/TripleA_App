@@ -12,9 +12,9 @@ import {
   INFURA_GATEWAY,
   STORAGE_NODE,
 } from "@/lib/constants";
-import fetchAccountsAvailable from "../../../../graphql/lens/queries/availableAccounts";
 import { chains } from "@lens-network/sdk/viem";
-import AgentAbi from "@abis/AgentAbi.json";
+import AgentManagerAbi from "@abis/AgentManagerAbi.json";
+import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useUserAgents = (
   lensClient: PublicClient,
@@ -115,7 +115,7 @@ const useUserAgents = (
 
       const { request } = await publicClient.simulateContract({
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
-        abi: AgentAbi,
+        abi: AgentManagerAbi,
         functionName: "editAgent",
         chain: chains.testnet,
         args: ["ipfs://" + responseJSON?.cid, currentAgent?.id],
@@ -149,7 +149,7 @@ const useUserAgents = (
 
       const { request } = await publicClient.simulateContract({
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
-        abi: AgentAbi,
+        abi: AgentManagerAbi,
         functionName: "addOwner",
         chain: chains.testnet,
         args: [agentOwners?.[index], currentAgent?.id],
@@ -187,7 +187,7 @@ const useUserAgents = (
 
       const { request } = await publicClient.simulateContract({
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
-        abi: AgentAbi,
+        abi: AgentManagerAbi,
         functionName: "revokeOwner",
         chain: chains.testnet,
         args: [agentOwners?.[index], currentAgent?.id],
@@ -225,16 +225,17 @@ const useUserAgents = (
             agent.metadata = await cadena.json();
           }
 
-          const result = await fetchAccountsAvailable(
-            {
-              managedBy: evmAddress(agent?.wallets?.[0]),
-            },
-            lensClient
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(agent?.wallets?.[0]),
+          });
+          if (result.isErr()) {
+            setAgentsLoading(false);
+            return;
+          }
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result as any)?.[0]?.account?.metadata?.picture?.split(
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -246,7 +247,7 @@ const useUserAgents = (
           }
 
           return {
-            id: agent?.AAAAgents_id,
+            id: agent?.SkyhuntersAgentManager_id,
             cover: agent?.metadata?.cover,
             title: agent?.metadata?.title,
             description: agent?.metadata?.description,
@@ -256,9 +257,9 @@ const useUserAgents = (
             details: agent?.details,
             owner: agent?.owner,
             profile: {
-              ...(result as any)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result as any)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },
@@ -333,7 +334,7 @@ const useUserAgents = (
 
       const { request } = await publicClient.simulateContract({
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
-        abi: AgentAbi,
+        abi: AgentManagerAbi,
         functionName: "editAgent",
         chain: chains.testnet,
         args: ["ipfs://" + responseJSON?.cid, currentAgent?.id],
