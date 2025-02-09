@@ -64,8 +64,8 @@ const useAgentGallery = (
             title: agent?.metadata?.title,
             description: agent?.metadata?.description,
             wallet: agent?.wallets?.[0],
-            balance: agent?.balances,
-            details: agent?.details,
+            balances: agent?.balances,
+            workers: agent?.workers,
             activeCollectionIds: agent?.activeCollectionIds,
             collectionIdHistory: agent?.collectionIdHistory,
             profile: {

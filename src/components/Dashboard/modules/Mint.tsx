@@ -1,8 +1,8 @@
 import { FunctionComponent, JSX } from "react";
 import { CollectionType, MintProps } from "../types/dashboard.types";
-import { AiOutlineLoading } from "react-icons/ai";
 import Image from "next/legacy/image";
 import { TOKENS } from "@/lib/constants";
+import calculateRent from "@/lib/helpers/calculateRent";
 
 const Mint: FunctionComponent<MintProps> = ({
   handleMint,
@@ -23,33 +23,34 @@ const Mint: FunctionComponent<MintProps> = ({
               return (
                 <div
                   key={index}
-                  className="relative text-xxs text-white w-fit h-fit px-2 py-1 rounded-lg bg-pink rounded-md flex flex-row gap-2 items-center justify-center"
+                  className="relative text-xxs text-white w-full h-fit px-2 py-1 rounded-lg bg-pink rounded-md flex flex-col gap-2 items-center justify-center"
                 >
                   <div className="relative w-fit h-fit flex">
                     {agent?.agent?.title}
                   </div>
-                  <div className="relative w-fit h-fit flex">
-                    {(Number(
-                      tokenThresholds?.find(
-                        (t) =>
-                          t.token?.toLowerCase() ==
-                          mintData?.tokens?.[0]?.toLowerCase()
-                      )?.rent || 0
-                    ) /
-                      10 ** 18) *
-                      (Number(agent?.publishFrequency || 0) +
-                        Number(agent?.leadFrequency || 0) +
-                        Number(agent?.remixFrequency || 0))}
-                  </div>
-                  <div className="relative w-fit h-fit flex">
-                    {
-                      TOKENS.find(
-                        (t) =>
-                          t?.contract?.toLowerCase() ==
-                          mintData?.tokens?.[0]?.toLowerCase()
-                      )?.symbol
-                    }
-                  </div>
+                  {mintData?.tokens?.map((tok, index) => {
+                    const tokenThreshold = tokenThresholds?.find(
+                      (t) => t.token?.toLowerCase() == tok?.toLowerCase()
+                    );
+                    const rent = calculateRent(tokenThreshold!, agent as any);
+                    return (
+                      <div
+                        key={index}
+                        className="relative w-full h-fit flex flex-row items-center justify-between gap-2"
+                      >
+                        <div className="relative w-fit h-fit flex">{rent}</div>
+                        <div className="relative w-fit h-fit flex">
+                          {
+                            TOKENS.find(
+                              (t) =>
+                                t?.contract?.toLowerCase() ==
+                                tokenThreshold?.token?.toLowerCase()
+                            )?.symbol
+                          }
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
@@ -84,7 +85,7 @@ const Mint: FunctionComponent<MintProps> = ({
           </div>
           <div className="relative w-fit h-fit flex items-center justify-between flex-row gap-4 text-pink text-xl">
             <div className="relative w-fit h-fit flex text-left">
-              {mintData.amount} x {mintData.prices?.[0]}{" "}
+              {mintData.amount} x {mintData.prices}{" "}
               {
                 TOKENS.find((tok) => tok.contract == mintData.tokens?.[0])
                   ?.symbol

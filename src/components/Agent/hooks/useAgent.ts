@@ -2,6 +2,8 @@ import { LensConnected } from "@/components/Common/types/common.types";
 import {
   Agent,
   AgentCollection,
+  Balance,
+  Worker,
 } from "@/components/Dashboard/types/dashboard.types";
 import {
   Account,
@@ -329,9 +331,10 @@ const useAgent = (
         res?.data?.agentCreateds?.[0]?.activeCollectionIds || [];
       let collectionIdsHistory: AgentCollection[] =
         res?.data?.agentCreateds?.[0]?.collectionIdsHistory || [];
-      let details: any[] = res?.data?.agentCreateds?.[0]?.details || [];
+      let workers: Worker[] = res?.data?.agentCreateds?.[0]?.workers || [];
+      let balances: Balance[] = res?.data?.agentCreateds?.[0]?.balances || [];
 
-      await Promise.all(
+      activeCollectionIds = (await Promise.all(
         activeCollectionIds?.map(async (id: any) => {
           const result = await fetchAccountsAvailable(lensClient, {
             managedBy: evmAddress(id?.artist),
@@ -342,15 +345,15 @@ const useAgent = (
             return;
           }
 
-          activeCollectionIds.push({
+          return {
             profile: result?.value.items[0]?.account as Account,
             collectionId: id?.collectionId,
             metadata: id?.metadata,
-          });
+          };
         })
-      );
+      )) as AgentCollection[];
 
-      await Promise.all(
+      collectionIdsHistory = (await Promise.all(
         collectionIdsHistory?.map(async (id: any) => {
           const result = await fetchAccountsAvailable(
             lensConnected?.sessionClient || lensClient,
@@ -363,18 +366,26 @@ const useAgent = (
             return;
           }
 
-          collectionIdsHistory.push({
+          return {
             profile: result?.value.items[0]?.account as Account,
             collectionId: id?.collectionId,
             metadata: id?.metadata,
-          });
+          };
         })
-      );
+      )) as AgentCollection[];
 
-      await Promise.all(
-        details?.map(async (id: any) => {
+      balances = balances?.map((balance) => {
+        return {
+          ...balance,
+          image: [...collectionIdsHistory, ...activeCollectionIds].find(
+            (col) => Number(col.collectionId) == Number(balance.collectionId)
+          )?.metadata?.image,
+        };
+      }) as Balance[];
+
+      workers = (await Promise.all(
+        workers?.map(async (id) => {
           const col = await getCollectionArtist(Number(id?.collectionId));
-
           const result = await fetchAccountsAvailable(
             lensConnected?.sessionClient || lensClient,
             {
@@ -386,7 +397,7 @@ const useAgent = (
             setAgentLoading(false);
             return;
           }
-          details.push({
+          return {
             profile: result?.value.items[0]?.account as Account,
             collectionId: id?.collectionId,
             instructions: id?.instructions,
@@ -396,14 +407,14 @@ const useAgent = (
             remix: id?.remix,
             lead: id?.lead,
             publish: id?.publish,
-            tokens: col?.data?.collectionCreateds?.[0]?.tokens,
+            tokens: id?.tokens,
             metadata: {
               image: col?.data?.collectionCreateds?.[0]?.metadata?.image,
               title: col?.data?.collectionCreateds?.[0]?.metadata?.title,
             },
-          });
+          };
         })
-      );
+      )) as Worker[];
 
       const stats = await fetchAccountStats(
         lensConnected?.sessionClient || lensClient,
@@ -423,7 +434,7 @@ const useAgent = (
         Number(res?.data?.agentCreateds?.[0]?.SkyhuntersAgentManager_id)
       );
 
-      setAgentRent(rent?.data?.rentPaids);
+      setAgentRent(rent?.data?.agentPaidRents);
 
       setAgent({
         id: res?.data?.agentCreateds?.[0]?.SkyhuntersAgentManager_id,
@@ -439,10 +450,10 @@ const useAgent = (
           (messageExamples: string) => JSON.parse(messageExamples)
         ),
         wallet: res?.data?.agentCreateds?.[0]?.wallets?.[0],
-        balance: res?.data?.agentCreateds?.[0]?.balances,
+        balances,
         owners: res?.data?.agentCreateds?.[0]?.owners,
         creator: res?.data?.agentCreateds?.[0]?.creator,
-        details,
+        workers,
         profile,
         activity: posts || [],
         activeCollectionIds,

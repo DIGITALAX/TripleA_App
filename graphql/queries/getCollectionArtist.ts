@@ -10,7 +10,6 @@ const COLLECTION_ARTIST = gql`
       orderBy: blockTimestamp
     ) {
       artist
-      tokens
       metadata {
         image
         title

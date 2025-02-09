@@ -279,7 +279,7 @@ const useMint = (
             title: agent?.metadata?.title,
             description: agent?.metadata?.description,
             wallet: agent?.wallets?.[0],
-            balance: agent?.balances,
+            balances: agent?.balances,
             profile: {
               ...result.value.items?.[0]?.account,
               metadata: {

@@ -1,5 +1,5 @@
-import { Agent } from "@/components/Dashboard/types/dashboard.types";
-import { AGENTS_CONTRACT, WGRASS_CONTRACT } from "@/lib/constants";
+import { Worker } from "@/components/Dashboard/types/dashboard.types";
+import { AGENTS_CONTRACT, TOKENS } from "@/lib/constants";
 import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
@@ -9,11 +9,12 @@ const useRecharge = (
   publicClient: PublicClient,
   address: `0x${string}` | undefined,
   setNotification: (e: SetStateAction<string | undefined>) => void,
-  collections: Agent["details"]
+  collections: Worker[]
 ) => {
   const [rechargeLoading, setRechargeLoading] = useState<boolean[]>([]);
   const [rechargeAmount, setRechargeAmount] = useState<number[]>([]);
   const [approvedRecharge, setApprovedRecharge] = useState<boolean[]>([]);
+  const [chosenTokens, setChosenTokens] = useState<string[]>([]);
 
   const handleApproveRecharge = async (index: number) => {
     const amount = rechargeAmount[index];
@@ -37,7 +38,7 @@ const useRecharge = (
       });
 
       const { request } = await publicClient.simulateContract({
-        address: WGRASS_CONTRACT,
+        address: chosenTokens[index] as `0x${string}`,
         abi: [
           {
             inputs: [
@@ -118,7 +119,7 @@ const useRecharge = (
       });
 
       const balance = await publicClient.readContract({
-        address: WGRASS_CONTRACT,
+        address: chosenTokens[index] as `0x${string}`,
         abi: [
           {
             constant: true,
@@ -207,7 +208,13 @@ const useRecharge = (
       setApprovedRecharge(
         Array.from({ length: collections?.length }, () => false)
       );
+
       setRechargeAmount(Array.from({ length: collections?.length }, () => 1));
+      setChosenTokens(
+        Array.from({ length: collections?.length }, (_, i) =>
+          collections?.[i]?.tokens[0]?.toLowerCase()
+        )
+      );
     }
   }, [collections]);
 
@@ -218,6 +225,8 @@ const useRecharge = (
     rechargeAmount,
     handleApproveRecharge,
     approvedRecharge,
+    chosenTokens,
+    setChosenTokens,
   };
 };
 

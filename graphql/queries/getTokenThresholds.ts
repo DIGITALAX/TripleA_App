@@ -3,10 +3,14 @@ import { FetchResult, gql } from "@apollo/client";
 
 const TOKEN_THRESHOLDS = gql`
   query {
-    tokenThresholdSets {
-     token
-     threshold
-     rent
+    tokenDetailsSets {
+      rentRemix
+      rentPublish
+      threshold
+      token
+      vig
+      rentLead
+      base
     }
   }
 `;

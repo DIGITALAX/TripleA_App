@@ -253,8 +253,8 @@ const useUserAgents = (
             description: agent?.metadata?.description,
             customInstructions: agent?.metadata?.customInstructions,
             wallet: agent?.wallets?.[0],
-            balance: agent?.balances,
-            details: agent?.details,
+            balances: agent?.balances,
+            workers: agent?.workers,
             owner: agent?.owner,
             profile: {
               ...result.value.items?.[0]?.account,

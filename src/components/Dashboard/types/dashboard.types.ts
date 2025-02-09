@@ -174,31 +174,39 @@ export interface Agent {
     };
   }[][];
   wallet: string;
-  balance: Balances[];
+  balances: Balance[];
   creator: string;
   activeCollectionIds: AgentCollection[];
   collectionIdsHistory: AgentCollection[];
-  details: {
-    collectionId: string;
-    instructions: string;
-    publishFrequency: number;
-    remixFrequency: number;
-    leadFrequency: number;
-    publish: boolean;
-    remix: boolean;
-    lead: boolean;
-  }[];
   profile?: Account;
   ownerProfile?: Account;
   activity?: Post[];
   accountConnected?: string;
   feeds: string[];
+  workers?: Worker[];
 }
 
 export enum CollectionWorkerType {
   Publish = "Publish",
   Lead = "Lead Gen",
   Remix = "Remix",
+}
+
+export interface Worker {
+  leadFrequency: number;
+  publishFrequency: number;
+  remixFrequency: number;
+  remix: string;
+  publish: string;
+  lead: string;
+  instructions: string;
+  profile?: Account;
+  collectionId: string;
+  tokens: string[];
+  metadata: {
+    image: string;
+    title: string;
+  };
 }
 
 export interface AgentCollection {
@@ -210,18 +218,14 @@ export interface AgentCollection {
   profile: Account;
 }
 
-export interface Balances {
+export interface Balance {
   token: string;
-  activeBalance: number;
-  totalBalance: number;
-  collectionId: number;
-  instructions: string;
-  publishFrequency: number;
-  remixFrequency: number;
-  leadFrequency: number;
-  publish: boolean;
-  remix: boolean;
-  lead: boolean;
+  rentBalance: string;
+  historicalRentBalance: string;
+  historicalBonusBalance: string;
+  collectionId: string;
+  bonusBalance: string;
+  image?: string;
 }
 
 export interface DropInterface {

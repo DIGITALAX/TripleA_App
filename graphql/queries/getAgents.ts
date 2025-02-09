@@ -21,7 +21,6 @@ const AGENTS = gql`
       balances {
         token
         rentBalance
-        instructions
         historicalRentBalance
         historicalBonusBalance
         collectionId
@@ -42,6 +41,17 @@ const AGENTS = gql`
           image
           title
         }
+      }
+      workers {
+        remixFrequency
+        remix
+        publishFrequency
+        publish
+        leadFrequency
+        lead
+        instructions
+        tokens
+        collectionId
       }
       blockNumber
       SkyhuntersAgentManager_id

@@ -2,8 +2,8 @@ import { aaaClient } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const USER_AGENTS = gql`
-  query($owner: String!) {
-    agentCreateds( where: {owner: $owner }) {
+  query ($owner: String!) {
+    agentCreateds(where: { owner: $owner }) {
       metadata {
         title
         description
@@ -14,12 +14,12 @@ const USER_AGENTS = gql`
       owner
       blockTimestamp
       balances {
-        activeBalance
-        totalBalance
-        collectionId
         token
-        dailyFrequency
-        instructions
+        rentBalance
+        historicalRentBalance
+        historicalBonusBalance
+        collectionId
+        bonusBalance
       }
       activeCollectionIds {
         collectionId
@@ -37,10 +37,16 @@ const USER_AGENTS = gql`
           title
         }
       }
-      details {
-        collectionId
-        dailyFrequency
+      workers {
+        remixFrequency
+        remix
+        publishFrequency
+        publish
+        leadFrequency
+        lead
         instructions
+        tokens
+        collectionId
       }
       blockNumber
       SkyhuntersAgentManager_id

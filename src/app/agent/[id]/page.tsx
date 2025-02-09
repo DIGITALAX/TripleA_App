@@ -7,6 +7,7 @@ import useInteractions from "@/components/NFT/hooks/useInteractions";
 import Comments from "@/components/NFT/modules/Comments";
 import Post from "@/components/NFT/modules/Post";
 import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
+import calculateRent from "@/lib/helpers/calculateRent";
 import { downloadEliza } from "@/lib/helpers/downloadEliza";
 import { chains } from "@lens-network/sdk/viem";
 import { useModal } from "connectkit";
@@ -84,11 +85,13 @@ export default function Agent() {
     handleApproveRecharge,
     rechargeAmount,
     setRechargeAmount,
+    chosenTokens,
+    setChosenTokens,
   } = useRecharge(
     publicClient,
     address,
     context?.setNotification!,
-    agent?.details || []
+    agent?.workers || []
   );
 
   return (
@@ -103,6 +106,7 @@ export default function Agent() {
                   ? agent?.cover?.split("ipfs://")?.[1]
                   : agent?.cover
               }`}
+              priority
               draggable={false}
               layout="fill"
               objectFit="contain"
@@ -202,7 +206,7 @@ export default function Agent() {
                     <div className="relative w-full h-fit flex flex-row justify-between items-center gap-2">
                       <div className="relative w-fit h-fit flex items-start gap-1 flex-col justify-start">
                         <div className="relative w-fit h-fit flex text-xs">
-                          Agent Owner
+                          Agent Creator
                         </div>
                         <div className="relative w-fit h-fit flex items-center justify-start gap-2 flex-row">
                           <div className="relative flex rounded-full w-8 h-8 bg-morado border border-morado">
@@ -513,12 +517,12 @@ export default function Agent() {
               ) : screen == 5 ? (
                 <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start">
                   <div className="relative w-full h-fit flex flex-col items-start justify-start  gap-3">
-                    {Number(agent?.balance?.length) < 1 ? (
+                    {Number(agent?.balances?.length) < 1 ? (
                       <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
                         No Balances Yet.
                       </div>
                     ) : (
-                      agent?.balance?.map((balance, key) => {
+                      agent?.balances?.map((balance, key) => {
                         return (
                           <div
                             key={key}
@@ -527,7 +531,7 @@ export default function Agent() {
                               animationContext?.setPageChange?.(true);
                               router.prefetch(
                                 `/nft/${
-                                  (agent?.details as any[])
+                                  agent?.workers
                                     ?.find(
                                       (col) =>
                                         Number(col?.collectionId) ==
@@ -546,7 +550,7 @@ export default function Agent() {
                               );
                               router.push(
                                 `/nft/${
-                                  (agent?.details as any[])
+                                  agent?.workers
                                     ?.find(
                                       (col) =>
                                         Number(col?.collectionId) ==
@@ -573,19 +577,19 @@ export default function Agent() {
                                   className="rounded-sm"
                                   layout="fill"
                                   src={`${INFURA_GATEWAY}/ipfs/${
-                                    (agent?.details as any[])
+                                    agent?.balances
                                       ?.find(
                                         (col) =>
                                           Number(col?.collectionId) ==
                                           Number(balance?.collectionId)
                                       )
-                                      ?.metadata?.image?.split("ipfs://")?.[1]
+                                      ?.image?.split("ipfs://")?.[1]
                                   }`}
                                 />
                               </div>
                             </div>
                             <div className="relative w-fit h-fit flex text-left font-nerd text-xs">
-                              {Number(balance.activeBalance) / 10 ** 18}{" "}
+                              {Number(balance.rentBalance) / 10 ** 18}{" "}
                               {
                                 TOKENS.find(
                                   (tok) =>
@@ -603,7 +607,7 @@ export default function Agent() {
               ) : screen == 6 ? (
                 <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start">
                   <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3">
-                    {Number(agent?.details?.length) < 1 ? (
+                    {Number(agent?.workers?.length) < 1 ? (
                       <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
                         Agent Not Assigned to Any Collections Yet.
                       </div>
@@ -613,7 +617,7 @@ export default function Agent() {
                           Recharge to put this agent to work.
                         </div>
                         <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3">
-                          {agent?.details?.map((collection, key) => {
+                          {agent?.workers?.map((collection, key) => {
                             return (
                               <div
                                 key={key}
@@ -628,18 +632,14 @@ export default function Agent() {
                                         animationContext?.setPageChange?.(true);
                                         router.prefetch(
                                           `/nft/${
-                                            (
-                                              collection as any
-                                            )?.profile?.username?.value?.split(
+                                            collection?.profile?.username?.value?.split(
                                               "lens/"
                                             )?.[1]
                                           }/${collection?.collectionId}`
                                         );
                                         router.push(
                                           `/nft/${
-                                            (
-                                              collection as any
-                                            )?.profile?.username?.value?.split(
+                                            collection?.profile?.username?.value?.split(
                                               "lens/"
                                             )?.[1]
                                           }/${collection?.collectionId}`
@@ -653,9 +653,7 @@ export default function Agent() {
                                           className="rounded-sm"
                                           layout="fill"
                                           src={`${INFURA_GATEWAY}/ipfs/${
-                                            (
-                                              collection as any
-                                            )?.metadata?.image?.split(
+                                            collection?.metadata?.image?.split(
                                               "ipfs://"
                                             )?.[1]
                                           }`}
@@ -686,13 +684,10 @@ export default function Agent() {
                                         TOKENS?.find(
                                           (tok) =>
                                             tok.contract?.toLowerCase() ==
-                                            (
-                                              collection as any
-                                            )?.tokens?.[0]?.toLowerCase()
+                                            chosenTokens?.[key]
                                         )?.symbol
                                       }
                                     </div>
-
                                     <div className="relative w-fit h-fit flex">
                                       <div
                                         className={`relative w-24 h-8 bg-windows rounded-md text-white flex items-center justify-center font-nerd hover:opacity-80 ${
@@ -707,8 +702,7 @@ export default function Agent() {
                                             } else if (approvedRecharge[key]) {
                                               handleRecharge(
                                                 key,
-                                                (collection as any)
-                                                  ?.tokens?.[0],
+                                                collection?.tokens?.[0],
                                                 Number(agent?.id),
                                                 Number(collection?.collectionId)
                                               );
@@ -740,95 +734,171 @@ export default function Agent() {
                                     </div>
                                   </div>
                                 </div>
-                                <div className="relative w-full h-fit flex items-start justify-between gap-2 text-xs font-nerd sm:flex-nowrap flex-wrap">
-                                  <div className="relative w-full h-fit flex items-start justify-between flex-col gap-1">
-                                    <div className="relative w-fit h-fit flex">
-                                      Active Collection Balance:
+                                <div className="relative w-full h-fit flex items-start justify-between gap-2 text-xs flex-col">
+                                  <div className="relative w-full h-fit flex items-start justify-between flex-row gap-1">
+                                    <div className="relative w-fit h-fit flex items-center justify-center gap-1">
+                                      <div className="relative w-fit h-fit flex">
+                                        Active Collection Balance:
+                                      </div>
+                                      <div className="relative w-fit h-fit flex">
+                                        {Number(
+                                          agent?.balances?.find(
+                                            (bal) =>
+                                              bal?.token?.toLowerCase() ==
+                                              chosenTokens?.[key]
+                                          )?.rentBalance || 0
+                                        ) /
+                                          10 ** 18}
+                                      </div>
                                     </div>
-                                    <div className="relative w-fit h-fit flex">
-                                      {Number(
-                                        agent?.balance?.find(
-                                          (bal) =>
-                                            Number(bal?.collectionId) ==
-                                            Number(collection?.collectionId)
-                                        )?.activeBalance || 0
-                                      ) /
-                                        10 ** 18}
+                                    <div className="relative w-fit h-fit flex items-center justify-end flex flex-row gap-2">
+                                      {collection?.tokens?.map(
+                                        (item, index) => {
+                                          return (
+                                            <div
+                                              key={index}
+                                              className="relative w-fit h-fit flex items-center justify-center"
+                                            >
+                                              <div
+                                                className={`relative w-6 h-6 rounded-full border cursor-canP ${
+                                                  chosenTokens?.[key] ==
+                                                  item?.toLowerCase()
+                                                    ? "opacity-70 border-windows"
+                                                    : "border-black"
+                                                }`}
+                                                onClick={() =>
+                                                  setChosenTokens((prev) => {
+                                                    const arr = [...prev];
+                                                    arr[key] = item;
+
+                                                    return arr;
+                                                  })
+                                                }
+                                                title={
+                                                  TOKENS.find(
+                                                    (tok) =>
+                                                      tok.contract?.toLowerCase() ==
+                                                      item?.toLowerCase()
+                                                  )?.symbol
+                                                }
+                                              >
+                                                <Image
+                                                  src={`${INFURA_GATEWAY}/ipfs/${
+                                                    TOKENS.find(
+                                                      (tok) =>
+                                                        tok.contract?.toLowerCase() ==
+                                                        item?.toLowerCase()
+                                                    )?.image
+                                                  }`}
+                                                  layout="fill"
+                                                  objectFit="cover"
+                                                  draggable={false}
+                                                  className="rounded-full"
+                                                  alt={
+                                                    TOKENS.find(
+                                                      (tok) =>
+                                                        tok.contract?.toLowerCase() ==
+                                                        item?.toLowerCase()
+                                                    )?.symbol
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+                                          );
+                                        }
+                                      )}
                                     </div>
                                   </div>
-                                  <div className="relative w-full h-fit flex items-start justify-between flex-col gap-1">
-                                    <div className="relative w-fit h-fit flex">
-                                      Publishing Rate:
-                                    </div>
-                                    <div className="relative w-fit h-fit flex">
-                                      {Number(
-                                        agent?.details?.find(
-                                          (bal) =>
-                                            Number(bal?.collectionId) ==
-                                            Number(collection?.collectionId)
-                                        )?.publishFrequency || 0
-                                      ) *
-                                        (Number(
-                                          context?.tokenThresholds?.find(
-                                            (thr) =>
-                                              thr?.token?.toLowerCase() ==
-                                              (
-                                                collection as any
-                                              )?.tokens?.[0]?.toLowerCase()
-                                          )?.rent || 0
-                                        ) /
-                                          10 ** 18)}
-                                    </div>
+                                  <div className="relative w-full h-fit flex flex-wrap items-center justify-between gap-2">
+                                    {collection?.publish && (
+                                      <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                        <div className="relative w-fit h-fit flex">
+                                          Publishing Rate:
+                                        </div>
+                                        <div className="relative w-fit h-fit flex">
+                                          {Number(
+                                            collection?.publishFrequency || 0
+                                          ) *
+                                            (Number(
+                                              context?.tokenThresholds?.find(
+                                                (thr) =>
+                                                  thr?.token?.toLowerCase() ==
+                                                  chosenTokens?.[key]
+                                              )?.rentPublish || 0
+                                            ) /
+                                              10 ** 18)}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {collection?.remix && (
+                                      <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                        <div className="relative w-fit h-fit flex">
+                                          Remix Rate:
+                                        </div>
+                                        <div className="relative w-fit h-fit flex">
+                                          {Number(
+                                            collection?.remixFrequency || 0
+                                          ) *
+                                            (Number(
+                                              context?.tokenThresholds?.find(
+                                                (thr) =>
+                                                  thr?.token?.toLowerCase() ==
+                                                  chosenTokens?.[key]
+                                              )?.rentRemix || 0
+                                            ) /
+                                              10 ** 18)}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {collection?.lead && (
+                                      <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                        <div className="relative w-fit h-fit flex">
+                                          Lead Gen Rate:
+                                        </div>
+                                        <div className="relative w-fit h-fit flex">
+                                          {Number(
+                                            collection?.leadFrequency || 0
+                                          ) *
+                                            (Number(
+                                              context?.tokenThresholds?.find(
+                                                (thr) =>
+                                                  thr?.token?.toLowerCase() ==
+                                                  chosenTokens?.[key]
+                                              )?.rentLead || 0
+                                            ) /
+                                              10 ** 18)}
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                                 <div className="relative w-full h-fit text-pink font-nerd text-sm break-all flex">
                                   {Number(
-                                    agent?.balance?.find(
+                                    agent?.balances?.find(
                                       (bal) =>
                                         Number(bal?.collectionId) ==
                                         Number(collection?.collectionId)
-                                    )?.activeBalance || 0
+                                    )?.rentBalance || 0
                                   ) /
-                                    (Number(
-                                      agent?.details?.find(
-                                        (bal) =>
-                                          Number(bal?.collectionId) ==
-                                          Number(collection?.collectionId)
-                                      )?.publishFrequency || 0
-                                    ) *
-                                      Number(
-                                        context?.tokenThresholds?.find(
-                                          (thr) =>
-                                            thr?.token?.toLowerCase() ==
-                                            (
-                                              collection as any
-                                            )?.tokens?.[0]?.toLowerCase()
-                                        )?.rent || 0
-                                      )) || 0 > 0
+                                    10 ** 18 >
+                                  0
                                     ? `If not recharged, Agent will run out in ${
                                         Number(
-                                          agent?.balance?.find(
+                                          agent?.balances?.find(
                                             (bal) =>
                                               Number(bal?.collectionId) ==
                                               Number(collection?.collectionId)
-                                          )?.activeBalance || 0
+                                          )?.rentBalance || 0
                                         ) /
-                                          (Number(
-                                            agent?.details?.find(
-                                              (bal) =>
-                                                Number(bal?.collectionId) ==
-                                                Number(collection?.collectionId)
-                                            )?.publishFrequency || 0
-                                          ) *
-                                            Number(
-                                              context?.tokenThresholds?.find(
-                                                (thr) =>
-                                                  thr?.token?.toLowerCase() ==
-                                                  (
-                                                    collection as any
-                                                  )?.tokens?.[0]?.toLowerCase()
-                                              )?.rent || 0
-                                            )) || 0
+                                        10 ** 18 /
+                                        calculateRent(
+                                          context?.tokenThresholds?.find(
+                                            (thr) =>
+                                              thr?.token?.toLowerCase() ==
+                                              collection?.tokens?.[0]?.toLowerCase()
+                                          )!,
+                                          collection
+                                        )
                                       } cycles.`
                                     : "Agent needs to be recharged to start activity."}
                                 </div>

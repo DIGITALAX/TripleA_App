@@ -16,6 +16,9 @@ const COLLECTION = gql`
         image
         title
         description
+        format
+        sizes
+        colors
       }
       dropId
       amountSold

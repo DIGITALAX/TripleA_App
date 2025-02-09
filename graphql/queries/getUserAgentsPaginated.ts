@@ -14,12 +14,12 @@ const USER_AGENTS = gql`
       owner
       blockTimestamp
       balances {
-        activeBalance
-        totalBalance
-        collectionId
         token
-        dailyFrequency
-        instructions
+        rentBalance
+        historicalRentBalance
+        historicalBonusBalance
+        collectionId
+        bonusBalance
       }
       activeCollectionIds {
         collectionId
@@ -29,10 +29,16 @@ const USER_AGENTS = gql`
           title
         }
       }
-      details {
-        collectionId
-        dailyFrequency
+      workers {
+        remixFrequency
+        remix
+        publishFrequency
+        publish
+        leadFrequency
+        lead
         instructions
+        tokens
+        collectionId
       }
       collectionIdsHistory {
         collectionId

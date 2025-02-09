@@ -17,9 +17,9 @@ const useAgents = (
 ) => {
   const loadAgents = async () => {
     setAgentsLoading(true);
-
     try {
       const data = await getAgents();
+
       const allAgents: Agent[] = await Promise.all(
         data?.data?.agentCreateds?.map(async (agent: any) => {
           if (!agent.metadata) {
@@ -63,8 +63,8 @@ const useAgents = (
             description: agent?.metadata?.description,
             customInstructions: agent?.metadata?.customInstructions,
             wallet: agent?.wallets?.[0],
-            balance: agent?.balances,
-            details: agent?.details,
+            balances: agent?.balances,
+            workers: agent?.workers,
             activeCollectionIds: agent?.activeCollectionIds,
             collectionIdHistory: agent?.collectionIdHistory,
             profile: {
@@ -88,7 +88,8 @@ const useAgents = (
     try {
       const data = await getTokenThresholds();
 
-      setTokenThresholds?.(data?.data?.tokenThresholdSets);
+
+      setTokenThresholds?.(data?.data?.tokenDetailsSets);
     } catch (err: any) {
       console.error(err.message);
     }
@@ -103,6 +104,7 @@ const useAgents = (
       loadThresholdsAndRent();
     }
   }, [lensClient]);
+
 };
 
 export default useAgents;

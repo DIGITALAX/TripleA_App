@@ -35,6 +35,7 @@ const Slider: FunctionComponent = (): JSX.Element => {
           className="relative w-10 h-10 flex pixel-border-4 bg-[#5aacfa] rounded-xl items-center justify-center hover:opacity-70 cursor-canP"
           onClick={() => {
             animationContext?.setPageChange?.(true);
+            router.prefetch("/agent-payouts");
             router.push("/agent-payouts");
           }}
           title={"Agent Payouts"}
@@ -54,6 +55,7 @@ const Slider: FunctionComponent = (): JSX.Element => {
           className="relative w-10 h-10 flex pixel-border-4 bg-morado rounded-xl items-center justify-center hover:opacity-70 cursor-canP"
           onClick={() => {
             animationContext?.setPageChange?.(true);
+            router.prefetch("/agents");
             router.push("/agents");
           }}
           title={"Agents"}
@@ -75,6 +77,7 @@ const Slider: FunctionComponent = (): JSX.Element => {
           className="relative w-10 h-10 flex pixel-border-4 bg-[#FFF026] rounded-xl items-center justify-center hover:opacity-70 cursor-canP"
           onClick={() => {
             animationContext?.setPageChange?.(true);
+            router.prefetch("/gallery");
             router.push("/gallery");
           }}
           title={"Gallery"}

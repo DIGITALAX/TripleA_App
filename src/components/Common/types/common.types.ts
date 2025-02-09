@@ -46,9 +46,13 @@ export interface Collector {
 }
 
 export interface TokenThreshold {
-  token: string;
+  rentRemix: string;
+  rentPublish: string;
   threshold: string;
-  rent: string;
+  token: string;
+  vig: string;
+  rentLead: string;
+  base: string;
 }
 
 export interface Fulfiller {

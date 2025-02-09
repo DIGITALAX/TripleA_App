@@ -19,6 +19,7 @@ import {
   CollectionType,
   Format,
 } from "@/components/Dashboard/types/dashboard.types";
+import calculateRent from "@/lib/helpers/calculateRent";
 
 const Purchase: FunctionComponent<PurchaseProps> = ({
   nft,
@@ -105,7 +106,6 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
     nft,
     handlePosts
   );
-
   return (
     <div
       className={`relative w-full md:w-[38rem] h-full flex flex-col gap-4 items-start justify-start text-left text-windows p-3 bg-viol rounded-md ${
@@ -257,8 +257,8 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   }
                 </div>
               </div>
-              {nft?.prices?.length > 0 && (
-                <div className="relative w-full h-fit flex items-center justify-center flex flex-row gap-2">
+              {nft?.prices?.length > 1 && (
+                <div className="relative w-full h-fit flex items-center justify-end flex flex-row gap-2">
                   {nft?.prices?.map((item, index) => {
                     return (
                       <div
@@ -325,15 +325,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       ) >=
                         Number(
                           tokenThresholds?.find(
-                            (t) =>
-                              t?.token?.toLowerCase() ==
-                              nft?.prices
-                                ?.find(
-                                  (tok) =>
-                                    tok.token?.toLowerCase() ==
-                                    collectData?.token
-                                )
-                                ?.token?.toLowerCase()
+                            (t) => t?.token?.toLowerCase() == collectData?.token
                           )?.threshold
                         )) ||
                     (Number(nft?.agentIds?.length || 0) > 0 &&
@@ -346,24 +338,16 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       ) >=
                         Number(
                           tokenThresholds?.find(
-                            (t) =>
-                              t?.token?.toLowerCase() ==
-                              nft?.prices
-                                ?.find(
-                                  (tok) =>
-                                    tok.token?.toLowerCase() ==
-                                    collectData?.token
-                                )
-                                ?.token?.toLowerCase()
+                            (t) => t?.token?.toLowerCase() == collectData?.token
                           )?.threshold
                         ) &&
                       agents
                         ?.filter((ag) => nft?.agentIds?.includes(ag?.id))
                         ?.map((bal) =>
-                          bal?.balance?.filter(
+                          bal?.balances?.filter(
                             (b) =>
-                              b?.collectionId == nft?.id &&
-                              Number(b?.activeBalance) > 0
+                              Number(b?.collectionId) == nft?.id &&
+                              Number(b?.rentBalance) > 0
                           )
                         )
                         ?.filter((arr) => arr?.length > 0)?.length > 0)
@@ -378,14 +362,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                     ) >=
                       Number(
                         tokenThresholds?.find(
-                          (t) =>
-                            t?.token?.toLowerCase() ==
-                            nft?.prices
-                              ?.find(
-                                (tok) =>
-                                  tok.token?.toLowerCase() == collectData?.token
-                              )
-                              ?.token?.toLowerCase()
+                          (t) => t?.token?.toLowerCase() == collectData?.token
                         )?.threshold
                       )
                   ? "Agents Not Yet Activated for this Collection. One more sale needed! Or recharge now!"
@@ -430,7 +407,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               {nft?.collectionType == CollectionType.IRL && (
                 <>
                   <div
-                    className={`hover:opacity-60 relative bg-windows rounded-md w-fit h-fit flex cursor-canP text-sm flex p-1 items-center justify-center text-center font-nerd`}
+                    className={`relative bg-windows rounded-md w-fit h-fit flex text-sm flex p-1 items-center justify-center text-center font-nerd text-white`}
                   >
                     {nft?.format}
                   </div>
@@ -510,8 +487,8 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 </>
               )}
               <div className="relative w-full h-full flex flex-col gap-3 items-start justify-between">
-                <div className="relative w-full h-full flex py-4 overflow-y-scroll">
-                  <div className="py-3 h-full max-h-full overflow-y-scroll flex relative items-start justify-start text-left text-sm font-nerd">
+                <div className="relative w-full h-full max-h-full flex py-4 overflow-y-scroll">
+                  <div className="py-3 h-fit max-h-40 flex relative items-start justify-start text-left text-sm font-nerd">
                     {nft?.description}
                   </div>
                 </div>
@@ -677,6 +654,9 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 {agents
                   ?.filter((ag) => nft?.agentIds?.includes(ag?.id))
                   ?.map((agent, key) => {
+                    const worker = agent?.workers?.find(
+                      (ag) => Number(ag?.collectionId) == nft?.id
+                    );
                     return (
                       <div
                         key={key}
@@ -747,11 +727,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                   } else if (approvedRecharge[key]) {
                                     handleRecharge(
                                       key,
-                                      nft?.prices?.find(
-                                        (tok) =>
-                                          tok.token?.toLowerCase() ==
-                                          collectData?.token
-                                      )?.token!,
+                                      collectData?.token!,
                                       Number(agent?.id)
                                     );
                                   } else {
@@ -780,143 +756,104 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                             </div>
                           </div>
                         </div>
-                        <div className="relative w-full h-fit flex items-start justify-between gap-2 text-xs sm:flex-nowrap flex-wrap">
-                          <div className="relative w-full h-fit flex items-start justify-between flex-col gap-1">
+                        <div className="relative w-full h-fit flex items-start justify-between gap-2 text-xs flex-col">
+                          <div className="relative w-full h-fit flex items-start justify-between flex-row gap-1">
                             <div className="relative w-fit h-fit flex">
                               Active Collection Balance:
                             </div>
                             <div className="relative w-fit h-fit flex">
                               {Number(
-                                agent?.balance?.find(
+                                agent?.balances?.find(
                                   (bal) =>
                                     Number(bal?.collectionId) == Number(nft?.id)
-                                )?.activeBalance || 0
+                                )?.rentBalance || 0
                               ) /
                                 10 ** 18}
                             </div>
                           </div>
-                          <div className="relative w-full h-fit flex items-start justify-between flex-col gap-1">
-                            <div className="relative w-fit h-fit flex">
-                              Publishing Rate:
-                            </div>
-                            <div className="relative w-fit h-fit flex">
-                              {Number(
-                                agent?.details?.find(
-                                  (bal) =>
-                                    Number(bal?.collectionId) == Number(nft?.id)
-                                )?.publishFrequency || 0
-                              ) *
-                                (Number(
-                                  tokenThresholds?.find(
-                                    (thr) =>
-                                      thr?.token?.toLowerCase() ==
-                                      nft?.prices
-                                        ?.find(
-                                          (tok) =>
-                                            tok.token?.toLowerCase() ==
-                                            collectData?.token
-                                        )
-                                        ?.token?.toLowerCase()
-                                  )?.rent || 0
-                                ) /
-                                  10 ** 18)}
-                            </div>
+                          <div className="relative w-full h-fit flex flex-wrap items-center justify-between gap-2">
+                            {worker?.publish && (
+                              <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                <div className="relative w-fit h-fit flex">
+                                  Publishing Rate:
+                                </div>
+                                <div className="relative w-fit h-fit flex">
+                                  {Number(worker?.publishFrequency || 0) *
+                                    (Number(
+                                      tokenThresholds?.find(
+                                        (thr) =>
+                                          thr?.token?.toLowerCase() ==
+                                          collectData?.token
+                                      )?.rentPublish || 0
+                                    ) /
+                                      10 ** 18)}
+                                </div>
+                              </div>
+                            )}
+                            {worker?.remix && (
+                              <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                <div className="relative w-fit h-fit flex">
+                                  Remix Rate:
+                                </div>
+                                <div className="relative w-fit h-fit flex">
+                                  {Number(worker?.remixFrequency || 0) *
+                                    (Number(
+                                      tokenThresholds?.find(
+                                        (thr) =>
+                                          thr?.token?.toLowerCase() ==
+                                          collectData?.token
+                                      )?.rentRemix || 0
+                                    ) /
+                                      10 ** 18)}
+                                </div>
+                              </div>
+                            )}
+                            {worker?.lead && (
+                              <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                <div className="relative w-fit h-fit flex">
+                                  Lead Gen Rate:
+                                </div>
+                                <div className="relative w-fit h-fit flex">
+                                  {Number(worker?.leadFrequency || 0) *
+                                    (Number(
+                                      tokenThresholds?.find(
+                                        (thr) =>
+                                          thr?.token?.toLowerCase() ==
+                                          collectData?.token
+                                      )?.rentLead || 0
+                                    ) /
+                                      10 ** 18)}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="relative w-full h-fit text-pink text-sm break-all flex">
-                          {Number(
-                            agent?.balance?.find(
+                          {(Number(
+                            agent?.balances?.find(
                               (bal) =>
                                 Number(bal?.collectionId) == Number(nft?.id)
-                            )?.activeBalance || 0
-                          ) /
-                            (Number(
-                              agent?.details?.find(
-                                (bal) =>
-                                  Number(bal?.collectionId) == Number(nft?.id)
-                              )?.publishFrequency || 0
-                            ) *
-                              Number(
-                                tokenThresholds?.find(
-                                  (thr) =>
-                                    thr?.token?.toLowerCase() ==
-                                    nft?.prices
-                                      ?.find(
-                                        (tok) =>
-                                          tok.token?.toLowerCase() ==
-                                          collectData?.token
-                                      )
-                                      ?.token?.toLowerCase()
-                                )?.rent || 0
-                              )) || 0 > 0
+                            )?.rentBalance
+                          ) || 0) /
+                            10 ** 18 >
+                          0
                             ? `If not recharged, Agent will run out in ${
                                 Number(
-                                  agent?.balance?.find(
+                                  agent?.balances?.find(
                                     (bal) =>
                                       Number(bal?.collectionId) ==
                                       Number(nft?.id)
-                                  )?.activeBalance || 0
+                                  )?.rentBalance || 0
                                 ) /
-                                ((Number(
-                                  agent?.details?.find(
-                                    (bal) =>
-                                      Number(bal?.collectionId) ==
-                                      Number(nft?.id)
-                                  )?.publishFrequency || 0
-                                ) *
-                                  Number(
-                                    tokenThresholds?.find(
-                                      (thr) =>
-                                        thr?.token?.toLowerCase() ==
-                                        nft?.prices
-                                          ?.find(
-                                            (tok) =>
-                                              tok.token?.toLowerCase() ==
-                                              collectData?.token
-                                          )
-                                          ?.token?.toLowerCase()
-                                    )?.rent || 0
-                                  ) || 0) +
-                                  (Number(
-                                    agent?.details?.find(
-                                      (bal) =>
-                                        Number(bal?.collectionId) ==
-                                        Number(nft?.id)
-                                    )?.publishFrequency || 0
-                                  ) *
-                                    Number(
-                                      tokenThresholds?.find(
-                                        (thr) =>
-                                          thr?.token?.toLowerCase() ==
-                                          nft?.prices
-                                            ?.find(
-                                              (tok) =>
-                                                tok.token?.toLowerCase() ==
-                                                collectData?.token
-                                            )
-                                            ?.token?.toLowerCase()
-                                      )?.rent || 0
-                                    ) || 0) +
-                                  (Number(
-                                    agent?.details?.find(
-                                      (bal) =>
-                                        Number(bal?.collectionId) ==
-                                        Number(nft?.id)
-                                    )?.publishFrequency || 0
-                                  ) *
-                                    Number(
-                                      tokenThresholds?.find(
-                                        (thr) =>
-                                          thr?.token?.toLowerCase() ==
-                                          nft?.prices
-                                            ?.find(
-                                              (tok) =>
-                                                tok.token?.toLowerCase() ==
-                                                collectData?.token
-                                            )
-                                            ?.token?.toLowerCase()
-                                      )?.rent || 0
-                                    ) || 0))
+                                10 ** 18 /
+                                calculateRent(
+                                  tokenThresholds?.find(
+                                    (t) =>
+                                      t?.token?.toLowerCase() ==
+                                      collectData?.token
+                                  )!,
+                                  worker!
+                                )
                               } cycles.`
                             : "Agent needs to be recharged to start activity."}
                         </div>

@@ -17,7 +17,10 @@ import {
   TextOnlyMetadata,
 } from "@lens-protocol/client";
 import { getCollectors } from "../../../../graphql/queries/getCollectors";
-import { Agent } from "@/components/Dashboard/types/dashboard.types";
+import {
+  Agent,
+  CollectionType,
+} from "@/components/Dashboard/types/dashboard.types";
 import {
   getCollectionsArtist,
   getCollectionsArtistNot,
@@ -275,7 +278,7 @@ const useNFT = (
         blocktimestamp: collection?.blockTimestamp,
         active: collection?.active,
         prices: collection?.prices,
-        agentIds: collection?.agents,
+        agentIds: collection?.agentIds,
         artist: collection?.artist,
         amountSold: collection?.amountSold,
         tokenIds: collection?.tokenIds,
@@ -292,7 +295,10 @@ const useNFT = (
         },
         collectors,
         agentActivity: posts || [],
-        collectionType: collection?.collectionType,
+        collectionType:
+          collection?.collectionType == "1"
+            ? CollectionType.IRL
+            : CollectionType.Digital,
         format: collection?.metadata?.format,
         sizes: collection?.metadata?.sizes,
         colors: collection?.metadata?.colors,

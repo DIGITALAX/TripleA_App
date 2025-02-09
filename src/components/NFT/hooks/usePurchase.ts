@@ -32,7 +32,7 @@ const usePurchase = (
   const [approved, setApproved] = useState<boolean>(false);
 
   const checkAllowance = async () => {
-    if (!address) return;
+    if (!address || !collectData?.token) return;
     try {
       const data = await publicClient.readContract({
         address: WGRASS_CONTRACT,

@@ -22,7 +22,6 @@ const AGENT = gql`
       balances {
         token
         rentBalance
-        instructions
         historicalRentBalance
         historicalBonusBalance
         collectionId
@@ -44,6 +43,9 @@ const AGENT = gql`
         publish
         leadFrequency
         lead
+        instructions
+        tokens
+        collectionId
       }
     }
   }
