@@ -291,7 +291,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                     </div>
                     <div className="flex relative w-full h-fit items-center justify-between gap-2 flex-row text-xs text-left">
                       <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
-                        <div className="relative flex w-fit h-fit">Rent</div>
+                        <div className="relative flex w-fit h-fit">Max Total Rent</div>
                         <div className="relative flex w-fit h-fit">
                           {calculateRent(
                             tokenThresholds?.find(

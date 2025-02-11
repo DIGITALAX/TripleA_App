@@ -14,6 +14,7 @@ const AGENTS_PAGINATED = gql`
         customInstructions
         cover
         bio
+        model
         adjectives
       }
       creator

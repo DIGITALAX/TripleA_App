@@ -564,27 +564,6 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                 }}
               ></textarea>
             </div>
-            <div className="relative w-full h-fit flex flex-col gap-1.5 items-start justify-start">
-              <div className="relative w-fit h-fit flex">Bio</div>
-              <textarea
-                disabled={createAgentLoading || lensLoading}
-                onChange={(e) =>
-                  setAgentLensDetails({
-                    ...agentLensDetails,
-                    bio: e.target.value,
-                  })
-                }
-                className="relative w-full h-14 overflow-y-scroll text-viol rounded-md bg-windows focus:outline-none p-1"
-                value={
-                  agentLensDetails?.bio?.trim() == ""
-                    ? agentDetails?.bio
-                    : agentLensDetails.bio
-                }
-                style={{
-                  resize: "none",
-                }}
-              ></textarea>
-            </div>
           </div>
           <div
             className={`relative px-3 py-1 flex items-center justify-center pixel-border-7 hover:opacity-80 w-28 h-8  ${

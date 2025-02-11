@@ -144,9 +144,13 @@ const useCreateAgent = (
       );
       const agentWalletCreated = Wallet.createRandom(provider);
 
+      console.log({
+        address: agentWalletCreated.address,
+        key: agentWalletCreated.privateKey
+      })
+
       const authenticatedOnboarding = await lensClient.login({
         onboardingUser: {
-          app: "0xe5439696f4057aF073c0FB2dc6e5e755392922e1",
           wallet: agentWalletCreated.address,
         },
         signMessage: (message) => agentWalletCreated.signMessage(message),
@@ -194,7 +198,6 @@ const useCreateAgent = (
             if (newAcc.value?.address) {
               const authenticated = await lensClient.login({
                 accountOwner: {
-                  app: "0xe5439696f4057aF073c0FB2dc6e5e755392922e1",
                   account: evmAddress(newAcc.value.address),
                   owner: agentWalletCreated.address?.toLowerCase(),
                 },
@@ -241,7 +244,7 @@ const useCreateAgent = (
                     );
                     await txResponse.wait();
                     if (txResponse) {
-                      setCreateSwitcher(CreateSwitcher.Create);
+                      setCreateSwitcher(CreateSwitcher.Feeds);
                       setAgentWallet(agentWalletCreated);
                       setAgentAccountAddress(newAcc.value?.address);
                     } else {

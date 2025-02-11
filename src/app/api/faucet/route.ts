@@ -17,7 +17,8 @@ export async function POST(req: Request) {
 
     const tx = await accessControls.faucet(
       address,
-      BigInt("500000000000000000"),
+      BigInt("200000000000000000"),
+      22000,
       {
         gasLimit: 1000000,
         maxFeePerGas: feeData?.gasPrice,

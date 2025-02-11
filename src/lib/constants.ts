@@ -13,7 +13,7 @@ export const WGRASS_CONTRACT: `0x${string}` =
 export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
   "0x575da586767F54DC9ba7E08024844ce72480e234";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
-  "0x1b37B6FD3457b7FbB09308752e3ECCA4a7734839";
+  "0x59104328311864bf0A42d832F78d74AC89967740";
 export const AU_TOKEN: `0x${string}` = "0x";
 export const AU_TREASURY_CONTRACT: `0x${string}` = "0x";
 

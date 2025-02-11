@@ -5,8 +5,9 @@ import {
   CollectionWorkerType,
 } from "../types/dashboard.types";
 import Image from "next/legacy/image";
-import { INFURA_GATEWAY } from "@/lib/constants";
+import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import { ImSwitch } from "react-icons/im";
+import calculateRent from "@/lib/helpers/calculateRent";
 
 const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
   agents,
@@ -17,11 +18,11 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
 }): JSX.Element => {
   return (
     <div
-      className={`flex relative w-full h-96 items-center justify-start ${
+      className={`flex relative w-full h-[29rem] items-center justify-start ${
         Number(mintData?.amount || 0) <= 2 ||
         mintData?.prices?.filter(
           (price, index) =>
-            price * 10 ** 18 <
+            price * 10 ** 18 >=
             Number(
               tokenThresholds?.find(
                 (t) =>
@@ -29,7 +30,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                   mintData?.tokens?.[index]?.toLowerCase()
               )?.threshold
             )
-        )?.length > 0
+        )?.length < 1
           ? "overflow-hidden"
           : "overflow-x-scroll"
       }`}
@@ -51,7 +52,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                   className={`relative w-60 h-full bg-pink rounded-md flex flex-col items-center justify-between cursor-canP p-2 ${
                     mintData.agents
                       ?.map((ag) => ag?.agent?.id)
-                      .includes(agent?.id) && "border border-windows opacity-70"
+                      .includes(agent?.id) && "border border-windows"
                   }`}
                   onClick={(e) => {
                     e.preventDefault();
@@ -93,7 +94,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                     ?.map((ag) => ag?.agent?.id)
                     .includes(agent?.id) && (
                     <div className="relative w-full h-fit flex">
-                      <div className="relative w-full h-28 rounded-lg flex bg-white pixel-border-7">
+                      <div className="relative w-full h-28 rounded-lg flex bg-windows pixel-border-7">
                         <Image
                           objectFit="contain"
                           layout="fill"
@@ -113,13 +114,53 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                     <div className="relative w-fit h-fit flex text-lg uppercase">
                       {agent.title}
                     </div>
+
                     {!mintData.agents
                       ?.map((ag) => ag?.agent?.id)
-                      .includes(agent?.id) && (
+                      .includes(agent?.id) ? (
                       <div
                         className={`relative w-fit overflow-y-scroll max-h-44 flex text-xs`}
                       >
                         {agent.bio}
+                      </div>
+                    ) : (
+                      <div
+                        className={`relative w-full h-fit flex text-xs flex-col items-center justify-center gap-2`}
+                      >
+                        <div className="relative w-fit h-fit flex">
+                          Total Rent:
+                        </div>
+                        <div className="relative w-full h-fit flex flex-wrap gap-1 items-center justify-center">
+                          {mintData?.tokens?.map((token, index) => {
+                            return (
+                              <div
+                                key={index}
+                                className="relative w-fit h-fit flex"
+                              >
+                                {`${calculateRent(
+                                  tokenThresholds?.find(
+                                    (tok) =>
+                                      tok.token?.toLowerCase() ==
+                                      token?.toLowerCase()
+                                  )!,
+                                  mintData?.agents?.find(
+                                    (ag) => ag?.agent?.id == agent?.id
+                                  ) as any
+                                )} ${
+                                  TOKENS?.find(
+                                    (tok) =>
+                                      tok.contract?.toLowerCase() ==
+                                      token?.toLowerCase()
+                                  )?.symbol
+                                } ${
+                                  index != mintData?.tokens?.length - 1
+                                    ? "|"
+                                    : ""
+                                }`}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -286,7 +327,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
       {(Number(mintData?.amount || 0) <= 2 ||
         mintData?.prices?.filter(
           (price, index) =>
-            price * 10 ** 18 <
+            price * 10 ** 18 >=
             Number(
               tokenThresholds?.find(
                 (t) =>
@@ -294,13 +335,12 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                   mintData?.tokens?.[index]?.toLowerCase()
               )?.threshold
             )
-        )?.length > 0) && (
+        )?.length < 1) && (
         <div className="absolute top-0 left-0 flex items-center justify-center bg-viol/90 w-full h-full text-windows text-center rounded-sm">
           <div className="relative sm:w-1/2 w-full flex items-center justify-center">
-            {`Minimum edition of 3 and price above token threshold ${
-              mintData?.collectionType == CollectionType.IRL && "and token base"
-            } required to
-            activate Agents for this collection.`}
+            {mintData?.collectionType !== CollectionType.IRL
+              ? "A minimum edition of 3 AND at least one price above the token threshold are required to activate Agents for this collection."
+              : "A minimum edition of 3, at least one price above the token threshold AND all prices above the token base are required to activate Agents for this collection."}
           </div>
         </div>
       )}

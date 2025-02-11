@@ -14,6 +14,7 @@ const AGENTS = gql`
         customInstructions
         cover
         bio
+        model
         adjectives
       }
       creator

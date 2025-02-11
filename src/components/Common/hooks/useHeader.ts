@@ -169,7 +169,6 @@ const useHeader = (
       if (accounts.value.items?.[0]?.account?.address) {
         const authenticated = await lensClient.login({
           accountOwner: {
-            app: "0xe5439696f4057aF073c0FB2dc6e5e755392922e1",
             account: evmAddress(accounts.value.items?.[0]?.account?.address),
             owner: signer.account.address?.toLowerCase(),
           },
@@ -212,7 +211,6 @@ const useHeader = (
       } else {
         const authenticatedOnboarding = await lensClient.login({
           onboardingUser: {
-            app: "0xe5439696f4057aF073c0FB2dc6e5e755392922e1",
             wallet: signer.account.address,
           },
           signMessage: (message) => signer.signMessage({ message }),

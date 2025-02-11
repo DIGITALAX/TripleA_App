@@ -48,6 +48,7 @@ const Footer: FunctionComponent = (): JSX.Element => {
           muted
           autoPlay
           loop
+          key={`${INFURA_GATEWAY}/ipfs/Qmcy2HA8ugTTjnsfNieGhAMmLrJvi5MMLSU7iCmTLTJbbA`}
           className="flex object-cover w-full h-full"
           draggable={false}
         >

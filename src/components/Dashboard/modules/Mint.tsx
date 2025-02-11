@@ -83,25 +83,16 @@ const Mint: FunctionComponent<MintProps> = ({
             {allDrops?.find((drop) => mintData.dropId == Number(drop.id))
               ?.title || mintData?.dropTitle}
           </div>
-          <div className="relative w-fit h-fit flex items-center justify-between flex-row gap-4 text-pink text-xl">
-            <div className="relative w-fit h-fit flex text-left">
-              {mintData.amount}
-            </div>
-            {mintData.prices?.map((price, index) => {
-              return (
-                <div
-                  key={index}
-                  className="relative w-fit h-fit flex items-center justify-center"
-                >
-                  {price}{" "}
-                  {
+          <div className="relative w-fit h-fit flex items-center justify-between flex-row gap-4 text-pink text-sm">
+            {mintData.amount +
+              ` x (${mintData.prices?.map(
+                (price, index) =>
+                  ` ${price} ${
                     TOKENS.find(
                       (tok) => tok.contract == mintData.tokens?.[index]
                     )?.symbol
-                  }
-                </div>
-              );
-            })}
+                  }`
+              )})`}
           </div>
           <div className="relative flex w-full sm:w-fit max-w-96 h-fit max-h-60 overflow-y-scroll text-left text-black text-windows">
             {mintData.description}
