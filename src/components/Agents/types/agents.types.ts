@@ -44,6 +44,7 @@ export interface AgentDetails {
   owners: string[];
   bio: string;
   lore: string;
+  model: string;
   knowledge: string;
   style: string;
   adjectives: string;
@@ -54,5 +55,6 @@ export interface AgentDetails {
     };
   }[][];
   customInstructions: string;
-  feeds: string[];
+  feeds: { address: string; added: boolean }[];
+  modelsOpen: boolean;
 }

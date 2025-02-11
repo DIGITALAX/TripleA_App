@@ -285,9 +285,31 @@ export default function Agent() {
                   </div>
                   <div className="relative w-full h-fit flex items-center justify-between gap-2">
                     <div className="relative w-fit h-fit flex font-dos text-sm">
+                      Model
+                    </div>
+                    <div className="relative w-fit h-fit flex">
+                      <div
+                        className="relative w-7 h-7 rounded-full border border-windows"
+                        title={agent?.model}
+                      >
+                        <Image
+                          draggable={false}
+                          layout="fill"
+                          className="rounded-full"
+                          src={`${INFURA_GATEWAY}/ipfs/${
+                            agent?.model == "llama-3.3-70b"
+                              ? "QmWiUuuWqdbtrUqj1Q1Vb1geNVAok9B7FCz4kM8YNZCusw"
+                              : "QmSLT8ESoWNbtx8moyEbdgDGwyK8uhRnozrxHeMzk226YU"
+                          }`}
+                          objectFit="cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative w-full h-fit flex items-center justify-between gap-2">
+                    <div className="relative w-fit h-fit flex font-dos text-sm">
                       Port To Eliza
                     </div>
-
                     <div
                       onClick={() =>
                         downloadEliza(
@@ -702,7 +724,7 @@ export default function Agent() {
                                             } else if (approvedRecharge[key]) {
                                               handleRecharge(
                                                 key,
-                                                collection?.tokens?.[0],
+                                                chosenTokens?.[key],
                                                 Number(agent?.id),
                                                 Number(collection?.collectionId)
                                               );
@@ -895,7 +917,7 @@ export default function Agent() {
                                           context?.tokenThresholds?.find(
                                             (thr) =>
                                               thr?.token?.toLowerCase() ==
-                                              collection?.tokens?.[0]?.toLowerCase()
+                                            chosenTokens?.[key]
                                           )!,
                                           collection
                                         )

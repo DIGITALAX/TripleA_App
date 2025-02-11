@@ -67,6 +67,8 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
           address={address}
           lensClient={context?.lensClient!}
           setNotification={context?.setNotification!}
+          setAgents={context?.setAgents!}
+          sessionClient={context?.lensConnected?.sessionClient!}
         />
       );
 

@@ -44,7 +44,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <Animation>
-            <div className="relative w-full h-full flex flex-col items-start justify-start overflow-x-hidden">
+            <div className="relative w-full h-full flex flex-col items-start justify-start overflow-x-hidden min-h-80">
               <Header />
               {children}
             </div>

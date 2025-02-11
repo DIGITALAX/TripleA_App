@@ -120,48 +120,68 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                   />
                 </div>
               </div>
-              <div className="relative w-full h-fit flex flex-row gap-3 justify-between items-center text-xs">
-                <input
-                  className="relative w-full h-10 bg-viol p-1 focus:outline-none"
-                  type="number"
-                  step={1}
-                  value={priceAdjusted}
-                  disabled={priceAdjustLoading}
-                  onChange={(e) => setPriceAdjusted(Number(e.target.value))}
-                />
-                <div className="relative w-fit h-fit flex">
-                  {
-                    TOKENS?.find(
-                      (tok) =>
-                        tok.contract.toLowerCase() ==
-                        collection?.prices?.[0]?.token?.toLowerCase()
-                    )?.symbol
-                  }
-                </div>
-              </div>
-              <div className="relative w-full h-fit flex">
-                <div
-                  className={`relative w-full h-8 text-viol bg-windows rounded-md hover:opacity-80 flex items-center justify-center text-xxs font-start ${
-                    !priceAdjustLoading ? "cursor-canP" : "opacity-70"
-                  }`}
-                  onClick={() => !priceAdjustLoading && handlePriceAdjust()}
-                >
-                  {priceAdjustLoading ? (
-                    <svg
-                      fill="none"
-                      className="size-4 animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
+              <div className="relative w-full h-fit flex items-start justify-start gap-2 flex-col">
+                {priceAdjusted?.map((price, index: number) => {
+                  return (
+                    <div
+                      className="relative w-full h-fit flex flex-row gap-3 justify-between items-center text-xs"
+                      key={index}
                     >
-                      <path
-                        d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                        fill="currentColor"
-                      />{" "}
-                    </svg>
-                  ) : (
-                    "Adjust Price"
-                  )}
-                </div>
+                      <input
+                        className="relative w-full h-10 bg-viol p-1 focus:outline-none"
+                        type="number"
+                        step={1}
+                        value={price?.price}
+                        disabled={priceAdjustLoading}
+                        onChange={(e) =>
+                          setPriceAdjusted((prev) => {
+                            const arr = [...prev];
+                            arr[index] = {
+                              ...arr[index],
+                              price: Number(e.target.value),
+                            };
+                            return arr;
+                          })
+                        }
+                      />
+                      <div className="relative w-fit h-fit flex">
+                        {
+                          TOKENS?.find(
+                            (tok) =>
+                              tok.contract.toLowerCase() ==
+                              price?.token.toLowerCase()
+                          )?.symbol
+                        }
+                      </div>
+                      <div className="relative w-full h-fit flex">
+                        <div
+                          className={`relative w-full h-8 text-viol bg-windows rounded-md hover:opacity-80 flex items-center justify-center text-xxs font-start ${
+                            !priceAdjustLoading ? "cursor-canP" : "opacity-70"
+                          }`}
+                          onClick={() =>
+                            !priceAdjustLoading && handlePriceAdjust(index)
+                          }
+                        >
+                          {priceAdjustLoading ? (
+                            <svg
+                              fill="none"
+                              className="size-4 animate-spin"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
+                                fill="currentColor"
+                              />{" "}
+                            </svg>
+                          ) : (
+                            "Adjust"
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
               <div className="relative w-full h-fit flex">
                 <div

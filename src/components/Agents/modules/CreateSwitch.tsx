@@ -45,7 +45,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
     createFeedLoading,
     feed,
     setFeed,
-    addFeedAdmin,
+    addFeedRule,
     feedAdminLoading,
   } = useCreateAgent(
     publicClient,
@@ -122,7 +122,9 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                   customInstructions: "",
                   style: "",
                   adjectives: "",
-                  feeds: [""],
+                  feeds: [],
+                  model: "llama-3.3-70b",
+                  modelsOpen: false,
                 });
                 setAgentLensDetails({
                   localname: "",
@@ -268,7 +270,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
           </div>
           <div className="relative w-full h-fit flex flex-col gap-2 items-center justify-center">
             <div className="relative w-fit h-fit flex font-dos">
-              Add Existing Feeds (Make Sure to Add the Agent as An Admin)
+              Add Existing Feeds (Make Sure to Add the Agentic Rule)
             </div>
             <div className="relative w-full text-xxs h-fit flex flex-col gap-2 items-start justify-start max-h-28 overflow-y-scroll">
               {agentDetails?.feeds.map((feed, index) => {
@@ -299,12 +301,17 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                         onChange={(e) =>
                           setAgentDetails({
                             ...agentDetails,
-                            feeds: agentDetails.feeds.map((_, i) =>
-                              i == index ? e.target.value : _
+                            feeds: agentDetails.feeds.map((f, i) =>
+                              i == index
+                                ? {
+                                    address: e.target.value,
+                                    added: false,
+                                  }
+                                : f
                             ),
                           })
                         }
-                        value={feed}
+                        value={feed.address}
                         disabled={createAgentLoading}
                         style={{ resize: "none" }}
                       />
@@ -314,14 +321,15 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                         className={`relative flex h-8 w-fit px-1 border border-windows whitespace-nowrap text-center items-center justify-center rounded-md ${
                           feedAdminLoading[index]
                             ? "animate-spin"
-                            : "cursor-canP hover:opacity-70"
+                            : !feed.added && "cursor-canP hover:opacity-70"
                         }`}
                         onClick={() =>
                           !feedAdminLoading[index] &&
                           !createAgentLoading &&
                           !lensLoading &&
                           !createFeedLoading &&
-                          addFeedAdmin(index)
+                          !feed.added &&
+                          addFeedRule(index)
                         }
                       >
                         {feedAdminLoading[index] ? (
@@ -336,8 +344,10 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                               fill="#0000f5"
                             />{" "}
                           </svg>
+                        ) : !feed.added ? (
+                          "Add Agentic Rule"
                         ) : (
-                          "Add Agent Admin"
+                          "Added"
                         )}
                       </div>
                     </div>
@@ -352,7 +362,13 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                 onClick={() =>
                   setAgentDetails({
                     ...agentDetails,
-                    feeds: [...agentDetails.feeds, ""],
+                    feeds: [
+                      ...agentDetails.feeds,
+                      {
+                        address: "",
+                        added: false,
+                      },
+                    ],
                   })
                 }
                 className="cursor-canP"
@@ -973,10 +989,52 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
             </div>
             <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
               <div className="relative w-fit h-fit flex items-start justify-start text-windows">
+                Model
+              </div>
+              <div
+                className="relative flex w-full h-full flex-row gap-2 text-left text-viol bg-windows rounded-md p-1.5 cursor-canP items-center justify-between"
+                onClick={() =>
+                  setAgentDetails({
+                    ...agentDetails,
+                    modelsOpen: !agentDetails.modelsOpen,
+                  })
+                }
+              >
+                <div className="relative w-fit h-fit flex items-center justify-center">
+                  {agentDetails.model}
+                </div>
+                <div className="relative w-fit h-fit flex">↓</div>
+              </div>
+              {agentDetails.modelsOpen && !createAgentLoading && (
+                <div className="absolute top-16 left-0 bg-windows w-full h-fit flex flex-col rounded-md z-40 border border-white cursor-canP text-viol">
+                  {["llama-3.3-70b", "dolphin-2.9.2-qwen2-72b"].map(
+                    (model, index) => {
+                      return (
+                        <div
+                          key={index}
+                          className={`relative w-full h-fit flex text-center items-center justify-center p-1 hover:opacity-50 ${
+                            index > 0 && "border-t border-white"
+                          }`}
+                          onClick={() =>
+                            setAgentDetails({
+                              ...agentDetails,
+                              model,
+                              modelsOpen: false,
+                            })
+                          }
+                        >
+                          {model}
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              )}
+              <div className="relative w-fit h-fit flex items-start justify-start text-windows">
                 Style
               </div>
               <input
-                className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                className="relative flex w-full h-full text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
                 placeholder="Eager, Attentive, First Person Speak, Guardian-like"
                 onChange={(e) =>
                   setAgentDetails({
@@ -994,7 +1052,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                 Adjectives
               </div>
               <input
-                className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                className="relative flex w-full h-full text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
                 placeholder="Steadfast, Resilient, Fierce"
                 onChange={(e) =>
                   setAgentDetails({

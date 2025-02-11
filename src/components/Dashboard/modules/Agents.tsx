@@ -12,6 +12,8 @@ const Agents: FunctionComponent<AgentProps> = ({
   lensClient,
   setNotification,
   address,
+  setAgents,
+  sessionClient,
 }): JSX.Element => {
   const publicClient = createPublicClient({
     chain: chains.testnet,
@@ -32,7 +34,6 @@ const Agents: FunctionComponent<AgentProps> = ({
     agentEdit,
     setAgentEdit,
     setAgentOwners,
-    addLoading,
     addOwner,
     agentOwners,
     revokeLoading,
@@ -41,10 +42,17 @@ const Agents: FunctionComponent<AgentProps> = ({
     handleNewFeeds,
     setAgentFeeds,
     agentFeeds,
-    isAdmin,
-    changeFeedAdmin,
-    adminLoading,
-  } = useUserAgents(lensClient, publicClient, address, setNotification);
+    addFeedLoading,
+    addOwnerLoading,
+    addFeedRule,
+  } = useUserAgents(
+    lensClient,
+    sessionClient,
+    publicClient,
+    address,
+    setNotification,
+    setAgents
+  );
 
   switch (currentAgent) {
     case undefined:
@@ -107,6 +115,8 @@ const Agents: FunctionComponent<AgentProps> = ({
                             style: agent?.style,
                             knowledge: agent?.knowledge,
                             adjectives: agent?.adjectives,
+                            model: agent?.model,
+                            modelsOpen: false,
                           });
                         }}
                       >
@@ -196,7 +206,7 @@ const Agents: FunctionComponent<AgentProps> = ({
               agentMetadata={agentMetadata}
               setAgentMetadata={setAgentMetadata}
               setAgentOwners={setAgentOwners}
-              addLoading={addLoading}
+              addOwnerLoading={addOwnerLoading}
               addOwner={addOwner}
               agentOwners={agentOwners}
               revokeLoading={revokeLoading}
@@ -205,9 +215,8 @@ const Agents: FunctionComponent<AgentProps> = ({
               feedsLoading={feedsLoading}
               setAgentFeeds={setAgentFeeds}
               agentFeeds={agentFeeds}
-              isAdmin={isAdmin}
-              changeFeedAdmin={changeFeedAdmin}
-              adminLoading={adminLoading}
+              addFeedRule={addFeedRule}
+              addFeedLoading={addFeedLoading}
             />
           </div>
         </div>

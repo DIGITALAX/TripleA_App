@@ -2,7 +2,11 @@ import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
-import { SKYHUNTERS_AGENTS_MANAGER_CONTRACT } from "@/lib/constants";
+import {
+  AU_TOKEN,
+  AU_TREASURY_CONTRACT,
+  SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
+} from "@/lib/constants";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
 import { StorageClient } from "@lens-protocol/storage-node-client";
@@ -21,6 +25,7 @@ import {
   enableSignless,
   fetchAccount,
   fetchFeeds,
+  updateFeedRules,
 } from "@lens-protocol/client/actions";
 
 const useCreateAgent = (
@@ -58,6 +63,8 @@ const useCreateAgent = (
     lore: "",
     bio: "",
     knowledge: "",
+    model: "llama-3.3-70b",
+    modelsOpen: false,
     messageExamples: [
       [
         {
@@ -74,11 +81,10 @@ const useCreateAgent = (
         },
       ],
     ],
-
     customInstructions: "",
     style: "",
     adjectives: "",
-    feeds: [""],
+    feeds: [],
   });
   const [agentLensDetails, setAgentLensDetails] = useState<{
     localname: string;
@@ -185,7 +191,6 @@ const useCreateAgent = (
               return;
             }
 
-
             if (newAcc.value?.address) {
               const authenticated = await lensClient.login({
                 accountOwner: {
@@ -286,15 +291,21 @@ const useCreateAgent = (
   };
 
   const handleCreateAgent = async () => {
+    if (agentDetails?.feeds?.filter((f) => !f.added)?.length > 0) {
+      setNotification?.("Add Agentic Rules to All Feeds!");
+      return;
+    }
+
     if (
       !address ||
       agentDetails?.title?.trim() == "" ||
       agentDetails?.bio?.trim() == "" ||
       agentDetails?.customInstructions?.trim() == "" ||
       !agentDetails?.cover
-    )
+    ) {
+      setNotification?.("Fill Out All Details!");
       return;
-
+    }
     if (!agentAccountAddress || !agentWallet) {
       setNotification?.("Create your Agent's Lens Account!");
       return;
@@ -347,7 +358,10 @@ const useCreateAgent = (
           adjectives: agentDetails.adjectives,
           cover: "ipfs://" + responseImageJSON.cid,
           customInstructions: agentDetails.customInstructions,
-          feeds: agentDetails.feeds?.filter((fe) => fe.trim() !== ""),
+          feeds: agentDetails.feeds
+            ?.filter((fe) => fe?.address.trim() !== "")
+            ?.map((ad) => ad.address),
+          model: agentDetails.model,
         }),
       });
 
@@ -483,6 +497,19 @@ const useCreateAgent = (
         const resFeed = await createFeed(builder.value, {
           metadataUri: uri,
           admins: [address, agentWallet?.address],
+          rules: {
+            anyOf: [
+              {
+                simplePaymentRule: {
+                  recipient: AU_TREASURY_CONTRACT,
+                  cost: {
+                    value: "1",
+                    currency: AU_TOKEN,
+                  },
+                },
+              },
+            ],
+          },
         });
 
         if (resFeed.isOk()) {
@@ -499,7 +526,13 @@ const useCreateAgent = (
           if (feeds.isOk()) {
             setAgentDetails({
               ...agentDetails,
-              feeds: [feeds?.value?.items?.[0]?.address, ...agentDetails.feeds],
+              feeds: [
+                {
+                  address: feeds?.value?.items?.[0]?.address,
+                  added: true,
+                },
+                ...agentDetails.feeds,
+              ],
             });
             setFeed({
               title: "",
@@ -515,7 +548,9 @@ const useCreateAgent = (
     setCreateFeedLoading(false);
   };
 
-  const addFeedAdmin = async (index: number) => {
+  const addFeedRule = async (index: number) => {
+    if (agentDetails.feeds?.[index]?.address?.trim() == "") return;
+
     setFeedAdminLoading((prev) => {
       let feeds = [...prev];
 
@@ -523,6 +558,46 @@ const useCreateAgent = (
       return feeds;
     });
     try {
+      const res = await updateFeedRules(lensConnected?.sessionClient!, {
+        toAdd: {
+          anyOf: [
+            {
+              simplePaymentRule: {
+                recipient: AU_TREASURY_CONTRACT,
+                cost: {
+                  value: "1",
+                  currency: AU_TOKEN,
+                },
+              },
+            },
+          ],
+        },
+        feed: agentDetails.feeds?.[index]?.address,
+      });
+
+      if (res.isErr()) {
+        setFeedAdminLoading((prev) => {
+          let feeds = [...prev];
+
+          feeds[index] = true;
+          return feeds;
+        });
+        setNotification("Something went wrong. Try again? :/");
+        return;
+      }
+
+      setAgentDetails((prev) => ({
+        ...prev,
+        feeds: agentDetails.feeds?.map((feed, i) =>
+          i == index
+            ? {
+                ...feed,
+                added: true,
+              }
+            : feed
+        ),
+      }));
+      setNotification("Agentic Feed Rule Added!");
     } catch (err: any) {
       console.error(err.message);
     }
@@ -555,7 +630,7 @@ const useCreateAgent = (
     createFeedLoading,
     feed,
     setFeed,
-    addFeedAdmin,
+    addFeedRule,
     feedAdminLoading,
   };
 };

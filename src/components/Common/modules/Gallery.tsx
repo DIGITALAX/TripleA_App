@@ -13,10 +13,14 @@ const Gallery: FunctionComponent<{
   choice: string;
 }> = ({ lensClient, choice }): JSX.Element => {
   const animationContext = useContext(AnimationContext);
-  const { handleMoreGallery, nfts, hasMore, galleryLoading } = useGallery(
-    lensClient!,
-    choice
-  );
+  const {
+    handleMoreGallery,
+    nfts,
+    hasMore,
+    galleryLoading,
+    priceIndex,
+    setPriceIndex,
+  } = useGallery(lensClient!, choice);
   const router = useRouter();
 
   return (
@@ -38,8 +42,7 @@ const Gallery: FunctionComponent<{
             {(galleryLoading || Number(nfts?.length) < 1
               ? [...nfts, ...Array.from({ length: 20 })]
               : nfts
-            ).map((nft: NFTData | unknown, indice: number) => {
-           
+            ).map((nft: NFTData | unknown, index: number) => {
               return (
                 <>
                   {(nft as any)?.id !== undefined &&
@@ -99,18 +102,44 @@ const Gallery: FunctionComponent<{
                               fill="white"
                             />
                           </svg>
-                          <div className="relative w-fit h-fit flex items-center justify-center">
-                            {Number((nft as NFTData)?.prices?.[0]?.price) /
-                              10 ** 18}{" "}
-                            {
-                              TOKENS?.find(
-                                (tok) =>
-                                  (
-                                    nft as NFTData
-                                  )?.prices?.[0]?.token?.toLowerCase() ==
-                                  tok.contract?.toLowerCase()
-                              )?.symbol
-                            }
+                          <div className="relative w-fit h-fit flex items-center justify-center gap-2">
+                            <div className="relative w-fit h-fit flex items-center justify-center">
+                              {Number(
+                                (nft as NFTData)?.prices?.[priceIndex?.[index]]
+                                  ?.price
+                              ) /
+                                10 ** 18}{" "}
+                              {
+                                TOKENS?.find(
+                                  (tok) =>
+                                    (nft as NFTData)?.prices?.[
+                                      priceIndex?.[index]
+                                    ]?.token?.toLowerCase() ==
+                                    tok.contract?.toLowerCase()
+                                )?.symbol
+                              }
+                            </div>
+                            {(nft as NFTData)?.prices?.length > 1 && (
+                              <div
+                                className="relative w-fit h-fit flex items-center justify-center cursor-canP"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  setPriceIndex((prev) => {
+                                    const arr = [...prev];
+                                    arr[index] =
+                                      arr[index] + 1 >
+                                      (nft as NFTData)?.prices?.length
+                                        ? 0
+                                        : arr[index] + 1;
+
+                                    return arr;
+                                  });
+                                }}
+                              >
+                                {">>"}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="relative text-xxs flex">
@@ -139,7 +168,7 @@ const Gallery: FunctionComponent<{
                   ) : (
                     <div className={`w-fit h-fit flex relative animate-pulse`}>
                       <div
-                        key={`placeholder-${indice}`}
+                        key={`placeholder-${index}`}
                         className="w-56 h-56 rounded-3xl bg-white flex p-2 relative pixel-border-6 gap-2"
                       >
                         <div className="relative w-full h-full flex bg-mochi pixel-border-7 rounded-lg">

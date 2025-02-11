@@ -22,7 +22,7 @@ const calculateRent = (tokenThreshold: TokenThreshold, agent: Worker) => {
       Number(agent?.remixFrequency || 0);
   }
 
-  return total;
+  return Number(parseFloat(total.toFixed(3)).toString());
 };
 
 export default calculateRent;

@@ -4,7 +4,7 @@ import {
   NFTData,
   TokenThreshold,
 } from "@/components/Common/types/common.types";
-import { Account, Post, PublicClient } from "@lens-protocol/client";
+import { Account, Post, PublicClient, SessionClient } from "@lens-protocol/client";
 import { SetStateAction } from "react";
 import { StorageClient } from "@lens-protocol/storage-node-client";
 
@@ -117,6 +117,8 @@ export type AgentProps = {
   lensClient: PublicClient;
   address: `0x${string}` | undefined;
   setNotification: (e: SetStateAction<string | undefined>) => void;
+  setAgents: (e: SetStateAction<Agent[]>) => void;
+  sessionClient: SessionClient
 };
 
 export type AccountProps = {
@@ -167,6 +169,7 @@ export interface Agent {
   knowledge: string;
   style: string;
   adjectives: string;
+  model: string;
   messageExamples: {
     user: string;
     content: {
@@ -196,9 +199,9 @@ export interface Worker {
   leadFrequency: number;
   publishFrequency: number;
   remixFrequency: number;
-  remix: string;
-  publish: string;
-  lead: string;
+  remix: boolean;
+  publish: boolean;
+  lead: boolean;
   instructions: string;
   profile?: Account;
   collectionId: string;
@@ -294,43 +297,35 @@ export enum AgentEditSwitcher {
   Feeds,
 }
 
+export interface AgentMetadata {
+  cover?: string | Blob;
+  title: string;
+  bio: string;
+  customInstructions: string;
+  knowledge: string;
+  style: string;
+  lore: string;
+  adjectives: string;
+  model: string;
+  modelsOpen: boolean;
+}
+
 export type AgentEditSwitchProps = {
   agentEdit: AgentEditSwitcher;
   handleEditAgent: () => Promise<void>;
   agentEditLoading: boolean;
-  agentMetadata: {
-    cover?: string | Blob;
-    title: string;
-    bio: string;
-    customInstructions: string;
-    knowledge: string;
-    style: string;
-    lore: string;
-    adjectives: string;
-  };
-  agentOwners: string[];
+  agentMetadata: AgentMetadata;
+  agentOwners: {address: string; added: boolean}[];
   revokeOwner: (index: number) => Promise<void>;
   addOwner: (index: number) => Promise<void>;
-  setAgentOwners: (e: SetStateAction<string[]>) => void;
+  setAgentOwners: (e: SetStateAction<{address: string; added: boolean}[]>) => void;
   revokeLoading: boolean[];
-  addLoading: boolean[];
-  setAgentMetadata: (
-    e: SetStateAction<{
-      cover?: string | Blob;
-      title: string;
-      bio: string;
-      customInstructions: string;
-      knowledge: string;
-      style: string;
-      lore: string;
-      adjectives: string;
-    }>
-  ) => void;
+  addOwnerLoading: boolean[];
+  setAgentMetadata: (e: SetStateAction<AgentMetadata>) => void;
   feedsLoading: boolean;
   handleNewFeeds: () => Promise<void>;
-  agentFeeds: string[];
-  setAgentFeeds: (e: SetStateAction<string[]>) => void;
-  adminLoading: boolean[];
-  changeFeedAdmin: (index: number) => Promise<void>;
-  isAdmin: boolean[];
+  agentFeeds: {address: string; added: boolean}[];
+  setAgentFeeds: (e: SetStateAction<{address: string; added: boolean}[]>) => void;
+  addFeedLoading: boolean[];
+  addFeedRule: (index: number) => Promise<void>
 };

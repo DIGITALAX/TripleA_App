@@ -2,16 +2,16 @@ import { aaaClient } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const USER_AGENTS = gql`
-  query ($owner: String!, $skip: Int!) {
-    agentCreateds(where: { owner: $owner }, first: 20, skip: $skip) {
+  query ($creator: String!, $skip: Int!) {
+    agentCreateds(where: { creator: $creator }, first: 20, skip: $skip) {
       metadata {
         title
-        description
+        bio
         cover
         customInstructions
       }
       creator
-      owner
+      owners
       blockTimestamp
       balances {
         token
@@ -58,14 +58,14 @@ const USER_AGENTS = gql`
 `;
 
 export const getUserAgentsPaginated = async (
-  owner: string,
+  creator: string,
   skip: number
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
   const queryPromise = aaaClient.query({
     query: USER_AGENTS,
     variables: {
-      owner,
+      creator,
       skip,
     },
     fetchPolicy: "no-cache",

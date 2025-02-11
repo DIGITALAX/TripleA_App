@@ -1,6 +1,10 @@
 import { SetStateAction, useEffect, useState } from "react";
-import { Agent, AgentEditSwitcher } from "../types/dashboard.types";
-import { evmAddress, PublicClient } from "@lens-protocol/client";
+import {
+  Agent,
+  AgentEditSwitcher,
+  AgentMetadata,
+} from "../types/dashboard.types";
+import { evmAddress, PublicClient, SessionClient } from "@lens-protocol/client";
 import {
   createWalletClient,
   custom,
@@ -11,16 +15,23 @@ import {
   SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
   INFURA_GATEWAY,
   STORAGE_NODE,
+  AU_TREASURY_CONTRACT,
+  AU_TOKEN,
 } from "@/lib/constants";
 import { chains } from "@lens-network/sdk/viem";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
-import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import {
+  fetchAccountsAvailable,
+  updateFeedRules,
+} from "@lens-protocol/client/actions";
 
 const useUserAgents = (
   lensClient: PublicClient,
+  sessionClient: SessionClient,
   publicClient: LensPublicClient,
   address: `0x${string}` | undefined,
-  setNotification: (e: SetStateAction<string | undefined>) => void
+  setNotification: (e: SetStateAction<string | undefined>) => void,
+  setAgents: (e: SetStateAction<Agent[]>) => void
 ) => {
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [agentEditLoading, setAgentEditLoading] = useState<boolean>(false);
@@ -28,16 +39,7 @@ const useUserAgents = (
   const [agentEdit, setAgentEdit] = useState<AgentEditSwitcher>(
     AgentEditSwitcher.Profile
   );
-  const [agentMetadata, setAgentMetadata] = useState<{
-    cover?: string | Blob;
-    title: string;
-    bio: string;
-    customInstructions: string;
-    knowledge: string;
-    style: string;
-    lore: string;
-    adjectives: string;
-  }>({
+  const [agentMetadata, setAgentMetadata] = useState<AgentMetadata>({
     title: "",
     bio: "",
     customInstructions: "",
@@ -45,43 +47,26 @@ const useUserAgents = (
     knowledge: "",
     adjectives: "",
     lore: "",
+    model: "llama-3.3-70b",
+    modelsOpen: false,
   });
   const [currentAgent, setCurrentAgent] = useState<Agent | undefined>();
-  const [agentOwners, setAgentOwners] = useState<string[]>([]);
-  const [agentFeeds, setAgentFeeds] = useState<string[]>([]);
-  const [addLoading, setAddLoading] = useState<boolean[]>([]);
+  const [agentOwners, setAgentOwners] = useState<
+    { address: string; added: boolean }[]
+  >([]);
+  const [agentFeeds, setAgentFeeds] = useState<
+    { address: string; added: boolean }[]
+  >([]);
+  const [addOwnerLoading, setAddOwnerLoading] = useState<boolean[]>([]);
+  const [addFeedLoading, setAddFeedLoading] = useState<boolean[]>([]);
   const [revokeLoading, setRevokeLoading] = useState<boolean[]>([]);
   const [feedsLoading, setFeedsLoading] = useState<boolean>(false);
-  const [adminLoading, setAdminLoading] = useState<boolean[]>([]);
-  const [isAdmin, setIsAdmin] = useState<boolean[]>([]);
-
-  const changeFeedAdmin = async (index: number) => {
-    setAdminLoading((prev) => {
-      let arr = [...prev];
-      arr[index] = true;
-      return arr;
-    });
-    try {
-      if (isAdmin?.[index]) {
-        setAgentFeeds(agentFeeds?.filter((_, i) => i !== index));
-        setNotification?.("Success! Admin Revoked.");
-      } else {
-        setNotification?.("Success! Admin Update.");
-      }
-    } catch (err: any) {
-      console.error(err.message);
-    }
-    setAdminLoading((prev) => {
-      let arr = [...prev];
-      arr[index] = false;
-      return arr;
-    });
-  };
 
   const handleNewFeeds = async () => {
-    if (agentFeeds?.filter((fe) => fe.trim() !== "")?.length < 1) return;
-    if (isAdmin?.filter((a) => a == false).length > 0) {
-      setNotification?.("Agent must be Feed admin to publish.");
+    if (agentFeeds?.filter((fe) => fe?.address?.trim() !== "")?.length < 1)
+      return;
+    if (agentFeeds?.filter((f) => !f.added)?.length > 0) {
+      setNotification?.("Add Agentic Rules to All Feeds!");
       return;
     }
 
@@ -99,7 +84,7 @@ const useUserAgents = (
         },
         body: JSON.stringify({
           title: currentAgent?.title,
-          description: currentAgent?.bio,
+          bio: currentAgent?.bio,
           customInstructions: currentAgent?.customInstructions,
           lore: currentAgent?.lore,
           adjectives: currentAgent?.adjectives,
@@ -107,7 +92,10 @@ const useUserAgents = (
           knowledge: currentAgent?.knowledge,
           cover: currentAgent?.cover,
           messageExamples: currentAgent?.messageExamples,
-          feeds: agentFeeds?.filter((f) => f.trim() !== ""),
+          feeds: agentFeeds
+            ?.filter((f) => f?.address?.trim() !== "")
+            ?.map((f) => f.address),
+          model: currentAgent?.model,
         }),
       });
 
@@ -135,8 +123,8 @@ const useUserAgents = (
   };
 
   const addOwner = async (index: number) => {
-    if (agentOwners?.[index]?.trim() == "") return;
-    setAddLoading((prev) => {
+    if (agentOwners?.[index]?.address.trim() == "") return;
+    setAddOwnerLoading((prev) => {
       let arr = [...prev];
       arr[index] = true;
       return arr;
@@ -161,11 +149,32 @@ const useUserAgents = (
         hash: res,
       });
 
+      setAgents((prev) => {
+        let ags = [...prev];
+
+        return ags.map((agent) => {
+          if (Number(agent.id) == Number(currentAgent?.id)) {
+            let newag = { ...agent };
+            let owners = [...agentOwners, agentOwners?.[index]];
+            newag.owners = owners.map((own) => own.address);
+            return newag;
+          } else {
+            return agent;
+          }
+        });
+      });
       setNotification?.("Success! Owner Added.");
+      setAgentOwners([
+        ...agentOwners,
+        {
+          ...agentOwners?.[index],
+          added: true,
+        },
+      ]);
     } catch (err: any) {
       console.error(err.message);
     }
-    setAddLoading((prev) => {
+    setAddOwnerLoading((prev) => {
       let arr = [...prev];
       arr[index] = false;
       return arr;
@@ -173,7 +182,7 @@ const useUserAgents = (
   };
 
   const revokeOwner = async (index: number) => {
-    if (agentOwners?.[index]?.trim() == "") return;
+    if (agentOwners?.[index]?.address.trim() == "") return;
     setRevokeLoading((prev) => {
       let arr = [...prev];
       arr[index] = true;
@@ -199,7 +208,26 @@ const useUserAgents = (
         hash: res,
       });
 
+      setAgents((prev) => {
+        let ags = [...prev];
+
+        return ags.map((agent) => {
+          if (Number(agent.id) == Number(currentAgent?.id)) {
+            let newag = { ...agent };
+            let owners = agentOwners.filter(
+              (owner) => owner !== agentOwners?.[index]
+            );
+            newag.owners = owners.map((own) => own.address);
+            return newag;
+          } else {
+            return agent;
+          }
+        });
+      });
       setNotification?.("Success! Owner Revoked.");
+      setAgentOwners(
+        agentOwners.filter((owner) => owner !== agentOwners?.[index])
+      );
     } catch (err: any) {
       console.error(err.message);
     }
@@ -215,7 +243,6 @@ const useUserAgents = (
     setAgentsLoading(true);
     try {
       const data = await getUserAgents(address);
-
       const allAgents: Agent[] = await Promise.all(
         data?.data?.agentCreateds.map(async (agent: any) => {
           if (!agent.metadata) {
@@ -250,12 +277,13 @@ const useUserAgents = (
             id: agent?.SkyhuntersAgentManager_id,
             cover: agent?.metadata?.cover,
             title: agent?.metadata?.title,
-            description: agent?.metadata?.description,
+            bio: agent?.metadata?.bio,
             customInstructions: agent?.metadata?.customInstructions,
             wallet: agent?.wallets?.[0],
             balances: agent?.balances,
             workers: agent?.workers,
-            owner: agent?.owner,
+            creator: agent?.creator,
+            owners: agent?.owners,
             profile: {
               ...result.value.items?.[0]?.account,
               metadata: {
@@ -318,7 +346,7 @@ const useUserAgents = (
         },
         body: JSON.stringify({
           title: agentMetadata.title,
-          description: agentMetadata.bio,
+          bio: agentMetadata.bio,
           customInstructions: agentMetadata.customInstructions,
           lore: agentMetadata.lore,
           adjectives: agentMetadata.adjectives,
@@ -327,6 +355,7 @@ const useUserAgents = (
           cover: agentImage,
           messageExamples: currentAgent?.messageExamples,
           feeds: currentAgent?.feeds,
+          model: agentMetadata?.model,
         }),
       });
 
@@ -353,11 +382,88 @@ const useUserAgents = (
     setAgentEditLoading(false);
   };
 
+  const addFeedRule = async (index: number) => {
+    if (agentFeeds?.[index]?.address?.trim() == "") return;
+
+    setAddFeedLoading((prev) => {
+      let feeds = [...prev];
+
+      feeds[index] = true;
+      return feeds;
+    });
+    try {
+      const res = await updateFeedRules(sessionClient, {
+        toAdd: {
+          anyOf: [
+            {
+              simplePaymentRule: {
+                recipient: AU_TREASURY_CONTRACT,
+                cost: {
+                  value: "1",
+                  currency: AU_TOKEN,
+                },
+              },
+            },
+          ],
+        },
+        feed: agentFeeds?.[index]?.address,
+      });
+
+      if (res.isErr()) {
+        setAddFeedLoading((prev) => {
+          let feeds = [...prev];
+
+          feeds[index] = true;
+          return feeds;
+        });
+        setNotification("Something went wrong. Try again? :/");
+        return;
+      }
+
+      setAgentFeeds(
+        agentFeeds?.map((feed, i) =>
+          i == index
+            ? {
+                ...feed,
+                added: true,
+              }
+            : feed
+        )
+      );
+      setNotification("Agentic Feed Rule Added!");
+    } catch (err: any) {
+      console.error(err.message);
+    }
+    setAddFeedLoading((prev) => {
+      let feeds = [...prev];
+
+      feeds[index] = false;
+      return feeds;
+    });
+  };
+
   useEffect(() => {
     if (userAgents?.length < 1 && lensClient && address) {
       handleUserAgents();
     }
   }, [lensClient, address]);
+
+  useEffect(() => {
+    if (currentAgent) {
+      setAgentOwners(
+        currentAgent?.owners?.map((owner) => ({
+          address: owner,
+          added: true,
+        }))
+      );
+      setAgentFeeds(
+        currentAgent?.feeds?.map((feed) => ({
+          address: feed,
+          added: true,
+        }))
+      );
+    }
+  }, [currentAgent]);
 
   return {
     agentsLoading,
@@ -371,7 +477,7 @@ const useUserAgents = (
     agentEdit,
     setAgentEdit,
     setAgentOwners,
-    addLoading,
+    addOwnerLoading,
     addOwner,
     agentOwners,
     revokeLoading,
@@ -380,9 +486,8 @@ const useUserAgents = (
     handleNewFeeds,
     setAgentFeeds,
     agentFeeds,
-    adminLoading,
-    changeFeedAdmin,
-    isAdmin,
+    addFeedRule,
+    addFeedLoading,
   };
 };
 

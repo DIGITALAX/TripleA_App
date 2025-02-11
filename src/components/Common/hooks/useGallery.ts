@@ -11,6 +11,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [galleryLoading, setGalleryLoading] = useState<boolean>(false);
+  const [priceIndex, setPriceIndex] = useState<number[]>([]);
 
   const handleGallery = async (): Promise<void> => {
     setGalleryLoading(true);
@@ -24,7 +25,6 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
           choice?.includes("Agent") ? true : false
         );
       }
-
 
       const gallery: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds?.map(async (collection: any) => {
@@ -82,6 +82,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
       setPage(gallery?.length == 40 ? 40 : 0);
       setHasMore(gallery?.length == 40 ? true : false);
       setNfts(gallery?.sort(() => Math.random() - 0.5));
+      setPriceIndex(Array.from({ length: gallery?.length }, () => 0));
     } catch (err: any) {
       console.error(err.message);
     }
@@ -128,7 +129,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
           let picture = "";
           const cadena = await fetch(
             `${STORAGE_NODE}/${
-              (result.value.items)?.[0]?.account?.metadata?.picture?.split(
+              result.value.items?.[0]?.account?.metadata?.picture?.split(
                 "lens://"
               )?.[1]
             }`
@@ -153,9 +154,9 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             tokenIds: collection?.tokenIds,
             amount: collection?.amount,
             profile: {
-              ...(result.value.items)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result.value.items)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },
@@ -166,6 +167,11 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
       setPage(gallery?.length == 40 ? page + 40 : page);
       setHasMore(gallery?.length == 40 ? true : false);
       setNfts([...nfts, ...gallery?.sort(() => Math.random() - 0.5)]);
+
+      setPriceIndex([
+        ...priceIndex,
+        ...Array.from({ length: gallery?.length }, () => 0),
+      ]);
     } catch (err: any) {
       console.error(err.message);
     }
@@ -177,6 +183,8 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
     nfts,
     hasMore,
     galleryLoading,
+    priceIndex,
+    setPriceIndex,
   };
 };
 

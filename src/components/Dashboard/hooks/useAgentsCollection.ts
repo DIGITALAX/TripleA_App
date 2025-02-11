@@ -27,12 +27,15 @@ const useAgentsCollection = (
       lead: boolean;
     }[]
   >([]);
-  const [priceAdjusted, setPriceAdjusted] = useState<number>(
-    Number(collection?.prices?.[0]) / 10 ** 18 || 0
-  );
+  const [priceAdjusted, setPriceAdjusted] = useState<
+    {
+      price: number;
+      token: string;
+    }[]
+  >([]);
 
-  const handlePriceAdjust = async () => {
-    if (priceAdjusted <= 0) return;
+  const handlePriceAdjust = async (index: number) => {
+    if (priceAdjusted?.[index]?.price <= 0) return;
 
     setPriceAdjustLoading(true);
     try {
@@ -47,9 +50,9 @@ const useAgentsCollection = (
         functionName: "adjustCollectionPrice",
         chain: chains.testnet,
         args: [
-          collection?.tokens?.[0],
+          priceAdjusted?.[index]?.token,
           Number(collection?.id),
-          priceAdjusted * 10 ** 18,
+          priceAdjusted?.[index]?.price * 10 ** 18,
         ],
         account: address,
       });
@@ -72,7 +75,7 @@ const useAgentsCollection = (
         transport: custom((window as any).ethereum),
       });
       let ids = agents
-        ?.filter((ag) => collection?.agents?.includes(ag?.id))
+        ?.filter((ag) => collection?.agentIds?.includes(ag?.id))
         ?.map((ag) => Number(ag?.id));
 
       const { request } = await publicClient.simulateContract({
@@ -142,42 +145,50 @@ const useAgentsCollection = (
 
   useEffect(() => {
     if (collection) {
-      setPriceAdjusted(Number(collection?.prices?.[0]) / 10 ** 18);
-      if (collection?.agents?.length > 0) {
+      setPriceAdjusted(
+        Array.from(
+          { length: collection?.prices?.length },
+          (_, index: number) => ({
+            price: Number(collection?.prices?.[index]?.price) / 10 ** 18,
+            token: collection?.prices?.[index]?.token,
+          })
+        )
+      );
+      if (collection?.agentIds?.length > 0) {
         let nftAgents = agents?.filter((ag) =>
-          collection?.agents?.includes(ag?.id)
+          collection?.agentIds?.includes(ag?.id)
         );
         if (nftAgents) {
           setFrequencies(
             nftAgents?.map((ag) => ({
               publishFrequency:
                 Number(
-                  ag?.details?.find(
+                  ag?.workers?.find(
                     (col) => Number(col?.collectionId) == Number(collection?.id)
                   )?.publishFrequency
                 ) || 0,
               remixFrequency:
                 Number(
-                  ag?.details?.find(
+                  ag?.workers?.find(
                     (col) => Number(col?.collectionId) == Number(collection?.id)
                   )?.remixFrequency
                 ) || 0,
               leadFrequency:
                 Number(
-                  ag?.details?.find(
+                  ag?.workers?.find(
                     (col) => Number(col?.collectionId) == Number(collection?.id)
                   )?.leadFrequency
                 ) || 0,
               lead:
-                ag?.details?.find(
+                ag?.workers?.find(
                   (col) => Number(col?.collectionId) == Number(collection?.id)
                 )?.lead || false,
               remix:
-                ag?.details?.find(
+                ag?.workers?.find(
                   (col) => Number(col?.collectionId) == Number(collection?.id)
                 )?.remix || false,
               publish:
-                ag?.details?.find(
+                ag?.workers?.find(
                   (col) => Number(col?.collectionId) == Number(collection?.id)
                 )?.publish || false,
             }))
@@ -185,7 +196,7 @@ const useAgentsCollection = (
           setCustomInstructions(
             nftAgents?.map(
               (ag) =>
-                ag?.details?.find(
+                ag?.workers?.find(
                   (col) => Number(col?.collectionId) == Number(collection?.id)
                 )?.instructions || ""
             )

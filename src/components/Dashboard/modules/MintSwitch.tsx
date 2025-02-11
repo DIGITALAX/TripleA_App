@@ -16,6 +16,7 @@ import { useAccount } from "wagmi";
 import { chains } from "@lens-network/sdk/viem";
 import { useRouter } from "next/navigation";
 import { AnimationContext } from "@/app/providers";
+import calculateRent from "@/lib/helpers/calculateRent";
 
 const MintSwitch: FunctionComponent<MintSwitchProps> = ({
   mintSwitcher,
@@ -288,39 +289,45 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                         {token.symbol}
                       </div>
                     </div>
-                    <div className="flex relative w-full h-fit items-center justify-center gap-2 flex-row text-sm text-left">
+                    <div className="flex relative w-full h-fit items-center justify-between gap-2 flex-row text-xs text-left">
                       <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                        <div className="relative flex w-fit h-fit">Rent</div>
                         <div className="relative flex w-fit h-fit">
-                          Token Rent
-                        </div>
-                        <div className="relative flex w-fit h-fit">
-                          {Number(
+                          {calculateRent(
                             tokenThresholds?.find(
                               (t) =>
                                 t.token?.toLowerCase() ==
                                 token.contract?.toLowerCase()
-                            )?.rent || 0
-                          ) /
-                            10 ** 18}
+                            )!,
+                            {
+                              publish: true,
+                              publishFrequency: 1,
+                              remix: true,
+                              remixFrequency: 1,
+                              lead: true,
+                              leadFrequency: 1,
+                            } as any
+                          )}
                           {" " + token.symbol}
                         </div>
                       </div>
                       <div
                         className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start ${
-                          Number(mintData?.prices?.[0]) * 10 ** 18 >=
+                          Number(mintData?.prices?.[key]) >=
                           Number(
                             tokenThresholds?.find(
                               (t) =>
                                 t.token?.toLowerCase() ==
                                 token.contract?.toLowerCase()
                             )?.threshold || 0
-                          )
+                          ) /
+                            10 ** 18
                             ? "text-pink"
                             : "text-black"
                         }`}
                       >
                         <div className="relative flex w-fit h-fit">
-                          Token Agent Threshold
+                          Agent Threshold
                         </div>
                         <div className="relative flex w-fit h-fit">
                           {Number(
@@ -334,6 +341,54 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                           {" " + token.symbol}
                         </div>
                       </div>
+                      {mintData?.collectionType == CollectionType.IRL && (
+                        <>
+                          <div
+                            className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start text-black`}
+                          >
+                            <div className="relative flex w-fit h-fit">Vig</div>
+                            <div className="relative flex w-fit h-fit">
+                              {Number(
+                                tokenThresholds?.find(
+                                  (t) =>
+                                    t.token?.toLowerCase() ==
+                                    token.contract?.toLowerCase()
+                                )?.vig || 0
+                              )}
+                              {"%"}
+                            </div>
+                          </div>
+                          <div
+                            className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start ${
+                              Number(mintData?.prices?.[key]) * 10 ** 18 >=
+                              Number(
+                                tokenThresholds?.find(
+                                  (t) =>
+                                    t.token?.toLowerCase() ==
+                                    token.contract?.toLowerCase()
+                                )?.base || 0
+                              )
+                                ? "text-pink"
+                                : "text-black"
+                            }`}
+                          >
+                            <div className="relative flex w-fit h-fit">
+                              Base
+                            </div>
+                            <div className="relative flex w-fit h-fit">
+                              {Number(
+                                tokenThresholds?.find(
+                                  (t) =>
+                                    t.token?.toLowerCase() ==
+                                    token.contract?.toLowerCase()
+                                )?.base || 0
+                              ) /
+                                10 ** 18}
+                              {" " + token.symbol}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 );

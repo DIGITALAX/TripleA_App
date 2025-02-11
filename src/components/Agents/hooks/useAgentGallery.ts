@@ -62,7 +62,7 @@ const useAgentGallery = (
             id: agent?.SkyhuntersAgentManager_id,
             cover: agent?.metadata?.cover,
             title: agent?.metadata?.title,
-            description: agent?.metadata?.description,
+            bio: agent?.metadata?.bio,
             wallet: agent?.wallets?.[0],
             balances: agent?.balances,
             workers: agent?.workers,

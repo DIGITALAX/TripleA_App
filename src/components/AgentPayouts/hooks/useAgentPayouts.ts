@@ -107,39 +107,47 @@ const useAgentPayouts = (lensClient: PublicClient) => {
 
       let owners_info = await Promise.all(
         owners?.data?.agentOwnerPaids?.map(async (coll: any) => {
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(coll?.owner),
-          });
-          let picture = "";
-          let profile: any;
+          return await Promise.all(
+            coll?.owners?.map(async (owner: string) => {
+              const result = await fetchAccountsAvailable(lensClient, {
+                managedBy: evmAddress(owner),
+              });
+              let picture = "";
+              let profile: any;
 
-          if (result.isOk()) {
-            const cadena = await fetch(
-              `${STORAGE_NODE}/${
-                result.value.items?.[0]?.account?.metadata?.picture?.split(
-                  "lens://"
-                )?.[1]
-              }`
-            );
+              if (result.isOk()) {
+                const cadena = await fetch(
+                  `${STORAGE_NODE}/${
+                    result.value.items?.[0]?.account?.metadata?.picture?.split(
+                      "lens://"
+                    )?.[1]
+                  }`
+                );
 
-            if (cadena) {
-              const json = await cadena.json();
-              picture = json.item;
-            }
+                if (cadena) {
+                  const json = await cadena.json();
+                  picture = json.item;
+                }
 
-            profile = {
-              ...result.value.items?.[0]?.account,
-              metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
-                picture,
-              },
-            };
-          }
+                profile = {
+                  ...result.value.items?.[0]?.account,
+                  metadata: {
+                    ...result.value.items?.[0]?.account?.metadata,
+                    picture,
+                  },
+                };
+              }
 
-          return {
-            ...coll,
-            profile,
-          };
+              return {
+                owner,
+                amount: Number(coll?.amount) / coll?.owners?.length,
+                blockTimestamp: coll?.blockTimestamp,
+                token: coll?.token,
+                transactionHash: coll?.transactionHash,
+                profile,
+              };
+            })
+          );
         })
       );
 
@@ -211,39 +219,47 @@ const useAgentPayouts = (lensClient: PublicClient) => {
 
         let owners_info = await Promise.all(
           owners?.data?.agentOwnerPaids?.map(async (coll: any) => {
-            const result = await fetchAccountsAvailable(lensClient, {
-              managedBy: evmAddress(coll?.owner),
-            });
-            let picture = "";
-            let profile: any;
+            return await Promise.all(
+              coll?.owners?.map(async (owner: string) => {
+                const result = await fetchAccountsAvailable(lensClient, {
+                  managedBy: evmAddress(owner),
+                });
+                let picture = "";
+                let profile: any;
 
-            if (result.isOk()) {
-              const cadena = await fetch(
-                `${STORAGE_NODE}/${
-                  result.value.items?.[0]?.account?.metadata?.picture?.split(
-                    "lens://"
-                  )?.[1]
-                }`
-              );
+                if (result.isOk()) {
+                  const cadena = await fetch(
+                    `${STORAGE_NODE}/${
+                      result.value.items?.[0]?.account?.metadata?.picture?.split(
+                        "lens://"
+                      )?.[1]
+                    }`
+                  );
 
-              if (cadena) {
-                const json = await cadena.json();
-                picture = json.item;
-              }
+                  if (cadena) {
+                    const json = await cadena.json();
+                    picture = json.item;
+                  }
 
-              profile = {
-                ...result.value.items?.[0]?.account,
-                metadata: {
-                  ...result.value.items?.[0]?.account?.metadata,
-                  picture,
-                },
-              };
-            }
+                  profile = {
+                    ...result.value.items?.[0]?.account,
+                    metadata: {
+                      ...result.value.items?.[0]?.account?.metadata,
+                      picture,
+                    },
+                  };
+                }
 
-            return {
-              ...coll,
-              profile,
-            };
+                return {
+                  owner,
+                  amount: Number(coll?.amount) / coll?.owners?.length,
+                  blockTimestamp: coll?.blockTimestamp,
+                  token: coll?.token,
+                  transactionHash: coll?.transactionHash,
+                  profile,
+                };
+              })
+            );
           })
         );
 

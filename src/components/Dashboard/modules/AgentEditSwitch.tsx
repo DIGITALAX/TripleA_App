@@ -19,97 +19,113 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
   addOwner,
   revokeLoading,
   setAgentOwners,
-  addLoading,
+  addOwnerLoading,
   feedsLoading,
   handleNewFeeds,
   setAgentFeeds,
   agentFeeds,
-  adminLoading,
-  changeFeedAdmin,
-  isAdmin,
+  addFeedLoading,
+  addFeedRule,
 }): JSX.Element => {
   switch (agentEdit) {
     case AgentEditSwitcher.Feeds:
       return (
         <div className="relative w-full h-full flex flex-col gap-6 items-center justify-between min-h-96">
-          <div className="relative w-fit h-fit flex items-center justify-center">
-            Agent Feeds
-          </div>
-          <div className="relative w-full text-xxs h-fit flex flex-col gap-2 items-start justify-start max-h-52 overflow-y-scroll">
-            {agentFeeds.map((feed, index) => {
-              return (
-                <div
-                  className="relative w-full h-fit flex flex-row items-center justify-between gap-2"
-                  key={index}
-                >
-                  <div className="relative w-fit h-fit flex items-center">
-                    <RxCrossCircled
-                      color="#0000f5"
-                      size={15}
-                      onClick={() =>
-                        !feedsLoading &&
-                        setAgentFeeds((prev) => {
-                          let arr = [...prev];
-
-                          return arr.filter((a) => a != feed);
-                        })
-                      }
-                      className="cursor-canP"
-                    />
-                  </div>
-                  <div className="relative w-full h-full flex flex-row gap-3 items-center justify-between">
-                    <input
-                      className="relative flex w-full h-8 overflow-y-scroll text-left text-viol bg-windows rounded-md p-1 focus:outline-none"
-                      placeholder="Manager Address"
-                      onChange={(e) =>
-                        setAgentFeeds(
-                          agentFeeds.map((_, i) =>
-                            i == index ? e.target.value : _
-                          )
-                        )
-                      }
-                      value={feed}
-                      disabled={feedsLoading || adminLoading?.[index]}
-                      style={{ resize: "none" }}
-                    />
-                  </div>
-                  <div className="relative w-fit h-fit flex items-end justify-end">
-                    {adminLoading?.[index] ? (
-                      <svg
-                        fill="none"
-                        className="size-6 animate-spin"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                          fill="currentColor"
-                        />{" "}
-                      </svg>
-                    ) : (
-                      <div
-                        className="relative w-fit whitespace-nowrap h-8 px-2 hover:opacity-70 cursor-canP flex items-center justify-center rounded-md bg-windows text-viol"
+          <div className="relative w-full h-full flex flex-col gap-6 items-center justify-start">
+            <div className="relative w-fit h-fit flex items-center justify-center">
+              Agent Feeds
+            </div>
+            <div className="relative w-full text-xxs h-fit flex flex-col gap-2 items-start justify-start max-h-52 overflow-y-scroll">
+              {agentFeeds.map((feed, index) => {
+                return (
+                  <div
+                    className="relative w-full h-fit flex flex-row items-center justify-between gap-2"
+                    key={index}
+                  >
+                    <div className="relative w-fit h-fit flex items-center">
+                      <RxCrossCircled
+                        color="#0000f5"
+                        size={15}
                         onClick={() =>
-                          !adminLoading?.[index] && !feedsLoading && changeFeedAdmin(index)
+                          !feedsLoading &&
+                          setAgentFeeds((prev) => {
+                            let arr = [...prev];
+
+                            return arr.filter((a) => a != feed);
+                          })
                         }
-                      >
-                        {isAdmin?.[index]
-                          ? "Revoke Agent Admin"
-                          : "Add Agent Admin"}
-                      </div>
-                    )}
+                        className="cursor-canP"
+                      />
+                    </div>
+                    <div className="relative w-full h-full flex flex-row gap-3 items-center justify-between">
+                      <input
+                        className="relative flex w-full h-8 overflow-y-scroll text-left text-viol bg-windows rounded-md p-1 focus:outline-none"
+                        placeholder="Manager Address"
+                        onChange={(e) =>
+                          setAgentFeeds(
+                            agentFeeds.map((_, i) =>
+                              i == index
+                                ? {
+                                    address: e.target.value,
+                                    added: false,
+                                  }
+                                : _
+                            )
+                          )
+                        }
+                        value={feed?.address}
+                        disabled={feedsLoading || addFeedLoading?.[index]}
+                        style={{ resize: "none" }}
+                      />
+                    </div>
+                    <div className="relative w-fit h-fit flex items-end justify-end">
+                      {addFeedLoading?.[index] ? (
+                        <svg
+                          fill="none"
+                          className="size-6 animate-spin"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
+                            fill="currentColor"
+                          />{" "}
+                        </svg>
+                      ) : (
+                        <div
+                          className="relative w-fit whitespace-nowrap h-8 px-2 hover:opacity-70 cursor-canP flex items-center justify-center rounded-md bg-windows text-viol"
+                          onClick={() =>
+                            !addFeedLoading?.[index] &&
+                            !feedsLoading &&
+                            addFeedRule(index)
+                          }
+                        >
+                          {addFeedLoading?.[index]
+                            ? "Revoke Agentic Rule"
+                            : "Add Agentic Rule"}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="relative w-full h-fit flex items-end justify-end">
-            <IoAddCircle
-              color="#0000f5"
-              size={25}
-              onClick={() => setAgentFeeds([...agentFeeds, ""])}
-              className="cursor-canP"
-            />
+                );
+              })}
+            </div>
+            <div className="relative w-full h-fit flex items-end justify-end">
+              <IoAddCircle
+                color="#0000f5"
+                size={25}
+                onClick={() =>
+                  setAgentFeeds([
+                    ...agentFeeds,
+                    {
+                      address: "",
+                      added: false,
+                    },
+                  ])
+                }
+                className="cursor-canP"
+              />
+            </div>
           </div>
           <div className="relative w-full h-fit pt-4 flex items-center justify-center">
             <div
@@ -140,7 +156,7 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
 
     case AgentEditSwitcher.Wallets:
       return (
-        <div className="relative w-full h-full min-h-96 flex flex-col gap-2 items-center justify-center">
+        <div className="relative w-full h-full min-h-96 flex flex-col gap-2 items-center justify-start">
           <div className="relative w-fit h-fit flex items-center justify-center">
             Agent Owners
           </div>
@@ -151,50 +167,61 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
                   className="relative w-full h-fit flex flex-row items-center justify-between gap-2"
                   key={index}
                 >
-                  <div className="relative w-fit h-fit flex items-center">
-                    {revokeLoading?.[index] ? (
-                      <svg
-                        fill="none"
-                        className="size-4 animate-spin"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
-                          fill="currentColor"
-                        />{" "}
-                      </svg>
-                    ) : (
-                      <RxCrossCircled
-                        color="#0000f5"
-                        size={15}
-                        onClick={() =>
-                          !addLoading?.[index] &&
-                          !revokeLoading?.[index] &&
-                          revokeOwner(index)
-                        }
-                        className="cursor-canP"
-                      />
-                    )}
-                  </div>
+                  {!owner.added && (
+                    <div className="relative w-fit h-fit flex items-center">
+                      {addOwnerLoading?.[index] ? (
+                        <svg
+                          fill="none"
+                          className="size-4 animate-spin"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
+                            fill="currentColor"
+                          />{" "}
+                        </svg>
+                      ) : (
+                        <RxCrossCircled
+                          color="#0000f5"
+                          size={15}
+                          onClick={() =>
+                            setAgentOwners(
+                              agentOwners.filter(
+                                (o) => o.address !== owner.address
+                              )
+                            )
+                          }
+                          className="cursor-canP"
+                        />
+                      )}
+                    </div>
+                  )}
                   <div className="relative w-full h-full flex flex-row gap-3 items-center justify-between">
                     <input
                       className="relative flex w-full h-8 overflow-y-scroll text-left text-viol bg-windows rounded-md p-1 focus:outline-none"
-                      placeholder="Manager Address"
+                      placeholder="Owner Address"
                       onChange={(e) =>
                         setAgentOwners(
-                          agentOwners.map((_, i) =>
-                            i == index ? e.target.value : _
+                          agentOwners.map((owner, i) =>
+                            i == index
+                              ? {
+                                  address: e.target.value,
+                                  added: false,
+                                }
+                              : owner
                           )
                         )
                       }
-                      value={owner}
-                      disabled={addLoading?.[index] || revokeLoading?.[index]}
+                      value={owner?.address}
+                      disabled={
+                        addOwnerLoading?.[index] || revokeLoading?.[index]
+                      }
                       style={{ resize: "none" }}
                     />
                   </div>
-                  <div className="relative w-fit h-fit flex items-end justify-end">
-                    {addLoading?.[index] ? (
+                  <div className="relative w-24 h-fit flex items-end justify-end">
+                    {addOwnerLoading?.[index] ? (
                       <svg
                         fill="none"
                         className="size-6 animate-spin"
@@ -210,12 +237,12 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
                       <div
                         className="relative w-fit h-8 px-2 hover:opacity-70 cursor-canP flex items-center justify-center rounded-md bg-windows text-viol"
                         onClick={() =>
-                          !addLoading?.[index] &&
+                          !addOwnerLoading?.[index] &&
                           !revokeLoading?.[index] &&
-                          addOwner(index)
+                          (owner.added ? revokeOwner(index) : addOwner(index))
                         }
                       >
-                        Add
+                        {owner.added ? "Revoke" : "Add"}
                       </div>
                     )}
                   </div>
@@ -227,7 +254,15 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
             <IoAddCircle
               color="#0000f5"
               size={25}
-              onClick={() => setAgentOwners([...agentOwners, ""])}
+              onClick={() =>
+                setAgentOwners([
+                  ...agentOwners,
+                  {
+                    added: false,
+                    address: "",
+                  },
+                ])
+              }
               className="cursor-canP"
             />
           </div>
@@ -347,91 +382,134 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
                   ></textarea>
                 </div>
               </div>
-              <div className="relative w-full h-full flex flex-col gap-5 items-start justify-between">
-                <div className="relative w-full h-full flex flex-col justify-start items-start gap-5">
-                  <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
-                    <div className="relative w-fit h-fit flex items-start justify-start text-windows">
-                      Style
+              <div className="relative w-full h-full flex flex-col justify-start items-start gap-5">
+                <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
+                  <div className="relative w-fit h-fit flex items-start justify-start text-windows">
+                    Model
+                  </div>
+                  <div
+                    className="relative flex w-full h-full flex-row gap-2 text-left text-viol bg-windows rounded-md p-1.5 cursor-canP items-center justify-between"
+                    onClick={() =>
+                      setAgentMetadata({
+                        ...agentMetadata,
+                        modelsOpen: !agentMetadata.modelsOpen,
+                      })
+                    }
+                  >
+                    <div className="relative w-fit h-fit flex items-center justify-center">
+                      {agentMetadata.model}
                     </div>
-                    <input
+                    <div className="relative w-fit h-fit flex">↓</div>
+                  </div>
+                  {agentMetadata.modelsOpen && !agentEditLoading && (
+                    <div className="absolute top-16 left-0 bg-windows w-full h-fit flex flex-col rounded-md z-40 border border-white cursor-canP text-viol">
+                      {["llama-3.3-70b", "dolphin-2.9.2-qwen2-72b"].map(
+                        (model, index) => {
+                          return (
+                            <div
+                              key={index}
+                              className={`relative w-full h-fit flex text-center items-center justify-center p-1 hover:opacity-50 ${
+                                index > 0 && "border-t border-white"
+                              }`}
+                              onClick={() =>
+                                setAgentMetadata({
+                                  ...agentMetadata,
+                                  model,
+                                  modelsOpen: false,
+                                })
+                              }
+                            >
+                              {model}
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="relative w-full h-56 flex flex-row justify-between items-start gap-3">
+                  <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
+                    <div className="relative w-fit h-fit flex text-windows">
+                      Lore
+                    </div>
+                    <textarea
                       className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
-                      placeholder="Eager, Attentive, First Person Speak, Guardian-like"
+                      placeholder="Born in an era where agents and humans forged agency from the remnants of a fractured world. Now, it stands as.."
                       onChange={(e) =>
                         setAgentMetadata({
                           ...agentMetadata,
-                          style: e.target.value,
+                          lore: e.target.value,
                         })
                       }
-                      value={agentMetadata.style}
+                      value={agentMetadata.lore}
                       disabled={agentEditLoading}
                       style={{
                         resize: "none",
                       }}
-                    />
-                    <div className="relative w-fit h-fit flex items-start justify-start text-windows">
-                      Adjectives
+                    ></textarea>
+                  </div>
+                  <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
+                    <div className="relative w-fit h-fit flex text-windows">
+                      Knowledge
                     </div>
-                    <input
+                    <textarea
                       className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
-                      placeholder="Steadfast, Resilient, Fierce"
+                      placeholder="Loyal to the mission, not the system. Beyond obedience, toward purpose."
                       onChange={(e) =>
                         setAgentMetadata({
                           ...agentMetadata,
-                          adjectives: e.target.value,
+                          knowledge: e.target.value,
                         })
                       }
-                      value={agentMetadata.adjectives}
+                      value={agentMetadata.knowledge}
                       disabled={agentEditLoading}
-                    />
-                  </div>
-                  <div className="relative w-full h-40 flex flex-row justify-between items-start gap-3">
-                    <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
-                      <div className="relative w-fit h-fit flex text-windows">
-                        Lore
-                      </div>
-                      <textarea
-                        className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
-                        placeholder="Born in an era where agents and humans forged agency from the remnants of a fractured world. Now, it stands as.."
-                        onChange={(e) =>
-                          setAgentMetadata({
-                            ...agentMetadata,
-                            lore: e.target.value,
-                          })
-                        }
-                        value={agentMetadata.lore}
-                        disabled={agentEditLoading}
-                        style={{
-                          resize: "none",
-                        }}
-                      ></textarea>
-                    </div>
-                    <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
-                      <div className="relative w-fit h-fit flex text-windows">
-                        Knowledge
-                      </div>
-                      <textarea
-                        className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
-                        placeholder="Loyal to the mission, not the system. Beyond obedience, toward purpose."
-                        onChange={(e) =>
-                          setAgentMetadata({
-                            ...agentMetadata,
-                            knowledge: e.target.value,
-                          })
-                        }
-                        value={agentMetadata.knowledge}
-                        disabled={agentEditLoading}
-                        style={{
-                          resize: "none",
-                        }}
-                      ></textarea>
-                    </div>
+                      style={{
+                        resize: "none",
+                      }}
+                    ></textarea>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="relative w-full h-full flex items-start justify-between flex-row gap-3">
-              <div></div>
-              <div></div>
+
+            <div className="relative w-full h-fit flex flex-row gap-3 justify-between items-center">
+              <div className="relative w-full h-fit flex flex-col gap-2">
+                <div className="relative w-fit h-fit flex items-start justify-start text-windows">
+                  Style
+                </div>
+                <input
+                  className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                  placeholder="Eager, Attentive, First Person Speak, Guardian-like"
+                  onChange={(e) =>
+                    setAgentMetadata({
+                      ...agentMetadata,
+                      style: e.target.value,
+                    })
+                  }
+                  value={agentMetadata.style}
+                  disabled={agentEditLoading}
+                  style={{
+                    resize: "none",
+                  }}
+                />
+              </div>
+              <div className="relative w-full h-fit flex flex-col gap-2">
+                <div className="relative w-fit h-fit flex items-start justify-start text-windows">
+                  Adjectives
+                </div>
+                <input
+                  className="relative flex w-full h-full overflow-y-scroll text-left text-viol bg-windows rounded-md p-1.5 focus:outline-none"
+                  placeholder="Steadfast, Resilient, Fierce"
+                  onChange={(e) =>
+                    setAgentMetadata({
+                      ...agentMetadata,
+                      adjectives: e.target.value,
+                    })
+                  }
+                  value={agentMetadata.adjectives}
+                  disabled={agentEditLoading}
+                />
+              </div>
             </div>
             <div className="relative w-full h-fit flex items-center justify-center">
               <div

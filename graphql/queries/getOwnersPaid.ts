@@ -6,7 +6,7 @@ const OWNERS_PAID = gql`
     agentOwnerPaids(first: 20, skip: $skip, orderDirection: desc, orderBy: blockTimestamp) {
       amount
       blockTimestamp
-      owner
+      owners
       token
       transactionHash
     }

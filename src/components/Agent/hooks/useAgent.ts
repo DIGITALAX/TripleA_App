@@ -461,6 +461,7 @@ const useAgent = (
         accountConnected: result?.value.items[0]?.account?.address,
         ownerProfile,
         feeds: metadata?.feeds,
+        model: metadata?.model
       });
     } catch (err: any) {
       console.error(err.message);

@@ -1,6 +1,7 @@
 import { FunctionComponent, JSX } from "react";
 import {
   ChooseAgentProps,
+  CollectionType,
   CollectionWorkerType,
 } from "../types/dashboard.types";
 import Image from "next/legacy/image";
@@ -18,13 +19,17 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
     <div
       className={`flex relative w-full h-96 items-center justify-start ${
         Number(mintData?.amount || 0) <= 2 ||
-        Number(mintData?.prices?.[0]) * 10 ** 18 <
-          Number(
-            tokenThresholds?.find(
-              (t) =>
-                t?.token?.toLowerCase() == mintData?.tokens?.[0]?.toLowerCase()
-            )?.threshold
-          )
+        mintData?.prices?.filter(
+          (price, index) =>
+            price * 10 ** 18 <
+            Number(
+              tokenThresholds?.find(
+                (t) =>
+                  t?.token?.toLowerCase() ==
+                  mintData?.tokens?.[index]?.toLowerCase()
+              )?.threshold
+            )
+        )?.length > 0
           ? "overflow-hidden"
           : "overflow-x-scroll"
       }`}
@@ -183,17 +188,13 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                                     data.agents = agents.map((ag) => {
                                       if (ag?.agent?.id == agent?.id) {
                                         (ag as any)[
+                                          item.key.replace("Frequency", "")
+                                        ] = !ag[
                                           item.key.replace(
                                             "Frequency",
                                             ""
-                                          ) 
-                                        ] =
-                                          !ag[
-                                            item.key.replace(
-                                              "Frequency",
-                                              ""
-                                            ) as keyof typeof ag
-                                          ] as unknown as boolean;
+                                          ) as keyof typeof ag
+                                        ] as unknown as boolean;
                                         return ag;
                                       } else {
                                         return ag;
@@ -283,17 +284,23 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
             })}
       </div>
       {(Number(mintData?.amount || 0) <= 2 ||
-        Number(mintData?.prices?.[0]) * 10 ** 18 <
-          Number(
-            tokenThresholds?.find(
-              (t) =>
-                t?.token?.toLowerCase() == mintData?.tokens?.[0]?.toLowerCase()
-            )?.threshold
-          )) && (
+        mintData?.prices?.filter(
+          (price, index) =>
+            price * 10 ** 18 <
+            Number(
+              tokenThresholds?.find(
+                (t) =>
+                  t?.token?.toLowerCase() ==
+                  mintData?.tokens?.[index]?.toLowerCase()
+              )?.threshold
+            )
+        )?.length > 0) && (
         <div className="absolute top-0 left-0 flex items-center justify-center bg-viol/90 w-full h-full text-windows text-center rounded-sm">
           <div className="relative sm:w-1/2 w-full flex items-center justify-center">
-            Minimum edition of 3 and price above token threshold required to
-            activate Agents for this collection.
+            {`Minimum edition of 3 and price above token threshold ${
+              mintData?.collectionType == CollectionType.IRL && "and token base"
+            } required to
+            activate Agents for this collection.`}
           </div>
         </div>
       )}
