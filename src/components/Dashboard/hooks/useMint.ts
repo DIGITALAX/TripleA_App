@@ -154,11 +154,8 @@ const useMint = (
         chain: chains.testnet,
         args: [
           {
-            customInstructions: mintData?.agents?.map(
-              (ag) => ag?.customInstructions
-            ),
-            tokens: filteredTokensAndPrices.map(({ token }) => token),
-            prices: filteredTokensAndPrices.map(
+            tokens: filteredTokensAndPrices?.map(({ token }) => token),
+            prices: filteredTokensAndPrices?.map(
               ({ price }) => Number(price) * 10 ** 18
             ),
             agentIds: mintData?.agents?.map((ag) => Number(ag?.agent?.id)),
@@ -180,6 +177,7 @@ const useMint = (
             publish: ag.publish,
             remix: ag.remix,
             lead: ag.lead,
+            instructions: ag.customInstructions,
           })),
           dropMetadata,
           mintData?.dropId,

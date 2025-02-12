@@ -1,5 +1,4 @@
-import { Agent } from "@/components/Dashboard/types/dashboard.types";
-import { AGENTS_CONTRACT, WGRASS_CONTRACT } from "@/lib/constants";
+import { AGENTS_CONTRACT } from "@/lib/constants";
 import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
@@ -16,7 +15,7 @@ const useAgentRecharge = (
   const [rechargeAmount, setRechargeAmount] = useState<number[]>([]);
   const [approvedRecharge, setApprovedRecharge] = useState<boolean[]>([]);
 
-  const handleApproveRecharge = async (index: number) => {
+  const handleApproveRecharge = async (index: number, token: string) => {
     const amount = rechargeAmount[index];
     if (amount <= 0) {
       setNotification?.("Invalid Recharge Amount :/");
@@ -38,7 +37,7 @@ const useAgentRecharge = (
       });
 
       const { request } = await publicClient.simulateContract({
-        address: WGRASS_CONTRACT,
+        address: token as `0x${string}`,
         abi: [
           {
             inputs: [
@@ -119,7 +118,7 @@ const useAgentRecharge = (
       });
 
       const balance = await publicClient.readContract({
-        address: WGRASS_CONTRACT,
+        address: token as `0x${string}`,
         abi: [
           {
             constant: true,
@@ -161,7 +160,7 @@ const useAgentRecharge = (
       const { request } = await publicClient.simulateContract({
         address: AGENTS_CONTRACT,
         abi: AgentAbi,
-        functionName: "rechargeAgentActiveBalance",
+        functionName: "rechargeAgentRentBalance",
         chain: chains.testnet,
         args: [token, Number(agentId), Number(collectionId), BigInt(amount * 10 ** 18)],
         account: address,

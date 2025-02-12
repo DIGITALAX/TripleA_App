@@ -23,6 +23,7 @@ const Gallery: FunctionComponent<{
   } = useGallery(lensClient!, choice);
   const router = useRouter();
 
+
   return (
     <div className="relative w-full h-fit flex flex-col">
       <div
@@ -43,6 +44,7 @@ const Gallery: FunctionComponent<{
               ? [...nfts, ...Array.from({ length: 20 })]
               : nfts
             ).map((nft: NFTData | unknown, index: number) => {
+           
               return (
                 <>
                   {(nft as any)?.id !== undefined &&

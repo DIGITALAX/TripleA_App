@@ -182,9 +182,9 @@ const useAgent = (
           return;
         }
 
-        posts = postsRes?.value?.items?.filter((pos: any) =>
+        posts = (postsRes?.value?.items?.filter((pos: any) =>
           (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA")
-        ) as Post[];
+        ) || []) as Post[];
       }
 
       posts = await Promise.all(
@@ -245,7 +245,6 @@ const useAgent = (
     try {
       const res = await getAgent(Number(id));
       let metadata: any = res?.data?.agentCreateds?.[0]?.metadata;
-
       if (!metadata) {
         const cadena = await fetch(
           `${INFURA_GATEWAY}/ipfs/${
@@ -334,55 +333,6 @@ const useAgent = (
       let workers: Worker[] = res?.data?.agentCreateds?.[0]?.workers || [];
       let balances: Balance[] = res?.data?.agentCreateds?.[0]?.balances || [];
 
-      activeCollectionIds = (await Promise.all(
-        activeCollectionIds?.map(async (id: any) => {
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(id?.artist),
-          });
-
-          if (result.isErr()) {
-            setAgentLoading(false);
-            return;
-          }
-
-          return {
-            profile: result?.value.items[0]?.account as Account,
-            collectionId: id?.collectionId,
-            metadata: id?.metadata,
-          };
-        })
-      )) as AgentCollection[];
-
-      collectionIdsHistory = (await Promise.all(
-        collectionIdsHistory?.map(async (id: any) => {
-          const result = await fetchAccountsAvailable(
-            lensConnected?.sessionClient || lensClient,
-            {
-              managedBy: evmAddress(id?.artist),
-            }
-          );
-          if (result.isErr()) {
-            setAgentLoading(false);
-            return;
-          }
-
-          return {
-            profile: result?.value.items[0]?.account as Account,
-            collectionId: id?.collectionId,
-            metadata: id?.metadata,
-          };
-        })
-      )) as AgentCollection[];
-
-      balances = balances?.map((balance) => {
-        return {
-          ...balance,
-          image: [...collectionIdsHistory, ...activeCollectionIds].find(
-            (col) => Number(col.collectionId) == Number(balance.collectionId)
-          )?.metadata?.image,
-        };
-      }) as Balance[];
-
       workers = (await Promise.all(
         workers?.map(async (id) => {
           const col = await getCollectionArtist(Number(id?.collectionId));
@@ -397,6 +347,20 @@ const useAgent = (
             setAgentLoading(false);
             return;
           }
+
+          let metadata = (id as any)?.collection?.metadata;
+
+          if (!metadata) {
+            const cadena = await fetch(
+              `${INFURA_GATEWAY}/ipfs/${
+                (id as any)?.collection?.uri?.includes("ipfs://")
+                  ? (id as any)?.collection?.uri?.split("ipfs://")?.[1]
+                  : (id as any)?.collection?.uri
+              }`
+            );
+            metadata = await cadena.json();
+          }
+
           return {
             profile: result?.value.items[0]?.account as Account,
             collectionId: id?.collectionId,
@@ -408,13 +372,71 @@ const useAgent = (
             lead: id?.lead,
             publish: id?.publish,
             tokens: id?.tokens,
-            metadata: {
-              image: col?.data?.collectionCreateds?.[0]?.metadata?.image,
-              title: col?.data?.collectionCreateds?.[0]?.metadata?.title,
-            },
+            metadata,
           };
         })
       )) as Worker[];
+
+
+      activeCollectionIds = (await Promise.all(
+        activeCollectionIds?.map(async (id: any) => {
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(id?.artist),
+          });
+
+          if (result.isErr()) {
+            setAgentLoading(false);
+            return;
+          }
+
+          return {
+            profile: result?.value.items[0]?.account as Account,
+            collectionId: id?.collectionId,
+            metadata: workers?.find(
+              (worker) =>
+                Number(worker?.collectionId) == Number(id?.collectionId)
+            )?.metadata,
+          };
+        })
+      )) as AgentCollection[];
+
+
+
+      collectionIdsHistory = (await Promise.all(
+        collectionIdsHistory?.map(async (id: any) => {
+          const result = await fetchAccountsAvailable(
+            lensConnected?.sessionClient || lensClient,
+            {
+              managedBy: evmAddress(id?.artist),
+            }
+          );
+          if (result.isErr()) {
+            setAgentLoading(false);
+            return;
+          }
+
+       
+
+          return {
+            profile: result?.value.items[0]?.account as Account,
+            collectionId: id?.collectionId,
+            metadata: workers?.find(
+              (worker) =>
+                Number(worker?.collectionId) == Number(id?.collectionId)
+            )?.metadata,
+          };
+        })
+      )) as AgentCollection[];
+
+      balances = balances?.map((balance) => {
+        return {
+          ...balance,
+          image: workers?.find(
+            (worker) =>
+              Number(worker?.collectionId) == Number(balance?.collectionId)
+          )?.metadata?.image,
+        };
+      }) as Balance[];
 
       const stats = await fetchAccountStats(
         lensConnected?.sessionClient || lensClient,
@@ -429,13 +451,11 @@ const useAgent = (
       }
 
       setStats(stats.value as AccountStats);
-
       const rent = await getAgentRent(
         Number(res?.data?.agentCreateds?.[0]?.SkyhuntersAgentManager_id)
       );
 
       setAgentRent(rent?.data?.agentPaidRents);
-
       setAgent({
         id: res?.data?.agentCreateds?.[0]?.SkyhuntersAgentManager_id,
         cover: metadata?.cover,
@@ -449,7 +469,7 @@ const useAgent = (
         messageExamples: metadata?.messageExamples?.map(
           (messageExamples: string) => JSON.parse(messageExamples)
         ),
-        wallet: res?.data?.agentCreateds?.[0]?.wallets?.[0],
+        wallets: res?.data?.agentCreateds?.[0]?.wallets,
         balances,
         owners: res?.data?.agentCreateds?.[0]?.owners,
         creator: res?.data?.agentCreateds?.[0]?.creator,
@@ -461,7 +481,7 @@ const useAgent = (
         accountConnected: result?.value.items[0]?.account?.address,
         ownerProfile,
         feeds: metadata?.feeds,
-        model: metadata?.model
+        model: metadata?.model,
       });
     } catch (err: any) {
       console.error(err.message);

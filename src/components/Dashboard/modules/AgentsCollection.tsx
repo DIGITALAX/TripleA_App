@@ -48,7 +48,10 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
     publicClient,
     collection,
     agents,
-    setNotification
+    setNotification,
+    setDrop,
+    setDropSwitcher,
+    setCollection
   );
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
@@ -153,9 +156,9 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                           )?.symbol
                         }
                       </div>
-                      <div className="relative w-full h-fit flex">
+                      <div className="relative w-full h-fit flex justify-end">
                         <div
-                          className={`relative w-full h-8 text-viol bg-windows rounded-md hover:opacity-80 flex items-center justify-center text-xxs font-start ${
+                          className={`relative w-20 h-6 text-viol bg-windows rounded-md hover:opacity-80 flex items-center justify-center text-xxs ${
                             !priceAdjustLoading ? "cursor-canP" : "opacity-70"
                           }`}
                           onClick={() =>

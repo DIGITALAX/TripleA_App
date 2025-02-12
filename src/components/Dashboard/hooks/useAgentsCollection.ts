@@ -4,14 +4,17 @@ import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
 import CollectionManagerAbi from "@abis/CollectionManagerAbi.json";
 import { NFTData } from "@/components/Common/types/common.types";
-import { Agent } from "../types/dashboard.types";
+import { Agent, DropInterface, DropSwitcher } from "../types/dashboard.types";
 
 const useAgentsCollection = (
   address: `0x${string}` | undefined,
   publicClient: PublicClient,
   collection: NFTData,
   agents: Agent[],
-  setNotification: (e: SetStateAction<string | undefined>) => void
+  setNotification: (e: SetStateAction<string | undefined>) => void,
+  setDrop: (e: SetStateAction<DropInterface | undefined>) => void,
+  setDropSwitcher: (e: SetStateAction<DropSwitcher>) => void,
+  setCollection: (e: SetStateAction<NFTData | undefined>) => void
 ) => {
   const [priceAdjustLoading, setPriceAdjustLoading] = useState<boolean>(false);
   const [editAgentsLoading, setEditAgentsLoading] = useState<boolean>(false);
@@ -104,7 +107,7 @@ const useAgentsCollection = (
     try {
       const functionName =
         Number(collection?.amountSold || 0) == 0
-          ? "deleteCollecton"
+          ? "deleteCollection"
           : collection?.active
           ? "deactivateCollection"
           : "activateCollection";
@@ -137,6 +140,9 @@ const useAgentsCollection = (
             : "Activated"
         } `
       );
+      setDropSwitcher(DropSwitcher.Drops);
+      setDrop(undefined);
+      setCollection(undefined);
     } catch (err: any) {
       console.error(err.message);
     }

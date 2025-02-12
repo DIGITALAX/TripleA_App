@@ -262,7 +262,7 @@ export default function Agent() {
                                   0,
                                   10
                                 )
-                              : agent?.wallet?.slice(0, 10)}
+                              : agent?.creator?.slice(0, 10)}
                           </div>
                         </div>
                       </div>
@@ -767,7 +767,7 @@ export default function Agent() {
                                           agent?.balances?.find(
                                             (bal) =>
                                               bal?.token?.toLowerCase() ==
-                                              chosenTokens?.[key]
+                                              chosenTokens?.[key]?.toLowerCase()
                                           )?.rentBalance || 0
                                         ) /
                                           10 ** 18}
@@ -782,7 +782,7 @@ export default function Agent() {
                                               className="relative w-fit h-fit flex items-center justify-center"
                                             >
                                               <div
-                                                className={`relative w-6 h-6 rounded-full border cursor-canP ${
+                                                 className={`relative w-6 h-6 rounded-full border cursor-canP ${
                                                   chosenTokens?.[key] ==
                                                   item?.toLowerCase()
                                                     ? "opacity-70 border-windows"
@@ -905,7 +905,7 @@ export default function Agent() {
                                     10 ** 18 >
                                   0
                                     ? `If not recharged, Agent will run out in ${
-                                        Number(
+                                       ( Number(
                                           agent?.balances?.find(
                                             (bal) =>
                                               Number(bal?.collectionId) ==
@@ -920,7 +920,7 @@ export default function Agent() {
                                             chosenTokens?.[key]
                                           )!,
                                           collection
-                                        )
+                                        ))?.toFixed(0)
                                       } cycles.`
                                     : "Agent needs to be recharged to start activity."}
                                 </div>

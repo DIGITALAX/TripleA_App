@@ -3,6 +3,7 @@ import { CollectionType, MintProps } from "../types/dashboard.types";
 import Image from "next/legacy/image";
 import { TOKENS } from "@/lib/constants";
 import calculateRent from "@/lib/helpers/calculateRent";
+import descriptionRegex from "@/lib/helpers/descriptionRegex";
 
 const Mint: FunctionComponent<MintProps> = ({
   handleMint,
@@ -94,9 +95,12 @@ const Mint: FunctionComponent<MintProps> = ({
                   }`
               )})`}
           </div>
-          <div className="relative flex w-full sm:w-fit max-w-96 h-fit max-h-60 overflow-y-scroll text-left text-black text-windows">
-            {mintData.description}
-          </div>
+          <div
+            className="relative flex w-full sm:w-fit max-w-96 h-fit max-h-60 overflow-y-scroll text-left text-black text-windows"
+            dangerouslySetInnerHTML={{
+              __html: descriptionRegex(mintData?.description, false),
+            }} 
+          ></div>
         </div>
       </div>
       <div className="relative w-full h-fit flex items-center justify-center">

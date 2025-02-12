@@ -20,6 +20,7 @@ import {
   Format,
 } from "@/components/Dashboard/types/dashboard.types";
 import calculateRent from "@/lib/helpers/calculateRent";
+import descriptionRegex from "@/lib/helpers/descriptionRegex";
 
 const Purchase: FunctionComponent<PurchaseProps> = ({
   nft,
@@ -214,8 +215,8 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   )}
                   <div className="relative flex w-fit h-fit">
                     {nft?.profile?.username?.localName
-                      ? nft?.profile?.username?.localName?.slice(0, 10)
-                      : nft?.artist?.slice(0, 10)}
+                      ? nft?.profile?.username?.localName?.slice(0, 10) + " ..."
+                      : nft?.artist?.slice(0, 10) + " ..."}
                   </div>
                 </div>
                 <div className="relative w-fit h-fit flex">
@@ -488,9 +489,12 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               )}
               <div className="relative w-full h-full flex flex-col gap-3 items-start justify-between">
                 <div className="relative w-full h-full max-h-full flex py-4 overflow-y-scroll">
-                  <div className="py-3 h-fit max-h-40 flex relative items-start justify-start text-left text-sm font-nerd">
-                    {nft?.description}
-                  </div>
+                  <div
+                    className="py-3 h-fit max-h-40 flex relative items-start justify-start text-left text-sm font-nerd break-all w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: descriptionRegex(nft?.description, false),
+                    }}
+                  ></div>
                 </div>
                 <div className="relative w-full h-fit flex-col gap-2 flex py-2 items-end justify-end">
                   <div className="relative w-fit h-fit text-right flex text-sm font-nerd">
@@ -655,8 +659,9 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   ?.filter((ag) => nft?.agentIds?.includes(ag?.id))
                   ?.map((agent, key) => {
                     const worker = agent?.workers?.find(
-                      (ag) => Number(ag?.collectionId) == nft?.id
+                      (ag) => Number(ag?.collectionId) == Number(nft?.id)
                     );
+
                     return (
                       <div
                         key={key}
@@ -731,7 +736,10 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                       Number(agent?.id)
                                     );
                                   } else {
-                                    handleApproveRecharge(key);
+                                    handleApproveRecharge(
+                                      key,
+                                      collectData?.token!
+                                    );
                                   }
                                 }
                               }}
@@ -765,7 +773,10 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                               {Number(
                                 agent?.balances?.find(
                                   (bal) =>
-                                    Number(bal?.collectionId) == Number(nft?.id)
+                                    Number(bal?.collectionId) ==
+                                      Number(nft?.id) &&
+                                    bal?.token?.toLowerCase() ==
+                                      collectData?.token?.toLowerCase()
                                 )?.rentBalance || 0
                               ) /
                                 10 ** 18}
@@ -837,7 +848,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                           ) || 0) /
                             10 ** 18 >
                           0
-                            ? `If not recharged, Agent will run out in ${
+                            ? `If not recharged, Agent will run out in ${(
                                 Number(
                                   agent?.balances?.find(
                                     (bal) =>
@@ -854,7 +865,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                   )!,
                                   worker!
                                 )
-                              } cycles.`
+                              )?.toFixed(0)} cycles.`
                             : "Agent needs to be recharged to start activity."}
                         </div>
                       </div>

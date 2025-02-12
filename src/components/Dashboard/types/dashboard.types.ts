@@ -176,7 +176,7 @@ export interface Agent {
       text: string;
     };
   }[][];
-  wallet: string;
+  wallets: string[];
   balances: Balance[];
   creator: string;
   activeCollectionIds: AgentCollection[];
@@ -283,10 +283,10 @@ export type CollectionProps = {
 };
 
 export type AgentsCollectionProps = {
-  setDropSwitcher: (e: SetStateAction<DropSwitcher>) => void;
   agents: Agent[];
-  setDrop: (e: SetStateAction<DropInterface | undefined>) => void;
   collection: NFTData;
+  setDrop: (e: SetStateAction<DropInterface | undefined>) => void;
+  setDropSwitcher: (e: SetStateAction<DropSwitcher>) => void;
   setCollection: (e: SetStateAction<NFTData | undefined>) => void;
   setNotification: (e: SetStateAction<string | undefined>) => void;
 };

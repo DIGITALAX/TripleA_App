@@ -7,7 +7,6 @@ const DROP = gql`
       collectionId
       artist
       uri
-      tokens
       prices
       agentIds
         prices {

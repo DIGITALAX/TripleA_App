@@ -3,7 +3,10 @@ import { FetchResult, gql } from "@apollo/client";
 
 const AGENT = gql`
   query ($SkyhuntersAgentManager_id: Int!) {
-    agentCreateds(where: { SkyhuntersAgentManager_id: $SkyhuntersAgentManager_id }, first: 1) {
+    agentCreateds(
+      where: { SkyhuntersAgentManager_id: $SkyhuntersAgentManager_id }
+      first: 1
+    ) {
       owners
       metadata {
         title
@@ -19,7 +22,14 @@ const AGENT = gql`
         adjectives
       }
       creator
-      collectionIdsHistory
+      collectionIdsHistory {
+        artist
+        collectionId
+      }
+      activeCollectionIds {
+        artist
+        collectionId
+      }
       balances {
         token
         rentBalance
@@ -28,7 +38,6 @@ const AGENT = gql`
         collectionId
         bonusBalance
       }
-      activeCollectionIds
       scoreNegative
       scorePositive
       transactionHash
@@ -47,6 +56,13 @@ const AGENT = gql`
         instructions
         tokens
         collectionId
+        collection {
+          uri
+          metadata {
+            title
+            image
+          }
+        }
       }
     }
   }

@@ -3,17 +3,15 @@ export const STORAGE_NODE: string = "https://storage-api.testnet.lens.dev";
 
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
 export const AGENTS_CONTRACT: `0x${string}` =
-  "0xF880C84F7EF0E49039B87Dbd534aD88545FC2D29";
+  "0x0c66DF3847Eae30797a62C2d2C28cf30B7af01Ce";
 export const SKYHUNTERS_AGENTS_MANAGER_CONTRACT: `0x${string}` =
-  "0x48d2347BBF723D4AeB9Cc2a7d4D25a958586e4Ce";
+  "0xd23fd2228D0D0dD442422c1704e4DB8abb5884d9";
 export const MARKET_CONTRACT: `0x${string}` =
-  "0x704D2A8e6385CbD203990E0C92397908d96Fc6dA";
-export const WGRASS_CONTRACT: `0x${string}` =
-  "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8";
+  "0x58c292A06Abe5A7996C32921e3DB48f7909D5D1B";
 export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
-  "0x575da586767F54DC9ba7E08024844ce72480e234";
+  "0x4ed83239189a803885cc888A6e470d1a13F7Ff4b";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
-  "0x59104328311864bf0A42d832F78d74AC89967740";
+  "0x0064d596558Ca3Dae49B7919AEe821330203C2A6";
 export const AU_TOKEN: `0x${string}` = "0x";
 export const AU_TREASURY_CONTRACT: `0x${string}` = "0x";
 

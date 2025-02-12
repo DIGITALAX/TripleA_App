@@ -56,7 +56,10 @@ const Header: FunctionComponent = (): JSX.Element => {
       <div className="relative px-2 w-full h-fit sm:h-16 flex flex-col gap-4 sm:flex-row justify-between items-center z-50">
         <div
           className="relative flex items-center justify-center w-fit h-fit cursor-canP"
-          onClick={() => router.push("/")}
+          onClick={() => {
+            router.prefetch("/");
+            router.push("/");
+          }}
         >
           <div className="w-fit h-fit text-xl font-jackey text-black flex relative">
             TripleA

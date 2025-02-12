@@ -1,5 +1,5 @@
 import { Worker } from "@/components/Dashboard/types/dashboard.types";
-import { AGENTS_CONTRACT, TOKENS } from "@/lib/constants";
+import { AGENTS_CONTRACT } from "@/lib/constants";
 import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
@@ -146,6 +146,7 @@ const useRecharge = (
         account: address,
       });
 
+
       if (balance < BigInt(amount * 10 ** 18)) {
         setNotification?.("Not Enough Tokens in Your Wallet :(");
         setRechargeLoading((prev) => {
@@ -161,7 +162,7 @@ const useRecharge = (
       const { request } = await publicClient.simulateContract({
         address: AGENTS_CONTRACT,
         abi: AgentAbi,
-        functionName: "rechargeAgentActiveBalance",
+        functionName: "rechargeAgentRentBalance",
         chain: chains.testnet,
         args: [
           token,
