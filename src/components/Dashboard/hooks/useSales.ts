@@ -17,11 +17,11 @@ const useSales = (
     setSalesLoading(true);
     try {
       const data = await getSales(address);
-
       const sales: Order[] = await Promise.all(
-        data?.data?.orders?.map(async (sale: any) => {
+        data?.data?.collectionPurchaseds?.map(async (sale: any) => {
           const result = await fetchAccountsAvailable(lensClient, {
             managedBy: evmAddress(sale?.collection?.artist),
+            includeOwned: true,
           });
 
           if (result.isErr()) {
@@ -46,25 +46,16 @@ const useSales = (
           return {
             id: sale?.id,
             totalPrice: sale?.totalPrice,
-            token: sale?.token,
+            token: sale?.paymentToken,
             amount: sale?.amount,
             collectionId: sale?.collectionId,
-            mintedTokenIds: sale?.mintedTokenIds,
+            mintedTokenIds: sale?.mintedTokens,
             blockTimestamp: sale?.blockTimestamp,
             transactionHash: sale?.transactionHash,
             collection: {
               id: sale?.collection?.id,
               image: sale?.collection?.metadata?.image,
               title: sale?.collection?.metadata?.title,
-              description: sale?.collection?.metadata?.description,
-              blocktimestamp: sale?.collection?.blockTimestamp,
-              prices: sale?.collection?.prices,
-              tokens: sale?.collection?.tokens,
-              agents: sale?.collection?.agents,
-              artist: sale?.collection?.artist,
-              amountSold: sale?.collection?.amountSold,
-              tokenIds: sale?.collection?.tokenIds,
-              amount: sale?.collection?.amount,
             },
             buyer: sale?.buyer,
             profile: {

@@ -15,7 +15,7 @@ import {
   SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
   INFURA_GATEWAY,
   STORAGE_NODE,
-  AU_TREASURY_CONTRACT,
+  AU_REWARDS_CONTRACT,
   AU_TOKEN,
 } from "@/lib/constants";
 import { chains } from "@lens-network/sdk/viem";
@@ -93,7 +93,8 @@ const useUserAgents = (
           cover: currentAgent?.cover,
           messageExamples: currentAgent?.messageExamples,
           feeds: agentFeeds
-            ?.filter((f) => f?.address?.trim() !== "")
+            ?.filter((f) => f && f.address && f.address.trim() !== "")
+            ?.filter(Boolean)
             ?.map((f) => f.address),
           model: currentAgent?.model,
         }),
@@ -253,7 +254,8 @@ const useUserAgents = (
           }
 
           const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(agent?.wallets?.[0]),
+            managedBy: evmAddress(agent?.creator),
+            includeOwned: true,
           });
           if (result.isErr()) {
             setAgentsLoading(false);
@@ -279,7 +281,7 @@ const useUserAgents = (
             title: agent?.metadata?.title,
             bio: agent?.metadata?.bio,
             customInstructions: agent?.metadata?.customInstructions,
-            wallet: agent?.wallets?.[0],
+            wallets: agent?.wallets,
             balances: agent?.balances,
             workers: agent?.workers,
             creator: agent?.creator,
@@ -397,7 +399,7 @@ const useUserAgents = (
           anyOf: [
             {
               simplePaymentRule: {
-                recipient: AU_TREASURY_CONTRACT,
+                recipient: AU_REWARDS_CONTRACT,
                 cost: {
                   value: "1",
                   currency: AU_TOKEN,

@@ -117,6 +117,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
         drops: drops?.data?.dropCreateds?.length == 20 ? true : false,
       });
 
+
       setPaginated({
         agents:
           agents?.data?.agentCreateds?.length == 20
@@ -198,7 +199,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
 
       setHasMore({
         collected: hasMoreCollected,
-        agents: hasMoreCollected,
+        agents: hasMoreAgents,
         drops: hasMoreDrops,
       });
 

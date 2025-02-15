@@ -1,5 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
-import { Order } from "../types/dashboard.types";
+import { CollectionType, Order } from "../types/dashboard.types";
 import { getOrders } from "../../../../graphql/queries/getOrders";
 import {
   evmAddress,
@@ -16,6 +16,7 @@ import { chains } from "@lens-network/sdk/viem";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { LIT_NETWORK } from "@lit-protocol/constants";
 
 const useCollects = (
   address: `0x${string}` | undefined,
@@ -42,7 +43,10 @@ const useCollects = (
   const [fulfillmentEncrypted, setFulfillmentEncrypted] = useState<string[]>(
     []
   );
-  const client = new LitNodeClient({ litNetwork: "datil", debug: false });
+  const client = new LitNodeClient({
+    litNetwork: LIT_NETWORK.DatilDev,
+    debug: false,
+  });
 
   const handleCollects = async () => {
     if (!address) return;
@@ -50,9 +54,10 @@ const useCollects = (
     try {
       const data = await getOrders(address);
       const collects: Order[] = await Promise.all(
-        data?.data?.orders?.map(async (collect: any) => {
+        data?.data?.collectionPurchaseds?.map(async (collect: any) => {
           const result = await fetchAccountsAvailable(lensClient, {
             managedBy: evmAddress(collect?.collection?.artist),
+            includeOwned: true,
           });
 
           if (result.isErr()) {
@@ -77,30 +82,26 @@ const useCollects = (
           return {
             id: collect?.id,
             totalPrice: collect?.totalPrice,
-            token: collect?.token,
+            token: collect?.paymentToken,
             amount: collect?.amount,
             collectionId: collect?.collectionId,
-            mintedTokenIds: collect?.mintedTokenIds,
+            mintedTokenIds: collect?.mintedTokens,
             blockTimestamp: collect?.blockTimestamp,
             transactionHash: collect?.transactionHash,
             collection: {
               id: collect?.collection?.id,
               image: collect?.collection?.metadata?.image,
               title: collect?.collection?.metadata?.title,
-              description: collect?.collection?.metadata?.description,
-              blocktimestamp: collect?.collection?.blockTimestamp,
-              prices: collect?.collection?.prices,
-              tokens: collect?.collection?.tokens,
-              agents: collect?.collection?.agents,
-              artist: collect?.collection?.artist,
-              amountSold: collect?.collection?.amountSold,
-              tokenIds: collect?.collection?.tokenIds,
-              amount: collect?.collection?.amount,
+              format: collect?.collection?.metadata?.format,
+              collectionType:
+                collect?.collection?.collectionType == "1"
+                  ? CollectionType.IRL
+                  : CollectionType.Digital,
             },
             fulfiller: collect?.fulfiller,
             buyer: collect?.buyer,
             fulfilled: collect?.fulfilled,
-            fulfillment: collect?.fulfillmentDetails,
+            fulfillment: collect?.fulfillment,
             profile: {
               ...result.value.items?.[0]?.account,
               metadata: {
@@ -144,25 +145,39 @@ const useCollects = (
       return arr;
     });
     try {
+      const encrypted = await JSON.parse(allCollects?.[index].fulfillment);
+
       let nonce = await client.getLatestBlockhash();
-      await checkAndSignAuthMessage({
+      const authSig = await checkAndSignAuthMessage({
         chain: "polygon",
         nonce: nonce!,
       });
       await client.connect();
-
-      const encrypted = await JSON.parse(allCollects?.[index].fulfillment);
 
       const { decryptedData } = await client.decrypt({
         dataToEncryptHash: encrypted.dataToEncryptHash,
         accessControlConditions: encrypted.accessControlConditions,
         chain: encrypted.chain,
         ciphertext: encrypted.ciphertext,
+        authSig,
       });
 
       const fulfillmentDetails = await JSON.parse(
         uint8arrayToString(decryptedData)
       );
+      setFulfillmentInfo((prev) => {
+        let arr = [...prev];
+        arr[index] = {
+          color: fulfillmentDetails?.color,
+          size: fulfillmentDetails?.size,
+          name: fulfillmentDetails?.name,
+          address: fulfillmentDetails?.address,
+          state: fulfillmentDetails?.state,
+          country: fulfillmentDetails?.country,
+          zip: fulfillmentDetails?.zip,
+        };
+        return arr;
+      });
       setAllCollects((prev) => {
         let arr = [...prev];
         arr[index] = {

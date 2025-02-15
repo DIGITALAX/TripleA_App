@@ -163,6 +163,7 @@ const useNFT = (
         lensConnected?.sessionClient || lensClient,
         {
           managedBy: evmAddress(collection?.artist),
+          includeOwned: true,
         }
       );
 
@@ -180,6 +181,7 @@ const useNFT = (
           lensConnected?.sessionClient || lensClient,
           {
             managedBy: evmAddress(res?.data?.orders?.[i]?.buyer),
+            includeOwned: true,
           }
         );
 
@@ -256,6 +258,7 @@ const useNFT = (
             managedBy: evmAddress(
               collData?.data?.collectionCreateds?.[0]?.remixCollection?.artist
             ),
+            includeOwned: true,
           }
         );
 
@@ -283,7 +286,7 @@ const useNFT = (
         amountSold: collection?.amountSold,
         tokenIds: collection?.tokenIds,
         amount: collection?.amount,
-        agent: collection?.agent,
+        isAgent: collection?.isAgent,
         remixId: collection?.remixId,
         remix,
         profile: {
@@ -435,6 +438,7 @@ const useNFT = (
             lensConnected?.sessionClient || lensClient,
             {
               managedBy: evmAddress(col?.artist),
+              includeOwned: true,
             }
           );
 

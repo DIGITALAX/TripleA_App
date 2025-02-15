@@ -27,6 +27,7 @@ const useArt = (lensClient: PublicClient, lensConnected: LensConnected) => {
             lensConnected?.sessionClient || lensClient,
             {
               managedBy: evmAddress(col?.artist),
+              includeOwned: true,
             }
           );
 
@@ -35,8 +36,6 @@ const useArt = (lensClient: PublicClient, lensConnected: LensConnected) => {
 
             return;
           }
-
-        
 
           return {
             id: Number(col?.id),

@@ -34,11 +34,10 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             );
             collection.metadata = await cadena.json();
           }
-         
+
           const result = await fetchAccountsAvailable(lensClient, {
             managedBy: evmAddress(collection?.artist),
             includeOwned: true,
-            
           });
           if (result.isErr()) {
             setGalleryLoading(false);
@@ -122,6 +121,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
 
           const result = await fetchAccountsAvailable(lensClient, {
             managedBy: evmAddress(collection?.artist),
+            includeOwned: true,
           });
 
           if (result.isErr()) {

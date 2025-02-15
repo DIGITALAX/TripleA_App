@@ -4,8 +4,9 @@ import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
 import {
   AU_TOKEN,
-  AU_TREASURY_CONTRACT,
+  AU_REWARDS_CONTRACT,
   SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
+  TOKENS,
 } from "@/lib/constants";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
@@ -146,8 +147,8 @@ const useCreateAgent = (
 
       console.log({
         address: agentWalletCreated.address,
-        key: agentWalletCreated.privateKey
-      })
+        key: agentWalletCreated.privateKey,
+      });
 
       const authenticatedOnboarding = await lensClient.login({
         onboardingUser: {
@@ -294,7 +295,10 @@ const useCreateAgent = (
   };
 
   const handleCreateAgent = async () => {
-    if (agentDetails?.feeds?.filter((f) => !f.added)?.length > 0) {
+    if (
+      agentDetails?.feeds?.filter((f) => !f?.added || f?.address?.trim() == "")
+        ?.length > 0
+    ) {
       setNotification?.("Add Agentic Rules to All Feeds!");
       return;
     }
@@ -304,7 +308,8 @@ const useCreateAgent = (
       agentDetails?.title?.trim() == "" ||
       agentDetails?.bio?.trim() == "" ||
       agentDetails?.customInstructions?.trim() == "" ||
-      !agentDetails?.cover
+      !agentDetails?.cover ||
+      !agentWallet
     ) {
       setNotification?.("Fill Out All Details!");
       return;
@@ -362,8 +367,9 @@ const useCreateAgent = (
           cover: "ipfs://" + responseImageJSON.cid,
           customInstructions: agentDetails.customInstructions,
           feeds: agentDetails.feeds
-            ?.filter((fe) => fe?.address.trim() !== "")
-            ?.map((ad) => ad.address),
+            ?.filter((f) => f && f.address && f.address.trim() !== "")
+            ?.filter(Boolean)
+            ?.map((ad) => ad?.address),
           model: agentDetails.model,
         }),
       });
@@ -379,6 +385,8 @@ const useCreateAgent = (
           [agentWallet.address],
           [address, ...agentDetails.owners?.filter((o) => o.trim() !== "")],
           "ipfs://" + responseJSON?.cid,
+          false,
+          false,
         ],
         account: address,
       });
@@ -468,7 +476,7 @@ const useCreateAgent = (
       feed.name.trim() == "" ||
       feed.title.trim() == "" ||
       feed.description.trim() == "" ||
-      agentWallet?.address
+      !agentWallet
     )
       return;
     setCreateFeedLoading(true);
@@ -504,17 +512,17 @@ const useCreateAgent = (
             anyOf: [
               {
                 simplePaymentRule: {
-                  recipient: AU_TREASURY_CONTRACT,
+                  recipient: AU_TOKEN,
                   cost: {
-                    value: "1",
-                    currency: AU_TOKEN,
+                    value: "0.1",
+                    currency: TOKENS[0].contract,
                   },
                 },
               },
             ],
           },
         });
-
+        console.log({ resFeed });
         if (resFeed.isOk()) {
           const feeds = await fetchFeeds(lensConnected?.sessionClient!, {
             orderBy: FeedsOrderBy.LatestFirst,
@@ -525,6 +533,8 @@ const useCreateAgent = (
               },
             },
           });
+
+          console.log({ feeds });
 
           if (feeds.isOk()) {
             setAgentDetails({
@@ -566,10 +576,10 @@ const useCreateAgent = (
           anyOf: [
             {
               simplePaymentRule: {
-                recipient: AU_TREASURY_CONTRACT,
+                recipient: evmAddress(AU_REWARDS_CONTRACT),
                 cost: {
-                  value: "1",
-                  currency: AU_TOKEN,
+                  value: "0.1",
+                  currency: evmAddress(AU_TOKEN),
                 },
               },
             },

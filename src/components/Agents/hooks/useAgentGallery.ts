@@ -26,9 +26,7 @@ const useAgentGallery = (
     try {
       const res = await getAgentsPaginated(agentPaginated);
 
-      let newAgents: Agent[] = [];
-
-      await Promise.all(
+      let newAgents = await Promise.all(
         res?.data?.agentCreateds?.map(async (agent: any) => {
           if (!agent.metadata) {
             const cadena = await fetch(
@@ -38,7 +36,8 @@ const useAgentGallery = (
           }
 
           const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(agent?.wallets?.[0]),
+            managedBy: evmAddress(agent?.creator),
+            includeOwned: true,
           });
           let picture = "";
           if (result.isErr()) {
@@ -63,7 +62,7 @@ const useAgentGallery = (
             cover: agent?.metadata?.cover,
             title: agent?.metadata?.title,
             bio: agent?.metadata?.bio,
-            wallet: agent?.wallets?.[0],
+            creator: agent?.creator,
             balances: agent?.balances,
             workers: agent?.workers,
             activeCollectionIds: agent?.activeCollectionIds,

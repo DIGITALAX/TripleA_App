@@ -35,7 +35,14 @@ export default function Home() {
           >
             {"< agents >"}
           </div>
-          <div className="relative w-fit h-fit flex cursor-canP hover:text-ama">
+          <div
+            className="relative w-fit h-fit flex cursor-canP hover:text-ama"
+            onClick={() => {
+              animationContext?.setPageChange?.(true);
+              router.prefetch("/agent-payouts");
+              router.push("/agent-payouts");
+            }}
+          >
             {"< returns >"}
           </div>
         </div>

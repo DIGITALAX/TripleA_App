@@ -31,6 +31,7 @@ const useDrops = (
 
           const result = await fetchAccountsAvailable(lensClient, {
             managedBy: evmAddress(collection?.artist),
+            includeOwned: true,
           });
 
           if (result.isErr()) {

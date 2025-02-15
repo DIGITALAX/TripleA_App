@@ -259,7 +259,8 @@ const useAgent = (
       const result = await fetchAccountsAvailable(
         lensConnected?.sessionClient || lensClient,
         {
-          managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.wallets?.[0]),
+          managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.creator),
+          includeOwned: true,
         }
       );
       let picture = "";
@@ -294,6 +295,7 @@ const useAgent = (
         lensConnected?.sessionClient || lensClient,
         {
           managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.creator),
+          includeOwned: true,
         }
       );
       let ownerPicture = "";
@@ -340,6 +342,7 @@ const useAgent = (
             lensConnected?.sessionClient || lensClient,
             {
               managedBy: evmAddress(col?.data?.collectionCreateds?.[0]?.artist),
+              includeOwned: true,
             }
           );
 
@@ -377,11 +380,11 @@ const useAgent = (
         })
       )) as Worker[];
 
-
       activeCollectionIds = (await Promise.all(
         activeCollectionIds?.map(async (id: any) => {
           const result = await fetchAccountsAvailable(lensClient, {
             managedBy: evmAddress(id?.artist),
+            includeOwned: true,
           });
 
           if (result.isErr()) {
@@ -400,22 +403,19 @@ const useAgent = (
         })
       )) as AgentCollection[];
 
-
-
       collectionIdsHistory = (await Promise.all(
         collectionIdsHistory?.map(async (id: any) => {
           const result = await fetchAccountsAvailable(
             lensConnected?.sessionClient || lensClient,
             {
               managedBy: evmAddress(id?.artist),
+              includeOwned: true,
             }
           );
           if (result.isErr()) {
             setAgentLoading(false);
             return;
           }
-
-       
 
           return {
             profile: result?.value.items[0]?.account as Account,

@@ -1,11 +1,7 @@
 "use client";
 
 import { AnimationContext, ModalContext } from "@/app/providers";
-import { NFTData } from "@/components/Common/types/common.types";
-import {
-  Agent,
-  DropInterface,
-} from "@/components/Dashboard/types/dashboard.types";
+import { DropInterface } from "@/components/Dashboard/types/dashboard.types";
 import useUser from "@/components/User/hooks/useUser";
 import UserInfo from "@/components/User/modules/UserInfo";
 import { INFURA_GATEWAY } from "@/lib/constants";
@@ -74,7 +70,7 @@ export default function User() {
         </div>
       </div>
 
-      <div className="flex relative w-full h-full items-start justify-start overflow-y-scroll">
+      <div className="flex relative w-full h-full items-start justify-start overflow-y-scroll min-h-80">
         <div
           className={`relative w-full h-full flex flex-wrap gap-6 items-start ${
             itemsLoading ? "justify-between" : "justify-start"

@@ -249,7 +249,8 @@ const useMint = (
           }
 
           const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(agent?.wallets?.[0]),
+            managedBy: evmAddress(agent?.creator),
+            includeOwned: true,
           });
 
           if (result.isErr()) {
@@ -276,7 +277,7 @@ const useMint = (
             cover: agent?.metadata?.cover,
             title: agent?.metadata?.title,
             description: agent?.metadata?.description,
-            wallet: agent?.wallets?.[0],
+            creator: agent?.creator,
             balances: agent?.balances,
             profile: {
               ...result.value.items?.[0]?.account,

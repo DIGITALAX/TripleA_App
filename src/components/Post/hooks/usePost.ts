@@ -7,7 +7,7 @@ import {
 } from "@lens-protocol/client";
 import { useEffect, useState } from "react";
 import { STORAGE_NODE } from "@/lib/constants";
-import { fetchPost, fetchPostReferences } from "@lens-protocol/client/actions";
+import { fetchPost, fetchPostReferences, fetchPosts } from "@lens-protocol/client/actions";
 
 const usePost = (
   lensConnected: LensConnected | undefined,

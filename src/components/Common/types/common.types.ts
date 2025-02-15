@@ -17,11 +17,11 @@ export interface NFTData {
   amountSold: number;
   tokenIds: string[];
   amount: number;
+  isAgent: boolean;
   profile: Account;
   collectors?: Collector[];
   agentActivity?: Post[];
   active: boolean;
-  agent: boolean;
   remixId: string;
   fulfillerId: string;
   remix?: {

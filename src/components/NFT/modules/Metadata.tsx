@@ -47,11 +47,12 @@ const Metadata: FunctionComponent<MetadataProps> = ({
               />
             </div>
           </div>
+
           <div
-            className={`relative w-full p-1.5 items-start justify-start text-xs pixel-border-7 bg-pink rounded-lg break-all h-full`}
+            className={`relative w-full overflow-y-scroll p-1 items-start justify-start text-xs bg-pink rounded-md break-all h-full`}
           >
             <div
-              className="relative overflow-y-scroll w-full h-full flex p-1.5 items-start justify-start break-all rounded-md bg-white font-nerd text-black" 
+              className="relative w-full h-full flex p-1 items-start justify-start break-all rounded-md bg-viol font-nerd text-windows min-h-20"
               dangerouslySetInnerHTML={{
                 __html: descriptionRegex(
                   (data as ImageMetadata)?.content as string,
@@ -66,12 +67,12 @@ const Metadata: FunctionComponent<MetadataProps> = ({
     case "TextOnlyMetadata":
       return (
         <div
-          className={`relative w-full overflow-y-scroll p-1.5 items-start justify-start text-xs pixel-border-7 bg-pink rounded-lg break-all ${
+          className={`relative w-full overflow-y-scroll p-1 items-start justify-start text-xs bg-pink rounded-md break-all ${
             post ? "h-full" : "h-full max-h-32"
           }`}
         >
           <div
-            className="relative w-full h-full flex p-1.5 items-start justify-start break-all rounded-md bg-white font-nerd text-black"
+            className="relative w-full h-full flex p-1 items-start justify-start break-all rounded-md bg-viol font-nerd text-windows min-h-20"
             dangerouslySetInnerHTML={{
               __html: descriptionRegex(
                 (data as ImageMetadata)?.content as string,

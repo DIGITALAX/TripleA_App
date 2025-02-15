@@ -3,10 +3,18 @@ import { FetchResult, gql } from "@apollo/client";
 
 const COLLECTORS_PAID = gql`
   query ($skip: Int!) {
-    orderPayments(first: 20, skip: $skip, orderDirection: desc, orderBy: blockTimestamp) {
+    collectorPaids(first: 20, skip: $skip, orderDirection: desc, orderBy: blockTimestamp) {
       amount
       blockTimestamp
-      recipient
+      collector
+      collection {
+        collectionId
+        artist
+        uri
+        metadata {
+          image
+        }
+      }
       token
       transactionHash
     }

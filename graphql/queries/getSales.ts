@@ -3,15 +3,15 @@ import { FetchResult, gql } from "@apollo/client";
 
 const SALES = gql`
   query ($artist: String!) {
-    orders(
+    collectionPurchaseds(
       where: { collection_: { artist_contains: $artist } }
       orderDirection: desc
       orderBy: blockTimestamp
     ) {
       id
       totalPrice
-      token
-      mintedTokenIds
+      paymentToken
+      mintedTokens
       transactionHash
       collectionId
       collection {

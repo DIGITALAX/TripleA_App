@@ -9,6 +9,7 @@ import {
   LitNodeClient,
   uint8arrayFromString,
 } from "@lit-protocol/lit-node-client";
+import { LIT_NETWORK } from "@lit-protocol/constants";
 
 const useFulfillment = (
   address: `0x${string}` | undefined,
@@ -43,7 +44,7 @@ const useFulfillment = (
     country: "",
     zip: "",
   });
-  const client = new LitNodeClient({ litNetwork: "datil", debug: false });
+  const client = new LitNodeClient({ litNetwork:LIT_NETWORK.DatilDev, debug: false });
 
   const handlePurchase = async () => {
     if (fulfillmentEncrypted.trim() == "") return;
@@ -71,7 +72,9 @@ const useFulfillment = (
       const res = await clientWallet.writeContract(request);
       await publicClient.waitForTransactionReceipt({ hash: res });
 
-      setNotification?.("It's All Yours! Check sales in your dashboard.");
+      setNotification?.(
+        "It's All Yours! Keep track of fulfillment updates in your dashboard."
+      );
       setFulfillmentOpen(undefined);
       setFulfillmentInfo({
         name: "",
@@ -148,10 +151,16 @@ const useFulfillment = (
             state: fulfillmentInfo.state,
           })
         ),
+        
       });
 
       setFulfillmentEncrypted(
-        JSON.stringify({ ciphertext, dataToEncryptHash })
+        JSON.stringify({
+          ciphertext,
+          dataToEncryptHash,
+          chain: "polygon",
+          accessControlConditions,
+        })
       );
     } catch (err: any) {
       console.error(err.message);

@@ -29,22 +29,20 @@ const useAgents = (
             agent.metadata = await cadena.json();
           }
 
-          const result = await fetchAccountsAvailable(
-            lensClient, {
-              managedBy: evmAddress(agent?.wallets?.[0]),
-            },
-      
-          );
+          const result = await fetchAccountsAvailable(lensClient, {
+            managedBy: evmAddress(agent?.creator),
+            includeOwned: true,
+          });
           if (result.isErr()) {
-            setAgentsLoading(false)
-            return
+            setAgentsLoading(false);
+            return;
           }
           let picture = "";
 
-          if ((result.value.items)?.[0]?.account?.metadata?.picture) {
+          if (result.value.items?.[0]?.account?.metadata?.picture) {
             const cadena = await fetch(
               `${STORAGE_NODE}/${
-                (result.value.items)?.[0]?.account?.metadata?.picture?.split(
+                result.value.items?.[0]?.account?.metadata?.picture?.split(
                   "lens://"
                 )?.[1]
               }`
@@ -62,17 +60,17 @@ const useAgents = (
             title: agent?.metadata?.title,
             bio: agent?.metadata?.bio,
             customInstructions: agent?.metadata?.customInstructions,
-            wallet: agent?.wallets?.[0],
+            creator: agent?.creator,
             balances: agent?.balances,
             workers: agent?.workers,
             owners: agent?.owners,
-            creator: agent?.creator,
+            wallets: agent?.wallets,
             activeCollectionIds: agent?.activeCollectionIds,
             collectionIdHistory: agent?.collectionIdHistory,
             profile: {
-              ...(result.value.items)?.[0]?.account,
+              ...result.value.items?.[0]?.account,
               metadata: {
-                ...(result.value.items)?.[0]?.account?.metadata,
+                ...result.value.items?.[0]?.account?.metadata,
                 picture,
               },
             },
@@ -90,7 +88,6 @@ const useAgents = (
     try {
       const data = await getTokenThresholds();
 
-
       setTokenThresholds?.(data?.data?.tokenDetailsSets);
     } catch (err: any) {
       console.error(err.message);
@@ -106,7 +103,6 @@ const useAgents = (
       loadThresholdsAndRent();
     }
   }, [lensClient]);
-
 };
 
 export default useAgents;

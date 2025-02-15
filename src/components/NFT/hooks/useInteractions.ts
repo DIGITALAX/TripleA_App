@@ -233,12 +233,12 @@ const useInteractions = (
               if (!prev) return;
 
               if (
-                (prev as Agent)?.wallet ||
+                (prev as Agent)?.creator ||
                 (prev as NFTData)?.prices?.length > 0
               ) {
                 const da = { ...(prev || {}) };
 
-                if ((da as Agent)?.wallet) {
+                if ((da as Agent)?.creator) {
                   let activity = (da as Agent).activity || [];
                   let index = activity?.findIndex((ac) => ac?.id == id);
 
@@ -246,7 +246,10 @@ const useInteractions = (
                     ...activity[index],
                     stats: {
                       ...activity[index].stats!,
-                      reactions: activity[index].stats?.reactions + 1,
+                      upvotes:
+                        reaction == "UPVOTE"
+                          ? activity[index].stats?.upvotes + 1
+                          : activity[index].stats?.upvotes - 1,
                     },
                     operations: {
                       ...activity[index].operations!,
@@ -264,7 +267,10 @@ const useInteractions = (
                     ...activity[index],
                     stats: {
                       ...activity[index].stats!,
-                      reactions: activity[index].stats?.reactions + 1,
+                      upvotes:
+                        reaction == "UPVOTE"
+                          ? activity[index].stats?.upvotes + 1
+                          : activity[index].stats?.upvotes - 1,
                     },
                     operations: {
                       ...activity[index].operations!,
@@ -284,7 +290,10 @@ const useInteractions = (
                   ...activity[index],
                   stats: {
                     ...activity[index].stats!,
-                    reactions: activity[index].stats?.reactions + 1,
+                    upvotes:
+                      reaction == "UPVOTE"
+                        ? activity[index].stats?.upvotes + 1
+                        : activity[index].stats?.upvotes - 1,
                   },
                   operations: {
                     ...activity[index].operations!,
@@ -399,12 +408,12 @@ const useInteractions = (
             if (!prev) return;
 
             if (
-              (prev as Agent)?.wallet ||
+              (prev as Agent)?.creator ||
               (prev as NFTData)?.prices?.length > 0
             ) {
               const da = { ...(prev || {}) };
 
-              if ((da as Agent)?.wallet) {
+              if ((da as Agent)?.creator) {
                 let activity = (da as Agent).activity || [];
                 let index = activity?.findIndex((ac) => ac?.id == id);
 
@@ -571,7 +580,7 @@ const useInteractions = (
       setInteractionsLoading(
         Array.from(
           {
-            length: ((data as Agent)?.wallet
+            length: ((data as Agent)?.creator
               ? (data as Agent)?.activity
               : (data as NFTData)?.prices?.length > 0
               ? (data as NFTData)?.agentActivity
@@ -580,11 +589,11 @@ const useInteractions = (
           (_, i) => ({
             mirror: false,
             like: false,
-            id: ((data as Agent)?.wallet
+            id: ((data as Agent)?.creator
               ? (data as Agent)?.activity
               : (data as NFTData)?.prices?.length > 0
               ? (data as NFTData)?.agentActivity
-              : (data as Post[]))?.[i]?.id,
+              : (data as Post[]))?.[i]?.id as string,
           })
         )
       );

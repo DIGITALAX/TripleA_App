@@ -3,17 +3,17 @@ export const STORAGE_NODE: string = "https://storage-api.testnet.lens.dev";
 
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
 export const AGENTS_CONTRACT: `0x${string}` =
-  "0x0c66DF3847Eae30797a62C2d2C28cf30B7af01Ce";
+  "0x58B9d53DFfF80de792F4003d350Fe7aBCdeC0960";
 export const SKYHUNTERS_AGENTS_MANAGER_CONTRACT: `0x${string}` =
-  "0xd23fd2228D0D0dD442422c1704e4DB8abb5884d9";
+  "0xDb362F0D06e40180e0BCB32e6fE4B665F09bD373";
 export const MARKET_CONTRACT: `0x${string}` =
-  "0x58c292A06Abe5A7996C32921e3DB48f7909D5D1B";
+  "0x393C4D38286ef9aDEb4FeE0bF98efb8477177a2F";
 export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
-  "0x4ed83239189a803885cc888A6e470d1a13F7Ff4b";
+  "0x6B434299F649eE8A908A67eeeAE4BE1E57720788";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
-  "0x0064d596558Ca3Dae49B7919AEe821330203C2A6";
-export const AU_TOKEN: `0x${string}` = "0x";
-export const AU_TREASURY_CONTRACT: `0x${string}` = "0x";
+  "0x44F12767C03bfC102e70603403d64EC83aA2Fa53";
+export const AU_TOKEN: `0x${string}` = "0x2f6036dF8F7F01c9CcE26cb662177eEcCD1AC17E";
+export const AU_REWARDS_CONTRACT: `0x${string}` = "0xbC83A15DF2Fd7b684C4eA169bb3b990fffC8e10e";
 
 export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   {

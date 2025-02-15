@@ -488,17 +488,19 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 </>
               )}
               <div className="relative w-full h-full flex flex-col gap-3 items-start justify-between">
-                <div className="relative w-full h-full max-h-full flex py-4 overflow-y-scroll">
+                <div className={`relative w-full h-full flex py-4 overflow-y-scroll ${
+                      Number(nft?.remixId) > 0 ? "max-h-28" : "max-h-32"
+                    }`}>
                   <div
-                    className="py-3 h-fit max-h-40 flex relative items-start justify-start text-left text-sm font-nerd break-all w-full"
+                    className={`py-3 h-fit flex relative items-start justify-start text-left text-sm font-nerd break-all w-full`}
                     dangerouslySetInnerHTML={{
                       __html: descriptionRegex(nft?.description, false),
                     }}
                   ></div>
                 </div>
-                <div className="relative w-full h-fit flex-col gap-2 flex py-2 items-end justify-end">
+                <div className="relative w-full h-fit flex-col gap-1 flex py-1 items-start justify-start">
                   <div className="relative w-fit h-fit text-right flex text-sm font-nerd">
-                    {nft?.agent ? "Minted By Agent" : "Minted By Hand"}
+                    {nft?.isAgent ? "Minted By Agent" : "Minted By Hand"}
                   </div>
                   {Number(nft?.remixId) > 0 && (
                     <div className="w-full h-fit flex relative flex-row justify-between items-center">

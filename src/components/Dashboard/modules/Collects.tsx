@@ -45,7 +45,6 @@ const Collects: FunctionComponent<CollectsProps> = ({
   } = useCollects(address, lensClient, setNotification, publicClient);
   const animationContext = useContext(AnimationContext);
   const router = useRouter();
-
   return (
     <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
       <div className="relative w-full min-h-80 h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
@@ -89,6 +88,7 @@ const Collects: FunctionComponent<CollectsProps> = ({
               </div>
             ) : (
               allCollects?.map((collect, key) => {
+
                 return (
                   <div
                     key={key}
@@ -128,24 +128,18 @@ const Collects: FunctionComponent<CollectsProps> = ({
                         {allCollects?.[key]?.fulfillmentDetails ? (
                           <div className="relative w-full h-fit flex flex-col gap-3 items-center justify-center">
                             <div className="relative w-full h-fit flex flex-row justify-center items-center gap-3">
-                              <div
-                                className={`relative bg-windows p-1 w-fit h-fit flex text-sm flex items-center justify-center text-center  ${
-                                  allCollects?.[key]?.collection?.format ==
-                                    Format.Sticker ||
-                                  allCollects?.[key]?.collection?.format ==
-                                    Format.Poster
-                                    ? "rounded-md"
-                                    : "rounded-full"
-                                }`}
-                              >
+                              <div className="relative w-fit h-fit flex flex-col gap-1 items-center justify-center">
+                                <div className="relative w-fit h-fit flex">
+                                  Size
+                                </div>
                                 <div
-                                  className={`relative flex items-center justify-center  ${
+                                  className={`relative flex text-white bg-windows items-center justify-center p-1 ${
                                     allCollects?.[key]?.collection?.format ==
                                       Format.Sticker ||
                                     allCollects?.[key]?.collection?.format ==
                                       Format.Poster
-                                      ? "w-fit h-fit"
-                                      : "w-5 h-5"
+                                      ? "w-fit h-fit rounded-md"
+                                      : "w-5 h-5 rounded-full"
                                   }`}
                                 >
                                   {allCollects?.[key]?.fulfillmentDetails?.size}
@@ -155,15 +149,18 @@ const Collects: FunctionComponent<CollectsProps> = ({
                                 Format.Sticker &&
                                 allCollects?.[key]?.collection?.format !==
                                   Format.Poster && (
-                                  <div
-                                    className={`relative rounded-full w-fit h-fit flex text-sm flex items-center justify-center text-center`}
-                                    style={{
-                                      backgroundColor:
-                                        allCollects?.[key]?.fulfillmentDetails
-                                          ?.color,
-                                    }}
-                                  >
-                                    <div className="relative w-7 h-7 flex"></div>
+                                  <div className="relative w-fit h-fit flex flex-col gap-1 items-center justify-center">
+                                    <div className="relative w-fit h-fit flex">
+                                      Color
+                                    </div>
+                                    <div
+                                      className={`relative rounded-full w-5 h-5 flex text-sm flex items-center justify-center text-center`}
+                                      style={{
+                                        backgroundColor:
+                                          allCollects?.[key]?.fulfillmentDetails
+                                            ?.color,
+                                      }}
+                                    ></div>
                                   </div>
                                 )}
                             </div>

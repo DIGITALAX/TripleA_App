@@ -170,7 +170,7 @@ const Comments: FunctionComponent<CommentsProps> = ({
                       />{" "}
                     </svg>
                   ),
-                  stats: activity?.stats?.reactions,
+                  stats: activity?.stats?.upvotes,
                   reacted: activity?.operations?.hasUpvoted,
                   loader: interactionsLoading?.find(
                     (int) => int.id == activity?.id

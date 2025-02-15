@@ -44,7 +44,6 @@ const Gallery: FunctionComponent<{
               ? [...nfts, ...Array.from({ length: 20 })]
               : nfts
             ).map((nft: NFTData | unknown, index: number) => {
-           
               return (
                 <>
                   {(nft as any)?.id !== undefined &&

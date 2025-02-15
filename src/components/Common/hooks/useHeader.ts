@@ -58,6 +58,7 @@ const useHeader = (
 
           const result = await fetchAccountsAvailable(lensClient!, {
             managedBy: evmAddress(collection?.artist),
+            includeOwned: true,
           });
 
           if (result.isErr()) {
@@ -155,11 +156,11 @@ const useHeader = (
         transport: custom(window.ethereum!),
         account: address,
       });
-
       const accounts = await fetchAccountsAvailable(lensClient, {
         managedBy: evmAddress(signer.account.address),
         includeOwned: true,
       });
+
 
       if (accounts.isErr()) {
         setLensLoading(false);
@@ -246,6 +247,7 @@ const useHeader = (
       if (resumed?.isOk()) {
         const accounts = await fetchAccountsAvailable(lensClient!, {
           managedBy: evmAddress(address!),
+          includeOwned: true,
         });
 
         if (accounts.isErr()) {
