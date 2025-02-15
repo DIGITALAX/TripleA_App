@@ -21,7 +21,6 @@ import calculateRent from "@/lib/helpers/calculateRent";
 const MintSwitch: FunctionComponent<MintSwitchProps> = ({
   mintSwitcher,
   setMintSwitcher,
-  setAgents,
   agents,
   allDrops,
   lensConnected,
@@ -51,14 +50,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
     remixSearchLoading,
     title,
     setTitle,
-  } = useMint(
-    agents,
-    setAgents,
-    publicClient,
-    address,
-    setMintSwitcher,
-    lensConnected?.sessionClient!
-  );
+  } = useMint(publicClient, address, setMintSwitcher);
   switch (mintSwitcher) {
     case MintSwitcher.Agent:
       return (
@@ -182,10 +174,26 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                 onKeyDown={(e) => e.key == "Enter" && handleRemixSearch()}
               />
               <div
-                className="relative w-fit h-full flex bg-windows text-center items-center justify-center px-1 rounded-md"
-                onClick={() => handleRemixSearch()}
+                className={`relative w-20 h-full flex bg-windows text-center items-center justify-center px-1 rounded-md ${
+                  !remixSearchLoading && "cursor-canP"
+                }`}
+                onClick={() => !remixSearchLoading && handleRemixSearch()}
               >
-                Search
+                {remixSearchLoading ? (
+                  <svg
+                    fill="none"
+                    className="size-4 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M13 2h-2v6h2V2zm0 14h-2v6h2v-6zm9-5v2h-6v-2h6zM8 13v-2H2v2h6zm7-6h2v2h-2V7zm4-2h-2v2h2V5zM9 7H7v2h2V7zM5 5h2v2H5V5zm10 12h2v2h2v-2h-2v-2h-2v2zm-8 0v-2h2v2H7v2H5v-2h2z"
+                      fill="#0000f5"
+                    />{" "}
+                  </svg>
+                ) : (
+                  "Search"
+                )}
               </div>
             </div>
             {remixSearch?.length > 0 && (
@@ -291,7 +299,9 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                     </div>
                     <div className="flex relative w-full h-fit items-center justify-between gap-2 flex-row text-xs text-left">
                       <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
-                        <div className="relative flex w-fit h-fit">Max Total Rent</div>
+                        <div className="relative flex w-fit h-fit">
+                          Max Total Rent
+                        </div>
                         <div className="relative flex w-fit h-fit">
                           {calculateRent(
                             tokenThresholds?.find(

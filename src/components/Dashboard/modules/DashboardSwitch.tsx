@@ -99,7 +99,6 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               mintSwitcher={mintSwitcher}
               setMintSwitcher={setMintSwitcher}
               agents={context?.agents!}
-              setAgents={context?.setAgents!}
               allDrops={allDrops}
               allDropsLoading={allDropsLoading}
               lensConnected={context?.lensConnected!}

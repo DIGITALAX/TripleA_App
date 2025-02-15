@@ -4,7 +4,13 @@ import {
   AgentEditSwitcher,
   AgentMetadata,
 } from "../types/dashboard.types";
-import { evmAddress, PublicClient, SessionClient } from "@lens-protocol/client";
+import {
+  Account,
+  evmAddress,
+  FeedRuleExecuteOn,
+  PublicClient,
+  SessionClient,
+} from "@lens-protocol/client";
 import {
   createWalletClient,
   custom,
@@ -15,8 +21,7 @@ import {
   SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
   INFURA_GATEWAY,
   STORAGE_NODE,
-  AU_REWARDS_CONTRACT,
-  AU_TOKEN,
+  AGENT_FEED_RULE,
 } from "@/lib/constants";
 import { chains } from "@lens-network/sdk/viem";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
@@ -244,35 +249,51 @@ const useUserAgents = (
     setAgentsLoading(true);
     try {
       const data = await getUserAgents(address);
+
+      const metadataCache = new Map<string, any>();
+      const profileCache = new Map<string, Account>();
+      const pictureCache = new Map<string, string>();
       const allAgents: Agent[] = await Promise.all(
         data?.data?.agentCreateds.map(async (agent: any) => {
           if (!agent.metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${agent.uri.split("ipfs://")?.[1]}`
-            );
-            agent.metadata = await cadena.json();
+            const metadataUri = agent.uri?.split("ipfs://")?.[1] || "";
+            if (metadataUri && !metadataCache.has(metadataUri)) {
+              const response = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${metadataUri}`
+              );
+              const metadata = await response.json();
+              metadataCache.set(metadataUri, metadata);
+            }
+            agent.metadata = metadataCache.get(metadataUri);
           }
 
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(agent?.creator),
-            includeOwned: true,
-          });
-          if (result.isErr()) {
-            setAgentsLoading(false);
-            return;
+          const creatorAddress = evmAddress(agent?.creator);
+
+          if (!profileCache.has(creatorAddress)) {
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: creatorAddress,
+              includeOwned: true,
+            });
+
+            if (result.isErr()) {
+              setAgentsLoading(false);
+              return null;
+            }
+
+            profileCache.set(creatorAddress, result.value.items?.[0]?.account);
           }
+
           let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
+          const profile = profileCache.get(creatorAddress);
 
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
+            if (!pictureCache.has(pictureKey)) {
+              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await response.json();
+              pictureCache.set(pictureKey, json.item);
+            }
+            picture = pictureCache.get(pictureKey) || "";
           }
 
           return {
@@ -287,9 +308,9 @@ const useUserAgents = (
             creator: agent?.creator,
             owners: agent?.owners,
             profile: {
-              ...result.value.items?.[0]?.account,
+              ...profile,
               metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
+                ...profile?.metadata,
                 picture,
               },
             },
@@ -398,12 +419,9 @@ const useUserAgents = (
         toAdd: {
           anyOf: [
             {
-              simplePaymentRule: {
-                recipient: AU_REWARDS_CONTRACT,
-                cost: {
-                  value: "1",
-                  currency: AU_TOKEN,
-                },
+              unknownRule: {
+                executeOn: [FeedRuleExecuteOn.CreatingPost],
+                address: AGENT_FEED_RULE,
               },
             },
           ],

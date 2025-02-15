@@ -10,6 +10,7 @@ import {
   getCollectionRemix,
 } from "../../../../graphql/queries/getCollection";
 import {
+  Account,
   evmAddress,
   PageSize,
   Post,
@@ -175,45 +176,56 @@ const useNFT = (
       const res = await getCollectors(Number(id));
 
       let collectors: Collector[] = [];
+      const profileCache = new Map<string, Account>();
+      const pictureCache = new Map<string, string>();
 
-      for (let i = 0; i < res?.data?.orders?.length; i++) {
-        const accounts = await fetchAccountsAvailable(
-          lensConnected?.sessionClient || lensClient,
-          {
-            managedBy: evmAddress(res?.data?.orders?.[i]?.buyer),
-            includeOwned: true,
+      await Promise.all(
+        res?.data?.orders?.map(async (order: any) => {
+          const buyerAddress = evmAddress(order?.buyer);
+
+          if (!profileCache.has(buyerAddress)) {
+            const accounts = await fetchAccountsAvailable(
+              lensConnected?.sessionClient || lensClient,
+              {
+                managedBy: buyerAddress,
+                includeOwned: true,
+              }
+            );
+
+            if (accounts.isErr()) {
+              setNftLoading(false);
+              return null;
+            }
+
+            profileCache.set(buyerAddress, accounts.value.items?.[0]?.account);
           }
-        );
 
-        if (accounts.isErr()) {
-          setNftLoading(false);
-          return;
-        }
+          const profile = profileCache.get(buyerAddress);
+          let picture = "";
 
-        let picture = "";
-        const cadena = await fetch(
-          `${STORAGE_NODE}/${
-            accounts.value.items?.[0]?.account?.metadata?.picture?.split(
-              "lens://"
-            )?.[1]
-          }`
-        );
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
 
-        if (cadena) {
-          const json = await cadena.json();
-          picture = json.item;
-        }
+            if (!pictureCache.has(pictureKey)) {
+              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await response.json();
+              pictureCache.set(pictureKey, json.item);
+            }
 
-        collectors.push({
-          transactionHash: res?.data?.orders?.[i]?.transactionHash,
-          blockTimestamp: res?.data?.orders?.[i]?.blockTimestamp,
-          amount: res?.data?.orders?.[i]?.amount,
-          address: res?.data?.orders?.[i]?.buyer,
-          pfp: picture,
-          localName: accounts.value.items?.[0]?.account?.username?.localName,
-          name: accounts.value.items?.[0]?.account?.metadata?.name!,
-        });
-      }
+            picture = pictureCache.get(pictureKey) || "";
+          }
+
+          collectors.push({
+            transactionHash: order?.transactionHash,
+            blockTimestamp: order?.blockTimestamp,
+            amount: order?.amount,
+            address: order?.buyer,
+            pfp: picture,
+            localName: profile?.username?.localName,
+            name: profile?.metadata?.name!,
+          });
+        })
+      );
 
       const posts = await handlePosts(
         false,

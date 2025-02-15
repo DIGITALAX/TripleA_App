@@ -12,8 +12,7 @@ export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
   "0x6B434299F649eE8A908A67eeeAE4BE1E57720788";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
   "0x44F12767C03bfC102e70603403d64EC83aA2Fa53";
-export const AU_TOKEN: `0x${string}` = "0x2f6036dF8F7F01c9CcE26cb662177eEcCD1AC17E";
-export const AU_REWARDS_CONTRACT: `0x${string}` = "0xbC83A15DF2Fd7b684C4eA169bb3b990fffC8e10e";
+export const AGENT_FEED_RULE: `0x${string}` = "0x";
 
 export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   {
@@ -30,7 +29,7 @@ export const TOKENS: { symbol: string; contract: string; image: string }[] = [
     symbol: "BONSAI",
     contract: "0x15B58c74A0Ef6D0A593340721055223f38F5721E",
     image: "QmXoAwGW51843qTUxV8pkouewRHDvkyJ3A7tsCUGgGXqVs",
-  }
+  },
 ];
 
 export const FOOTER_TEXT: string[] = [

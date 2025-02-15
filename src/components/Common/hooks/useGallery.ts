@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { NFTData } from "../types/common.types";
 import { getCollections } from "../../../../graphql/queries/getGallery";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
-import { evmAddress, PublicClient } from "@lens-protocol/client";
+import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { FetchResult } from "@apollo/client";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useGallery = (lensClient: PublicClient, choice: string) => {
+  const metadataCache = new Map<string, any>();
+  const profileCache = new Map<string, Account>();
+  const pictureCache = new Map<string, string>();
   const [nfts, setNfts] = useState<NFTData[]>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -29,32 +32,40 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
       const gallery: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds?.map(async (collection: any) => {
           if (!collection.metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
-            );
-            collection.metadata = await cadena.json();
+            if (!metadataCache.has(collection.uri)) {
+              const cadena = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
+              );
+              metadataCache.set(collection.uri, await cadena.json());
+            }
+            collection.metadata = metadataCache.get(collection.uri);
           }
 
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(collection?.artist),
-            includeOwned: true,
-          });
-          if (result.isErr()) {
-            setGalleryLoading(false);
-            return;
+          const artistAddress = evmAddress(collection?.artist);
+          if (!profileCache.has(artistAddress)) {
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: artistAddress,
+              includeOwned: true,
+            });
+
+            if (result.isErr()) {
+              setGalleryLoading(false);
+              return;
+            }
+
+            profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
+
           let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
-
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+          const profile = profileCache.get(artistAddress);
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
+            if (!pictureCache.has(pictureKey)) {
+              const cadena = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await cadena.json();
+              pictureCache.set(pictureKey, json.item);
+            }
+            picture = pictureCache.get(pictureKey) || "";
           }
 
           return {
@@ -70,9 +81,9 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             tokenIds: collection?.tokenIds,
             amount: collection?.amount,
             profile: {
-              ...result.value.items?.[0]?.account,
+              ...profile,
               metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
+                ...profile?.metadata,
                 picture,
               },
             },
@@ -113,35 +124,41 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
       const gallery: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds?.map(async (collection: any) => {
           if (!collection.metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
-            );
-            collection.metadata = await cadena.json();
+            if (!metadataCache.has(collection.uri)) {
+              const cadena = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
+              );
+              metadataCache.set(collection.uri, await cadena.json());
+            }
+            collection.metadata = metadataCache.get(collection.uri);
           }
 
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(collection?.artist),
-            includeOwned: true,
-          });
+          const artistAddress = evmAddress(collection?.artist);
+          if (!profileCache.has(artistAddress)) {
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: artistAddress,
+              includeOwned: true,
+            });
 
-          if (result.isErr()) {
-            setGalleryLoading(false);
-            return;
+            if (result.isErr()) {
+              setGalleryLoading(false);
+              return;
+            }
+
+            profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
+
           let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
-
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+          const profile = profileCache.get(artistAddress);
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
+            if (!pictureCache.has(pictureKey)) {
+              const cadena = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await cadena.json();
+              pictureCache.set(pictureKey, json.item);
+            }
+            picture = pictureCache.get(pictureKey) || "";
           }
-
           return {
             id: collection?.id,
             image: collection?.metadata?.image,
@@ -156,9 +173,9 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             tokenIds: collection?.tokenIds,
             amount: collection?.amount,
             profile: {
-              ...result.value.items?.[0]?.account,
+              ...profile,
               metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
+                ...profile?.metadata,
                 picture,
               },
             },

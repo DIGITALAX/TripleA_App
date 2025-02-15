@@ -52,7 +52,6 @@ export enum DropSwitcher {
 export type MintSwitchProps = {
   mintSwitcher: MintSwitcher;
   setMintSwitcher: (e: SetStateAction<MintSwitcher>) => void;
-  setAgents: (e: SetStateAction<Agent[]>) => void;
   agents: Agent[];
   allDrops: DropInterface[];
   allDropsLoading: boolean;

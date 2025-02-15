@@ -1,6 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
 import {
-  Agent,
   CollectionType,
   Format,
   MintData,
@@ -9,24 +8,17 @@ import {
 import {
   COLLECTION_MANAGER_CONTRACT,
   INFURA_GATEWAY,
-  STORAGE_NODE,
   TOKENS,
 } from "@/lib/constants";
 import CollectionManagerAbi from "@abis/CollectionManagerAbi.json";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { chains } from "@lens-network/sdk/viem";
-import { getAgents } from "../../../../graphql/queries/getAgents";
-import { evmAddress, SessionClient } from "@lens-protocol/client";
 import { getCollectionSearch } from "../../../../graphql/queries/getCollectionSearch";
-import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useMint = (
-  agents: Agent[],
-  setAgents: (e: SetStateAction<Agent[]>) => void,
   publicClient: PublicClient,
   address: `0x${string}` | undefined,
-  setMintSwitcher: (e: SetStateAction<MintSwitcher>) => void,
-  lensClient: SessionClient
+  setMintSwitcher: (e: SetStateAction<MintSwitcher>) => void
 ) => {
   const [mintLoading, setMintLoading] = useState<boolean>(false);
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
@@ -234,69 +226,6 @@ const useMint = (
     setMintLoading(false);
   };
 
-  const loadAgents = async () => {
-    setAgentsLoading(true);
-
-    try {
-      const data = await getAgents();
-      const allAgents: Agent[] = await Promise.all(
-        data?.data?.agentCreateds.map(async (agent: any) => {
-          if (!agent.metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${agent.uri.split("ipfs://")?.[1]}`
-            );
-            agent.metadata = await cadena.json();
-          }
-
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(agent?.creator),
-            includeOwned: true,
-          });
-
-          if (result.isErr()) {
-            setAgentsLoading(false);
-            return;
-          }
-
-          let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
-
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
-          }
-
-          return {
-            id: agent?.SkyhuntersAgentManager_id,
-            cover: agent?.metadata?.cover,
-            title: agent?.metadata?.title,
-            description: agent?.metadata?.description,
-            creator: agent?.creator,
-            balances: agent?.balances,
-            profile: {
-              ...result.value.items?.[0]?.account,
-              metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
-                picture,
-              },
-            },
-          };
-        })
-      );
-
-      setAgents(allAgents);
-    } catch (err: any) {
-      console.error(err.message);
-    }
-    setAgentsLoading(false);
-  };
-
   const handleRemixSearch = async () => {
     if (title.trim() == "") return;
     setRemixSearchLoading(true);
@@ -329,12 +258,6 @@ const useMint = (
     }
     setRemixSearchLoading(false);
   };
-
-  useEffect(() => {
-    if (!agents || (agents?.length < 1 && lensClient)) {
-      loadAgents();
-    }
-  }, [lensClient]);
 
   useEffect(() => {
     if (mintData.collectionType == CollectionType.IRL) {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Order } from "../types/dashboard.types";
 import { getSales } from "../../../../graphql/queries/getSales";
-import { evmAddress, PublicClient } from "@lens-protocol/client";
-import { STORAGE_NODE } from "@/lib/constants";
+import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
+import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useSales = (
@@ -17,30 +17,52 @@ const useSales = (
     setSalesLoading(true);
     try {
       const data = await getSales(address);
+
+      const metadataCache = new Map<string, any>();
+      const profileCache = new Map<string, Account>();
+      const pictureCache = new Map<string, string>();
       const sales: Order[] = await Promise.all(
         data?.data?.collectionPurchaseds?.map(async (sale: any) => {
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(sale?.collection?.artist),
-            includeOwned: true,
-          });
+          const artistAddress = evmAddress(sale?.collection?.artist);
 
-          if (result.isErr()) {
-            setSalesLoading(false);
-            return;
+          if (!profileCache.has(artistAddress)) {
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: artistAddress,
+              includeOwned: true,
+            });
+
+            if (result.isErr()) {
+              setSalesLoading(false);
+              return null;
+            }
+
+            profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
           let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
+          const profile = profileCache.get(artistAddress);
 
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
+            if (!pictureCache.has(pictureKey)) {
+              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await response.json();
+              pictureCache.set(pictureKey, json.item);
+            }
+            picture = pictureCache.get(pictureKey) || "";
+          }
+
+          if (!sale?.collection?.metadata) {
+            const metadataUri =
+              sale?.collection?.uri?.split("ipfs://")?.[1] || "";
+            if (metadataUri && !metadataCache.has(metadataUri)) {
+              const response = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${metadataUri}`
+              );
+              const metadata = await response.json();
+              metadataCache.set(metadataUri, metadata);
+            }
+            sale.collection.metadata = metadataCache.get(metadataUri);
           }
 
           return {
@@ -59,9 +81,9 @@ const useSales = (
             },
             buyer: sale?.buyer,
             profile: {
-              ...result.value.items?.[0]?.account,
+              ...profile,
               metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
+                ...profile?.metadata,
                 picture,
               },
             },

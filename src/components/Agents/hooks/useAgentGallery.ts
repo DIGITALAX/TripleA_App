@@ -1,6 +1,6 @@
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
-import { evmAddress, PublicClient } from "@lens-protocol/client";
+import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { SetStateAction, useEffect, useState } from "react";
 import { getAgentsPaginated } from "../../../../graphql/queries/getAgentsPaginated";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
@@ -26,35 +26,50 @@ const useAgentGallery = (
     try {
       const res = await getAgentsPaginated(agentPaginated);
 
+      const metadataCache = new Map<string, any>();
+      const profileCache = new Map<string, Account>();
       let newAgents = await Promise.all(
         res?.data?.agentCreateds?.map(async (agent: any) => {
           if (!agent.metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${agent.uri.split("ipfs://")?.[1]}`
-            );
-            agent.metadata = await cadena.json();
+            if (!metadataCache.has(agent.uri)) {
+              const cadena = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${agent.uri.split("ipfs://")?.[1]}`
+              );
+              const metadata = await cadena.json();
+              metadataCache.set(agent.uri, metadata);
+            }
+            agent.metadata = metadataCache.get(agent.uri);
           }
 
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(agent?.creator),
-            includeOwned: true,
-          });
-          let picture = "";
-          if (result.isErr()) {
-            setAgentGalleryLoading(false);
-            return;
-          }
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
+          if (!profileCache.has(agent?.creator)) {
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: evmAddress(agent?.creator),
+              includeOwned: true,
+            });
 
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+            if (result.isErr()) {
+              setAgentGalleryLoading(false);
+              return;
+            }
+
+            let picture = "";
+            const profile = result.value.items?.[0]?.account;
+            if (profile?.metadata?.picture) {
+              const imageUri = profile.metadata.picture.split("lens://")?.[1];
+              const cadena = await fetch(`${STORAGE_NODE}/${imageUri}`);
+              if (cadena) {
+                const json = await cadena.json();
+                picture = json.item;
+              }
+            }
+
+            profileCache.set(agent?.creator, {
+              ...profile,
+              metadata: {
+                ...profile?.metadata,
+                picture,
+              } as any,
+            });
           }
 
           return {
@@ -67,13 +82,7 @@ const useAgentGallery = (
             workers: agent?.workers,
             activeCollectionIds: agent?.activeCollectionIds,
             collectionIdHistory: agent?.collectionIdHistory,
-            profile: {
-              ...result.value.items?.[0]?.account,
-              metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
-                picture,
-              },
-            },
+            profile: profileCache.get(agent?.creator),
           };
         })
       );

@@ -2,6 +2,7 @@ import { SetStateAction, useEffect, useState } from "react";
 import { CollectionType, Order } from "../types/dashboard.types";
 import { getOrders } from "../../../../graphql/queries/getOrders";
 import {
+  Account,
   evmAddress,
   PublicClient as PublicLensClient,
 } from "@lens-protocol/client";
@@ -53,30 +54,39 @@ const useCollects = (
     setCollectsLoading(true);
     try {
       const data = await getOrders(address);
+
+      const profileCache = new Map<string, Account>();
+      const pictureCache = new Map<string, string>();
+
       const collects: Order[] = await Promise.all(
         data?.data?.collectionPurchaseds?.map(async (collect: any) => {
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(collect?.collection?.artist),
-            includeOwned: true,
-          });
+          const artistAddress = evmAddress(collect?.collection?.artist);
 
-          if (result.isErr()) {
-            setCollectsLoading(false);
-            return;
+          if (!profileCache.has(artistAddress)) {
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: artistAddress,
+              includeOwned: true,
+            });
+
+            if (result.isErr()) {
+              setCollectsLoading(false);
+              return;
+            }
+
+            profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
           let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
+          const profile = profileCache.get(artistAddress);
 
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
+            if (!pictureCache.has(pictureKey)) {
+              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await response.json();
+              pictureCache.set(pictureKey, json.item);
+            }
+            picture = pictureCache.get(pictureKey) || "";
           }
 
           return {
@@ -103,9 +113,9 @@ const useCollects = (
             fulfilled: collect?.fulfilled,
             fulfillment: collect?.fulfillment,
             profile: {
-              ...result.value.items?.[0]?.account,
+              ...profile,
               metadata: {
-                ...result.value.items?.[0]?.account?.metadata!,
+                ...profile?.metadata!,
                 picture,
               },
             },

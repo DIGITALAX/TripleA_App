@@ -3,7 +3,7 @@ import { NFTData } from "@/components/Common/types/common.types";
 import { DropInterface } from "../types/dashboard.types";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { getDrop } from "../../../../graphql/queries/getDrop";
-import { evmAddress, PublicClient } from "@lens-protocol/client";
+import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useDrops = (
@@ -20,37 +20,50 @@ const useDrops = (
     try {
       const data = await getDrop(Number(drop?.id));
 
+      const metadataCache = new Map<string, any>();
+      const profileCache = new Map<string, Account>();
+      const pictureCache = new Map<string, string>();
+
       const collections: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds.map(async (collection: any) => {
           if (!collection.metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
-            );
-            collection.metadata = await cadena.json();
+            if (!metadataCache.has(collection.uri)) {
+              const response = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
+              );
+              const metadata = await response.json();
+              metadataCache.set(collection.uri, metadata);
+            }
+            collection.metadata = metadataCache.get(collection.uri);
           }
+          const artistAddress = evmAddress(collection?.artist);
 
-          const result = await fetchAccountsAvailable(lensClient, {
-            managedBy: evmAddress(collection?.artist),
-            includeOwned: true,
-          });
+          // 📌 Cachear perfil del artista
+          if (!profileCache.has(artistAddress)) {
+            const result = await fetchAccountsAvailable(lensClient, {
+              managedBy: artistAddress,
+              includeOwned: true,
+            });
 
-          if (result.isErr()) {
-            setCollectionsLoading(false);
-            return;
+            if (result.isErr()) {
+              setCollectionsLoading(false);
+              return;
+            }
+
+            profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
           let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
+          const profile = profileCache.get(artistAddress);
 
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
+            if (!pictureCache.has(pictureKey)) {
+              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await response.json();
+              pictureCache.set(pictureKey, json.item);
+            }
+            picture = pictureCache.get(pictureKey) || "";
           }
 
           return {
@@ -64,9 +77,9 @@ const useDrops = (
             amountSold: collection?.amountSold,
             amount: collection?.amount,
             profile: {
-              ...result.value.items?.[0]?.account,
+              ...profile,
               metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
+                ...profile?.metadata,
                 picture,
               },
             },

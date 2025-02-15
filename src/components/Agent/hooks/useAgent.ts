@@ -168,23 +168,6 @@ const useAgent = (
 
       if (postsRes?.value?.items?.length > 0) {
         posts = postsRes?.value?.items as Post[];
-      } else {
-        const postsRes = await fetchPosts(
-          lensConnected?.sessionClient || lensClient,
-          {
-            pageSize: PageSize.Fifty,
-            filter: {
-              authors: [agentInput ? agentInput : agent?.profile?.address],
-            },
-          }
-        );
-        if (postsRes.isErr()) {
-          return;
-        }
-
-        posts = (postsRes?.value?.items?.filter((pos: any) =>
-          (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA")
-        ) || []) as Post[];
       }
 
       posts = await Promise.all(
@@ -335,37 +318,55 @@ const useAgent = (
       let workers: Worker[] = res?.data?.agentCreateds?.[0]?.workers || [];
       let balances: Balance[] = res?.data?.agentCreateds?.[0]?.balances || [];
 
+      const metadataCache = new Map<string, any>();
+      const profileCache = new Map<string, Account>();
+
       workers = (await Promise.all(
         workers?.map(async (id) => {
           const col = await getCollectionArtist(Number(id?.collectionId));
-          const result = await fetchAccountsAvailable(
-            lensConnected?.sessionClient || lensClient,
-            {
-              managedBy: evmAddress(col?.data?.collectionCreateds?.[0]?.artist),
-              includeOwned: true,
-            }
-          );
 
-          if (result.isErr()) {
-            setAgentLoading(false);
-            return;
+          let profile = profileCache.get(
+            col?.data?.collectionCreateds?.[0]?.artist
+          );
+          if (!profile) {
+            const result = await fetchAccountsAvailable(
+              lensConnected?.sessionClient || lensClient,
+              {
+                managedBy: col?.data?.collectionCreateds?.[0]?.artist,
+                includeOwned: true,
+              }
+            );
+
+            if (result.isErr()) {
+              setAgentLoading(false);
+              return;
+            }
+
+            profile = result?.value.items[0]?.account as Account;
+            profileCache.set(
+              col?.data?.collectionCreateds?.[0]?.artist,
+              profile
+            );
           }
 
           let metadata = (id as any)?.collection?.metadata;
 
           if (!metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${
-                (id as any)?.collection?.uri?.includes("ipfs://")
-                  ? (id as any)?.collection?.uri?.split("ipfs://")?.[1]
-                  : (id as any)?.collection?.uri
-              }`
-            );
-            metadata = await cadena.json();
+            metadata = metadataCache.get((id as any)?.collection?.uri);
+
+            if (!metadata) {
+              const uri = (id as any)?.collection?.uri?.includes("ipfs://")
+                ? (id as any)?.collection?.uri?.split("ipfs://")[1]
+                : (id as any)?.collection?.uri;
+
+              const cadena = await fetch(`${INFURA_GATEWAY}/ipfs/${uri}`);
+              metadata = await cadena.json();
+              metadataCache.set((id as any)?.collection?.uri, metadata);
+            }
           }
 
           return {
-            profile: result?.value.items[0]?.account as Account,
+            profile,
             collectionId: id?.collectionId,
             instructions: id?.instructions,
             publishFrequency: Number(id?.publishFrequency),
@@ -520,25 +521,6 @@ const useAgent = (
 
       if (postsRes?.value.items?.length > 0) {
         posts = postsRes?.value.items as Post[];
-      } else {
-        const postsRes = await fetchPosts(
-          lensConnected?.sessionClient || lensClient,
-          {
-            pageSize: PageSize.Fifty,
-            filter: {
-              authors: [agent?.profile?.address],
-            },
-          }
-        );
-
-        if (postsRes.isErr()) {
-          setAgentLoading(false);
-          return;
-        }
-
-        posts = postsRes.value?.items?.filter((pos: any) =>
-          (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA")
-        ) as Post[];
       }
 
       if (postsRes?.value.pageInfo?.next) {

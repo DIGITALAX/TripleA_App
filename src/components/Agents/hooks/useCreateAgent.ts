@@ -2,18 +2,14 @@ import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
-import {
-  AU_TOKEN,
-  AU_REWARDS_CONTRACT,
-  SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
-  TOKENS,
-} from "@/lib/constants";
+import { SKYHUNTERS_AGENTS_MANAGER_CONTRACT, AGENT_FEED_RULE } from "@/lib/constants";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
 import { StorageClient } from "@lens-protocol/storage-node-client";
 import { v4 as uuidv4 } from "uuid";
 import {
   evmAddress,
+  FeedRuleExecuteOn,
   FeedsOrderBy,
   PublicClient as PublicClientLens,
 } from "@lens-protocol/client";
@@ -511,12 +507,9 @@ const useCreateAgent = (
           rules: {
             anyOf: [
               {
-                simplePaymentRule: {
-                  recipient: AU_TOKEN,
-                  cost: {
-                    value: "0.1",
-                    currency: TOKENS[0].contract,
-                  },
+                unknownRule: {
+                  executeOn: [FeedRuleExecuteOn.CreatingPost],
+                  address: AGENT_FEED_RULE,
                 },
               },
             ],
@@ -575,12 +568,9 @@ const useCreateAgent = (
         toAdd: {
           anyOf: [
             {
-              simplePaymentRule: {
-                recipient: evmAddress(AU_REWARDS_CONTRACT),
-                cost: {
-                  value: "0.1",
-                  currency: evmAddress(AU_TOKEN),
-                },
+              unknownRule: {
+                executeOn: [FeedRuleExecuteOn.CreatingPost],
+                address: AGENT_FEED_RULE,
               },
             },
           ],

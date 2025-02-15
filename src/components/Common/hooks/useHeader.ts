@@ -47,38 +47,47 @@ const useHeader = (
     try {
       const data = await getCollectionSearch(search);
 
+      const metadataCache = new Map<string, any>();
+      const profileCache = new Map<string, Account>();
+      const pictureCache = new Map<string, string>();
+
       const colls: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds?.map(async (collection: any) => {
           if (!collection.metadata) {
-            const cadena = await fetch(
-              `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
-            );
-            collection.metadata = await cadena.json();
+            if (!metadataCache.has(collection.uri)) {
+              const response = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${collection.uri.split("ipfs://")?.[1]}`
+              );
+              metadataCache.set(collection.uri, await response.json());
+            }
+            collection.metadata = metadataCache.get(collection.uri);
           }
+          const artistAddress = evmAddress(collection?.artist);
+          if (!profileCache.has(artistAddress)) {
+            const result = await fetchAccountsAvailable(lensClient!, {
+              managedBy: artistAddress,
+              includeOwned: true,
+            });
 
-          const result = await fetchAccountsAvailable(lensClient!, {
-            managedBy: evmAddress(collection?.artist),
-            includeOwned: true,
-          });
+            if (result.isErr()) {
+              setSearchLoading(false);
+              return;
+            }
 
-          if (result.isErr()) {
-            setSearchLoading(false);
-
-            return;
+            profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
           let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
+          const profile = profileCache.get(artistAddress);
 
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
+          if (profile?.metadata?.picture) {
+            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
+            if (!pictureCache.has(pictureKey)) {
+              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
+              const json = await response.json();
+              pictureCache.set(pictureKey, json.item);
+            }
+            picture = pictureCache.get(pictureKey) || "";
           }
 
           return {
@@ -88,9 +97,9 @@ const useHeader = (
             description: collection?.metadata?.description,
             artist: collection?.artist,
             profile: {
-              ...result.value.items?.[0]?.account,
+              ...profile,
               metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
+                ...profile?.metadata,
                 picture,
               },
             },
@@ -160,7 +169,6 @@ const useHeader = (
         managedBy: evmAddress(signer.account.address),
         includeOwned: true,
       });
-
 
       if (accounts.isErr()) {
         setLensLoading(false);
