@@ -113,7 +113,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
 
       setHasMore({
         agents: agents?.data?.agentCreateds?.length == 20 ? true : false,
-        collected: collected?.data?.orders?.length == 20 ? true : false,
+        collected: collected?.data?.collectionPurchaseds?.length == 20 ? true : false,
         drops: drops?.data?.dropCreateds?.length == 20 ? true : false,
       });
 
@@ -124,7 +124,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
             ? paginated?.agents + 20
             : paginated?.agents,
         collected:
-          collected?.data?.orders?.length == 20
+          collected?.data?.collectionPurchaseds?.length == 20
             ? paginated?.collected + 20
             : paginated?.collected,
         drops:
@@ -133,7 +133,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
             : paginated?.drops,
       });
 
-      setCollected(collected?.data?.orders);
+      setCollected(collected?.data?.collectionPurchaseds);
       setAgents(agents?.data?.agentCreateds);
       setDrops(drops?.data?.dropCreateds);
     } catch (err: any) {
@@ -159,10 +159,10 @@ const useUser = (username: string, lensClient: PublicClient) => {
         );
         setCollected([
           ...collected,
-          ...(collectedData?.data?.orderPayments || []),
+          ...(collectedData?.data?.collectionPurchaseds || []),
         ] as any);
 
-        if (collectedData?.data?.orderPayments?.length == 20) {
+        if (collectedData?.data?.collectionPurchaseds?.length == 20) {
           hasMoreCollected = true;
           paginatedCollected = paginated?.collected + 20;
         }

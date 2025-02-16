@@ -96,7 +96,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                     <div className="relative w-full h-fit flex">
                       <div className="relative w-full h-28 rounded-lg flex bg-windows pixel-border-7">
                         <Image
-                          objectFit="contain"
+                          objectFit="cover"
                           layout="fill"
                           draggable={false}
                           alt={agent?.title}

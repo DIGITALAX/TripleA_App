@@ -18,7 +18,7 @@ const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
     case AgentSwitcher.Create:
       return (
         <div className="relative w-full h-fit flex items-start justify-end">
-          <div className="relative md:w-3/4 w-full h-[40rem] flex flex-col gap-6 bg-viol rounded-md p-2">
+          <div className="relative xl:w-3/4 w-full h-[40rem] flex flex-col gap-6 bg-viol rounded-md p-2">
             <CreateSwitch
               createSwitcher={createSwitcher}
               setCreateSwitcher={setCreateSwitcher}

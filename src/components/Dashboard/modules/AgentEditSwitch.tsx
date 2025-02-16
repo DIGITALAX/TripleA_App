@@ -36,7 +36,7 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
               Agent Feeds
             </div>
             <div className="relative w-full text-xxs h-fit flex flex-col gap-2 items-start justify-start max-h-52 overflow-y-scroll">
-              {agentFeeds.map((feed, index) => {
+              {agentFeeds?.map((feed, index) => {
                 return (
                   <div
                     className="relative w-full h-fit flex flex-row items-center justify-between gap-2"
@@ -63,7 +63,7 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
                         placeholder="Manager Address"
                         onChange={(e) =>
                           setAgentFeeds(
-                            agentFeeds.map((_, i) =>
+                            agentFeeds?.map((_, i) =>
                               i == index
                                 ? {
                                     address: e.target.value,
@@ -301,7 +301,7 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
                           }`
                         : URL.createObjectURL(agentMetadata?.cover)
                     }
-                    objectFit="contain"
+                    objectFit="cover"
                     layout="fill"
                     draggable={false}
                   />
@@ -339,7 +339,7 @@ const AgentEditSwitch: FunctionComponent<AgentEditSwitchProps> = ({
                 />
               </label>
             </div>
-            <div className="relative w-full h-full flex items-start justify-between flex-row gap-3">
+            <div className="relative w-full h-full flex items-start justify-between flex-col md:flex-row gap-3">
               <div className="relative w-full h-full flex flex-col gap-8 items-start justify-between">
                 <div className="relative w-full h-full flex flex-col gap-1 items-start justify-start">
                   <div className="relative w-fit h-fit flex text-windows">

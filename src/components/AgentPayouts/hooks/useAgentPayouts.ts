@@ -249,7 +249,7 @@ const useAgentPayouts = (lensClient: PublicClient) => {
 
         setCollectorsPaid([...collectorsPaid, ...collectors_info] as any);
 
-        if (collectors?.data?.orderPayments?.length == 20) {
+        if (collectors?.data?.collectorPaids?.length == 20) {
           hasMoreCollector = true;
           paginatedCollector = paginated?.collectors + 20;
         }

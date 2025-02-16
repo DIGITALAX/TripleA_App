@@ -3,11 +3,13 @@
 import { AnimationContext, ModalContext } from "@/app/providers";
 import useAgent from "@/components/Agent/hooks/useAgent";
 import useRecharge from "@/components/Agent/hooks/useRecharge";
+import MiniGallery from "@/components/Common/modules/MiniGallery";
 import useInteractions from "@/components/NFT/hooks/useInteractions";
 import Comments from "@/components/NFT/modules/Comments";
 import Post from "@/components/NFT/modules/Post";
 import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import calculateRent from "@/lib/helpers/calculateRent";
+import descriptionRegex from "@/lib/helpers/descriptionRegex";
 import { downloadEliza } from "@/lib/helpers/downloadEliza";
 import { chains } from "@lens-network/sdk/viem";
 import { useModal } from "connectkit";
@@ -95,8 +97,8 @@ export default function Agent() {
   );
 
   return (
-    <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-10 gap-24 text-windows">
-      <div className="relative w-full h-[60rem] md:h-[40rem] flex flex-col md:flex-row items-center justify-between gap-4 pb-10 px-6 pt-6">
+    <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-3 sm:px-10 gap-24 text-windows">
+      <div className="relative w-full h-[60rem] md:h-[40rem] flex flex-col md:flex-row items-center justify-between gap-4 pb-10 xl:px-6 pt-6">
         <div className="relative w-full h-[30rem] md:h-full flex px-6 py-2">
           {agent?.cover && (
             <Image
@@ -268,18 +270,27 @@ export default function Agent() {
                       </div>
                     </div>
                   </div>
-                  <div className="relative w-full h-full max-h-full flex flex-col py-4 overflow-y-scroll">
-                    <div className="py-3 h-fit flex relative items-start justify-start text-left text-sm font-nim">
-                      {agent?.bio}
-                    </div>
+                  <div className="relative w-full h-full max-h-40 md:max-h-full flex flex-col py-4 overflow-y-scroll">
+                    <div
+                      className="py-3 h-fit flex relative items-start justify-start text-left text-sm font-nim"
+                      dangerouslySetInnerHTML={{
+                        __html: descriptionRegex(agent?.bio || "", false),
+                      }}
+                    ></div>
                     <div className="relative w-full h-fit flex py-4 flex-col items-start justify-start gap-2 font-nerd">
                       <div className="relative w-fit h-fit flex text-xxs">
                         Custom Instructions
                       </div>
                       <div className="relative w-full h-fit flexoverflow-y-scroll">
-                        <div className="pb-3 h-full max-h-full overflow-y-scroll flex relative items-start justify-start text-left text-sm">
-                          {agent?.customInstructions}
-                        </div>
+                        <div
+                          className="pb-3 h-full max-h-full overflow-y-scroll flex relative items-start justify-start text-left text-sm"
+                          dangerouslySetInnerHTML={{
+                            __html: descriptionRegex(
+                              agent?.customInstructions || "",
+                              false
+                            ),
+                          }}
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -366,8 +377,8 @@ export default function Agent() {
                   </div>
                 </>
               ) : screen == 1 ? (
-                <div className="relative w-full gap-3 flex flex-col h-full">
-                  <div className="relative w-full h-[50%] overflow-y-scroll">
+                <div className="relative w-full gap-3 flex flex-col h-full justify-between">
+                  <div className="relative w-full h-[20rem] overflow-y-scroll">
                     <InfiniteScroll
                       dataLength={agent?.activity?.length || 1}
                       next={handleMoreActivity}
@@ -401,7 +412,7 @@ export default function Agent() {
                   />
                 </div>
               ) : screen == 4 ? (
-                <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start">
+                <div className="relative w-full max-h-[30rem] h-full overflow-y-scroll flex items-start justify-start">
                   <div className="relative w-full h-fit flex flex-col items-start justify-start gap-5">
                     {Number(agentRent?.length) < 1 ? (
                       <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
@@ -537,7 +548,7 @@ export default function Agent() {
                   </div>
                 </div>
               ) : screen == 5 ? (
-                <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start">
+                <div className="relative w-full max-h-[30rem] h-full overflow-y-scroll flex items-start justify-start">
                   <div className="relative w-full h-fit flex flex-col items-start justify-start  gap-3">
                     {Number(agent?.balances?.length) < 1 ? (
                       <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
@@ -627,7 +638,7 @@ export default function Agent() {
                   </div>
                 </div>
               ) : screen == 6 ? (
-                <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start">
+                <div className="relative w-full max-h-[30rem] h-full overflow-y-scroll flex items-start justify-start">
                   <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3">
                     {Number(agent?.workers?.length) < 1 ? (
                       <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
@@ -782,7 +793,7 @@ export default function Agent() {
                                               className="relative w-fit h-fit flex items-center justify-center"
                                             >
                                               <div
-                                                 className={`relative w-6 h-6 rounded-full border cursor-canP ${
+                                                className={`relative w-6 h-6 rounded-full border cursor-canP ${
                                                   chosenTokens?.[key] ==
                                                   item?.toLowerCase()
                                                     ? "opacity-70 border-windows"
@@ -904,8 +915,8 @@ export default function Agent() {
                                   ) /
                                     10 ** 18 >
                                   0
-                                    ? `If not recharged, Agent will run out in ${
-                                       ( Number(
+                                    ? `If not recharged, Agent will run out in ${(
+                                        Number(
                                           agent?.balances?.find(
                                             (bal) =>
                                               Number(bal?.collectionId) ==
@@ -917,11 +928,11 @@ export default function Agent() {
                                           context?.tokenThresholds?.find(
                                             (thr) =>
                                               thr?.token?.toLowerCase() ==
-                                            chosenTokens?.[key]
+                                              chosenTokens?.[key]
                                           )!,
                                           collection
-                                        ))?.toFixed(0)
-                                      } cycles.`
+                                        )
+                                      )?.toFixed(0)} cycles.`
                                     : "Agent needs to be recharged to start activity."}
                                 </div>
                               </div>
@@ -999,100 +1010,17 @@ export default function Agent() {
           )}
         </div>
       </div>
-      <div className="relative w-full h-fit flex items-center justify-center">
-        <div className="relative w-5/6 flex items-center justify-center flex-col gap-3 h-fit">
-          <div className="relative w-fit h-fit flex font-nim text-white text-3xl uppercase">
-            {"<= MORE AGENTS =>"}
-          </div>
-          <div className="relative w-full h-fit flex overflow-x-scroll">
-            <div className="relative w-fit h-fit flex flex-row gap-6">
-              {context?.agentsLoading
-                ? Array.from({ length: 20 }).map((_, index) => {
-                    return (
-                      <div
-                        className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
-                        key={index}
-                      >
-                        <div className="relative animate-pulse flex w-56 h-56 rounded-md bg-pink p-4">
-                          <div className="pixel-border-6 w-full h-full relative bg-mochi rounded-3xl"></div>
-                        </div>
-                        <div className="relative w-fit h-fit flex items-center justify-center">
-                          <div className="relative w-20 h-20 flex">
-                            <Image
-                              layout="fill"
-                              src={`${INFURA_GATEWAY}/ipfs/${
-                                index % 3 === 0
-                                  ? "QmNVgB6TBsVeH2AwHck1MJwgHZTFtxWqrxGkGPsXRJhvs2"
-                                  : index % 3 === 1
-                                  ? "QmXHLgjrzCrDCzhfejFnNEcapxUqawuKLt5LSBd6je6G7V"
-                                  : "QmT8fNjUqmjarmC3BHoYUomcTSvR9YLd4CxiLQftkUquWR"
-                              }`}
-                              objectFit="contain"
-                              draggable={false}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                : context?.agents.map((agent, index: number) => {
-                    return (
-                      <div
-                        className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
-                        key={index}
-                      >
-                        <div
-                          className="relative cursor-canP flex w-56 h-56 rounded-md bg-pink p-4"
-                          onClick={() => {
-                            animationContext?.setPageChange?.(true);
-                            router.prefetch(`/agent/${agent?.id}`);
-                            router.push(`/agent/${agent?.id}`);
-                          }}
-                        >
-                          <div className="pixel-border-3 w-full h-full relative bg-mochi rounded-xl">
-                            <Image
-                              draggable={false}
-                              layout="fill"
-                              objectFit="cover"
-                              src={`${INFURA_GATEWAY}/ipfs/${
-                                agent?.cover?.split("ipfs://")?.[1]
-                              }`}
-                            />
-                          </div>
-                        </div>
-                        <div className="relative w-fit h-fit flex items-center justify-center">
-                          <div className="relative w-20 h-20 flex">
-                            <Image
-                              layout="fill"
-                              src={`${INFURA_GATEWAY}/ipfs/${
-                                index % 3 === 0
-                                  ? "QmNVgB6TBsVeH2AwHck1MJwgHZTFtxWqrxGkGPsXRJhvs2"
-                                  : index % 3 === 1
-                                  ? "QmXHLgjrzCrDCzhfejFnNEcapxUqawuKLt5LSBd6je6G7V"
-                                  : "QmT8fNjUqmjarmC3BHoYUomcTSvR9YLd4CxiLQftkUquWR"
-                              }`}
-                              objectFit="contain"
-                              draggable={false}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-            </div>
-          </div>
-          <div className="absolute top-0 -right-10 flex w-fit h-fit z-30">
-            <div className="relative w-40 h-20 flex rotate-[0.5rad]">
-              <Image
-                src={`${INFURA_GATEWAY}/ipfs/QmdXC6EZpvSU1U25ikHvTwX7RjAhA8FXJ7ZYLieN52gFyP`}
-                draggable={false}
-                layout="fill"
-                objectFit="contain"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <MiniGallery
+        text={"<= MORE AGENTS =>"}
+        loader={context?.agentsLoading!}
+        content={
+          context?.agents?.map((ag) => ({
+            id: ag?.id,
+            cover: ag?.cover,
+          }))!
+        }
+        route
+      />
     </div>
   );
 }

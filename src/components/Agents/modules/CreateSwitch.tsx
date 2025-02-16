@@ -141,10 +141,10 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
 
     case CreateSwitcher.Create:
       return (
-        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-between p-4 font-nerd text-windows">
-          <div className="relative w-full h-full flex flex-row items-center justify-center gap-4">
+        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-between md:p-4 font-nerd text-windows">
+          <div className="relative w-full h-full flex flex-col md:flex-row items-center justify-center gap-4">
             <div className="relative w-full h-full flex items-center justify-center">
-              <div className="relative w-80 h-80 md:h-full flex items-center justify-center">
+              <div className="relative w-full md:w-80 h-60 md:h-80 md:h-full flex items-center justify-center">
                 {agentDetails.cover && (
                   <Image
                     src={URL.createObjectURL(agentDetails.cover)}
@@ -155,7 +155,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                 )}
               </div>
             </div>
-            <div className="relative w-full h-full flex flex-col gap-4 items-start justify-start">
+            <div className="relative w-full h-full flex flex-col gap-4 items-start justify-start overflow-y-scroll">
               <div className="relative flex w-fit h-10 text-center font-dos uppercase text-2xl">
                 {agentDetails.title}
               </div>
@@ -196,8 +196,8 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
 
     case CreateSwitcher.Owners:
       return (
-        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-center text-windows p-4 text-center">
-          <div className="relative w-fit pb-3 h-fit flex items-center justify-center">
+        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-center text-windows md:p-4 text-center">
+          <div className="relative w-fit pb-3 h-fit flex items-center justify-center text-center">
             Is this agent owned by a DAO? Add additional owner wallets to
             delegate management of the agent on your behalf.
           </div>
@@ -264,15 +264,15 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
 
     case CreateSwitcher.Feeds:
       return (
-        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-center text-windows p-4">
-          <div className="relative w-fit pb-3 h-fit flex items-center justify-center">
+        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-between text-windows md:p-4">
+          <div className="relative w-fit pb-3 h-fit flex items-center justify-center text-center">
             Curate Feeds On Lens Where Your Agent Will Publish
           </div>
           <div className="relative w-full h-fit flex flex-col gap-2 items-center justify-center">
             <div className="relative w-fit h-fit flex font-dos">
               Add Existing Feeds (Make Sure to Add the Agentic Rule)
             </div>
-            <div className="relative w-full text-xxs h-fit flex flex-col gap-2 items-start justify-start max-h-28 overflow-y-scroll">
+            <div className="relative w-full text-xxs h-fit flex flex-col gap-2 items-start justify-start max-h-16 md:max-h-28 overflow-y-scroll">
               {agentDetails?.feeds.map((feed, index) => {
                 return (
                   <div
@@ -464,8 +464,8 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
 
     case CreateSwitcher.Profile:
       return (
-        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-center text-windows p-4">
-          <div className="relative w-fit pb-3 h-fit flex items-center justify-center">
+        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-center text-windows md:p-4">
+          <div className="relative w-fit pb-3 h-fit flex items-center justify-center text-center">
             Create Agent Lens Account
           </div>
           <div className="relative w-full h-fit flex flex-col gap-3 items-center justify-center">
@@ -509,7 +509,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                 />
               </label>
             </div>
-            <div className="relative w-full h-fit flex items-start justify-between flex-row gap-3">
+            <div className="relative w-full h-fit flex items-start justify-between flex-col sm:flex-row gap-3">
               <div className="relative w-full h-fit flex flex-col gap-1.5 items-start justify-start">
                 <div className="relative w-fit h-fit flex">Username</div>
                 <input
@@ -595,8 +595,8 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
 
     case CreateSwitcher.Conversation:
       return (
-        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-center text-windows p-4 text-center">
-          <div className="relative w-fit pb-3 h-fit flex items-center justify-center">
+        <div className="relative font-nerd w-full h-full flex flex-col gap-6 items-center justify-center text-windows md:p-4 text-center">
+          <div className="relative w-fit pb-3 h-fit flex items-center justify-center text-center">
             Create some example conversations to train your Agent.
           </div>
           <div className="relative w-full h-full flex gap-3 items-start justify-start flex-col">
@@ -815,11 +815,11 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
 
     default:
       return (
-        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-between font-nerd p-4 text-sm">
-          <div className="relative w-full h-full flex items-start justify-between flex-row gap-3">
-            <div className="relative w-fit h-full flex">
+        <div className="relative w-full h-full flex flex-col gap-6 items-center justify-between font-nerd md:p-4 text-sm overflow-y-scroll">
+          <div className="relative w-full h-full flex items-start justify-between flex-col tablet:flex-row gap-3">
+            <div className="relative w-full tablet:w-fit h-full flex">
               <label
-                className="relative w-96 h-60 sm:h-full flex items-center justify-center cursor-canP"
+                className="relative w-full tablet:w-96 h-60 tablet:h-full flex items-center justify-center cursor-canP"
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
@@ -945,7 +945,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
               </div>
             </div>
           </div>
-          <div className="relative w-full h-full flex items-start justify-between flex-row gap-3">
+          <div className="relative w-full h-full flex items-start justify-between flex-col tablet:flex-row gap-3">
             <div className="relative w-full h-full flex items-start justify-start flex-col gap-2">
               <div className="relative w-fit h-fit flex items-start justify-start text-windows">
                 Custom Instructions

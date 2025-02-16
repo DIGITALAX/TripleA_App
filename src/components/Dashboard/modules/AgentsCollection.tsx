@@ -241,7 +241,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                           <div className="relative w-fit h-fit rounded-md flex">
                             <div className="relative w-12 h-12 pixel-border-7 bg-white rounded-xl flex">
                               <Image
-                                objectFit="contain"
+                                objectFit="cover"
                                 layout="fill"
                                 draggable={false}
                                 alt={agent?.title}

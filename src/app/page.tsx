@@ -11,9 +11,11 @@ export default function Home() {
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
   return (
-    <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-10 gap-24">
+    <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-4 tablet:px-10">
       <SlidingDoors>
-        <div className="absolute top-10 right-20 flex flex-col gap-2 items-center justify-center w-fit h-fit font-dos text-white z-100">
+        <div
+          className={`relative tablet:absolute tablet:top-10 tablet:right-20 flex flex-col gap-2 items-center justify-center w-full tablet:w-fit h-fit font-dos text-white z-100`}
+        >
           <div className="relative w-fit h-fit flex">speedrun /</div>
           <div
             className="relative w-fit h-fit flex cursor-canP hover:text-ama"
@@ -46,32 +48,10 @@ export default function Home() {
             {"< returns >"}
           </div>
         </div>
-        <div className="relative w-full h-[40rem] flex flex-row justify-center items-center gap-6 font-nerd text-win py-10">
-          <div className="relative w-fit h-full flex items-start justify-between flex-col z-10">
-            <div className="relative w-fit h-fit flex">
-              <div className="relative w-32 h-32 flex top-10 left-20">
-                <Image
-                  src={`${INFURA_GATEWAY}/ipfs/QmULPAe9jPNtggDm8av3yUcRXeLVUprJ7h2DjMjFJTcgBw`}
-                  layout="fill"
-                  objectFit="contain"
-                  draggable={false}
-                />
-              </div>
-            </div>
-            <div className="relative w-fit h-fit flex">
-              <div className="relative w-36 h-36 flex left-20 top-12">
-                <Image
-                  src={`${INFURA_GATEWAY}/ipfs/QmU17KqFyzN4Payyxzdgk8K7i6DdwViXDhyCf8yiZJFkY6`}
-                  layout="fill"
-                  objectFit="contain"
-                  draggable={false}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="relative w-fit h-fit flex z-0">
-            <div className="relative py-3 px-6 w-[28rem] h-full flex bg-viol text-left flex-col gap-5 items-start justify-between rounded-md">
-              <div className="relative w-full h-full flex text-xl">
+        <div className="relative w-full h-full tablet:h-[40rem] flex justify-center items-center font-nerd text-win py-10">
+          <div className="relative w-full items-center justify-center tablet:w-fit h-fit flex z-0">
+            <div className="relative py-3 px-6 w-full galaxy:w-1/2 tablet:w-[28rem] h-full flex bg-viol text-left flex-col gap-5 items-start justify-between rounded-md">
+              <div className="relative w-full h-full flex text-base tablet:text-xl">
                 so we gave the machines their own wallets and let them loose in
                 the art market.
                 <br />
@@ -91,37 +71,55 @@ export default function Home() {
               <div className="relative w-full h-full flex items-end justify-end text-base">
                 — TRIPLE AGENT
               </div>
-            </div>
-          </div>
-          <div className="relative w-fit h-full flex items-start justify-between flex-col">
-            <div className="relative w-fit h-fit flex">
-              <div className="relative w-48 h-40 flex right-10 bottom-10">
-                <Image
-                  src={`${INFURA_GATEWAY}/ipfs/QmWLPmcf4LerwrL1pTmiWDsFc2rfaMLHeY4Zvim8dhcUur`}
-                  layout="fill"
-                  objectFit="contain"
-                  draggable={false}
-                />
+              <div className="absolute w-fit h-fit flex -top-4 -left-10 tablet:-top-10 tablet:-left-28">
+                <div className="relative w-12 tablet:w-32 h-12 tablet:h-32 flex">
+                  <Image
+                    src={`${INFURA_GATEWAY}/ipfs/QmULPAe9jPNtggDm8av3yUcRXeLVUprJ7h2DjMjFJTcgBw`}
+                    layout="fill"
+                    objectFit="contain"
+                    draggable={false}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="relative w-fit h-fit flex">
-              <div className="relative w-28 h-28 flex right-20">
-                <Image
-                  src={`${INFURA_GATEWAY}/ipfs/QmTYEBJ9dGNrLEMAHMg1vEDYve7sBH6aLoyuY4jMY6nR6t`}
-                  layout="fill"
-                  objectFit="contain"
-                  draggable={false}
-                />
+              <div className="absolute w-fit h-fit flex -left-10 bottom-0 tablet:-left-28">
+                <div className="relative w-16 h-16 tablet:w-36 tablet:h-36 flex">
+                  <Image
+                    src={`${INFURA_GATEWAY}/ipfs/QmU17KqFyzN4Payyxzdgk8K7i6DdwViXDhyCf8yiZJFkY6`}
+                    layout="fill"
+                    objectFit="contain"
+                    draggable={false}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="relative w-fit h-fit flex">
-              <div className="relative w-32 h-24 flex top-8 right-12">
-                <Image
-                  src={`${INFURA_GATEWAY}/ipfs/QmeYgadVmH7pqGU1MqfNonWCcVzMdkDLoGEdfDikjWp4h6`}
-                  layout="fill"
-                  objectFit="contain"
-                  draggable={false}
-                />
+              <div className="absolute w-fit h-fit flex -right-8 tablet:-right-40 -top-2 tablet:-top-10">
+                <div className="relative w-20 h-16 tablet:w-48 tablet:h-40 flex">
+                  <Image
+                    src={`${INFURA_GATEWAY}/ipfs/QmWLPmcf4LerwrL1pTmiWDsFc2rfaMLHeY4Zvim8dhcUur`}
+                    layout="fill"
+                    objectFit="contain"
+                    draggable={false}
+                  />
+                </div>
+              </div>
+              <div className="absolute w-fit h-fit flex -right-8 tablet:-right-20 top-1/3">
+                <div className="relative w-12 h-12 tablet:w-28 tablet:h-28 flex">
+                  <Image
+                    src={`${INFURA_GATEWAY}/ipfs/QmTYEBJ9dGNrLEMAHMg1vEDYve7sBH6aLoyuY4jMY6nR6t`}
+                    layout="fill"
+                    objectFit="contain"
+                    draggable={false}
+                  />
+                </div>
+              </div>
+              <div className="absolute w-fit h-fit flex -right-9 tablet:-right-24 bottom-0">
+                <div className="relative w-16 h-12 tablet:w-32 tablet:h-24 flex">
+                  <Image
+                    src={`${INFURA_GATEWAY}/ipfs/QmeYgadVmH7pqGU1MqfNonWCcVzMdkDLoGEdfDikjWp4h6`}
+                    layout="fill"
+                    objectFit="contain"
+                    draggable={false}
+                  />
+                </div>
               </div>
             </div>
           </div>

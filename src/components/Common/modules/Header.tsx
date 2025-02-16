@@ -53,7 +53,7 @@ const Header: FunctionComponent = (): JSX.Element => {
 
   return (
     <div className="relative w-full h-fit flex flex-col gap-3 bg-white">
-      <div className="relative px-2 w-full h-fit sm:h-16 flex flex-col gap-4 sm:flex-row justify-between items-center z-50">
+      <div className="relative px-2 w-full h-fit sm:h-16 flex flex-col gap-4 sm:flex-row justify-between items-center z-200">
         <div
           className="relative flex items-center justify-center w-fit h-fit cursor-canP"
           onClick={() => {
@@ -256,7 +256,7 @@ const Header: FunctionComponent = (): JSX.Element => {
               )}
             </div>
             {openAccount && (
-              <div className="absolute w-40 h-fit rounded-md flex right-0 top-12 flex-col gap-5 shadow-lg p-2 text-xxs font-jackey pixel-border-3 z-200">
+              <div className="absolute w-40 h-fit rounded-md flex right-0 top-12 flex-col gap-5 shadow-lg p-2 text-xxs font-jackey pixel-border-3 z-250">
                 <div
                   className={`relative w-full h-fit flex items-center justify-start flex-row gap-1 ${
                     context?.lensConnected?.profile && "cursor-canP"

@@ -11,11 +11,11 @@ const Drop: FunctionComponent<DropProps> = ({
   setMintSwitcher,
 }): JSX.Element => {
   return (
-    <div className="relative w-full h-full flex items-start flex-row justify-between gap-3 font-nerd text-windows">
+    <div className="relative w-full h-full flex items-start flex-col md:flex-row justify-between gap-3 font-nerd text-windows">
       <div className="relative w-full h-full flex flex-col items-center justify-between gap-5">
         <div className="relative w-full h-fit flex items-center justify-center">
           <input
-            className="relative flex w-1/2 h-10 text-center bg-windows text-viol rounded-md p-1.5 focus:outline-none text-3xl"
+            className="relative flex w-full md:w-1/2 h-10 text-center bg-windows text-viol rounded-md p-1.5 focus:outline-none text-3xl"
             placeholder="Drop Title"
             onChange={(e) =>
               setMintData({

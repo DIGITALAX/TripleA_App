@@ -39,6 +39,7 @@ export default function SlidingDoors({
             <Image
               src={`${INFURA_GATEWAY}/ipfs/Qma4hocWVFBDDJtHCDEAqBVMiNgsE8Pk5ocyWg6snj4ZPS`}
               layout="fill"
+                    className="z-50"
               draggable={false}
             />
           </motion.div>
@@ -53,6 +54,7 @@ export default function SlidingDoors({
             <Image
               src={`${INFURA_GATEWAY}/ipfs/QmWWkuW45Rj9mmAp6i9bSoTToxKMSpu5U7RkYF5chANCxj`}
               layout="fill"
+              className="z-50"
               draggable={false}
             />
           </motion.div>

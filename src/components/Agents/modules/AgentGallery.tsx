@@ -23,7 +23,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
         id="scroll"
         className="relative w-full h-[40rem] overflow-y-scroll flex"
       >
-        <div className="relative w-fit h-full px-3">
+        <div className="relative w-full h-full px-3">
           <InfiniteScroll
             key={"agentGallery"}
             dataLength={context?.agents?.length || 1}
@@ -31,7 +31,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
             hasMore={hasMore}
             loader={<div key={0} />}
             scrollableTarget="scroll"
-            className="grid grid-cols-3 gap-10 w-max h-fit pb-10"
+            className="grid grid-cols-1 sm:grid-cols-2 tablet:grid-cols-3 gap-10 xl:w-max h-fit pb-10 items-start justify-between xl:w-auto w-full sm:w-[calc(100vw-10rem)]"
           >
             {(agentGalleryLoading || Number(context?.agents?.length) < 1
               ? [...(context?.agents || []), ...Array.from({ length: 20 })]
@@ -41,9 +41,9 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
               Number((agent as any)?.id) > 0 ? (
                 <div
                   key={`agent-${(agent as Agent).id}`}
-                  className={`w-fit h-fit flex relative flex-col gap-3`}
+                  className={`w-full sm:w-fit h-fit flex relative flex-col gap-3`}
                 >
-                  <div className="w-56 h-56 rounded-md bg-pink flex p-4 relative">
+                  <div className="w-full sm:w-40 h-80 sm:h-40 xl:w-56 xl:h-56 rounded-md bg-pink flex p-4 relative">
                     <div className="relative w-full h-full flex bg-mochi pixel-border-7 rounded-lg">
                       <div className="relative w-full h-full  rounded-sm bg-mochi p-2">
                         <div
@@ -63,7 +63,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
                             alt={"NFT " + (agent as Agent).id}
                             className="w-full h-full flex relative"
                             layout="fill"
-                            objectFit="contain"
+                            objectFit="cover"
                             draggable={false}
                           />
                         </div>

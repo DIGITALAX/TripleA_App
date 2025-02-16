@@ -174,13 +174,13 @@ const useNFT = (
       }
 
       const res = await getCollectors(Number(id));
-
+   
       let collectors: Collector[] = [];
       const profileCache = new Map<string, Account>();
       const pictureCache = new Map<string, string>();
 
       await Promise.all(
-        res?.data?.orders?.map(async (order: any) => {
+        res?.data?.collectionPurchaseds?.map(async (order: any) => {
           const buyerAddress = evmAddress(order?.buyer);
 
           if (!profileCache.has(buyerAddress)) {

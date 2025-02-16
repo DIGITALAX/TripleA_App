@@ -23,14 +23,13 @@ const Gallery: FunctionComponent<{
   } = useGallery(lensClient!, choice);
   const router = useRouter();
 
-
   return (
-    <div className="relative w-full h-fit flex flex-col">
+    <div className="relative w-full h-fit flex flex-col text-white">
       <div
         id="scroll"
         className="relative w-full h-[40rem] overflow-y-scroll flex"
       >
-        <div className="relative w-fit h-full px-3">
+        <div className="relative w-full h-full px-3">
           <InfiniteScroll
             key={"gallery"}
             dataLength={nfts?.length}
@@ -38,7 +37,7 @@ const Gallery: FunctionComponent<{
             hasMore={hasMore}
             loader={<div key={0} />}
             scrollableTarget="scroll"
-            className="grid grid-cols-3 gap-10 w-max h-fit pb-10"
+            className="grid grid-cols-1 sm:grid-cols-2 tablet:grid-cols-3 gap-10 xl:w-max h-fit pb-10 items-start justify-between xl:w-auto w-full sm:w-[calc(100vw-10rem)]"
           >
             {(galleryLoading || Number(nfts?.length) < 1
               ? [...nfts, ...Array.from({ length: 20 })]
@@ -50,9 +49,9 @@ const Gallery: FunctionComponent<{
                   Number((nft as any)?.id) > 0 ? (
                     <div
                       key={`nft-${(nft as NFTData).id}`}
-                      className={`w-fit h-fit text-white flex relative flex-col gap-3`}
+                      className={`w-full sm:w-fit h-fit flex relative flex-col gap-3`}
                     >
-                      <div className="w-56 h-56 rounded-3xl bg-white flex p-2 relative pixel-border-6 gap-2">
+                      <div className="w-full sm:w-40 h-80 sm:h-40 xl:w-56 xl:h-56 rounded-3xl bg-white flex p-2 relative pixel-border-6 gap-2">
                         <div className="relative w-full h-full flex bg-mochi pixel-border-7 rounded-lg">
                           <div className="relative w-full h-full  rounded-sm bg-mochi p-2">
                             <div
@@ -90,7 +89,7 @@ const Gallery: FunctionComponent<{
                           : (nft as NFTData)?.title}
                       </div>
                       <div className="relative h-1 w-full flex bg-white"></div>
-                      <div className="relative w-full h-fit flex justify-between flex-row gap-2 font-jackey2">
+                      <div className="relative w-full h-fit flex justify-between items-center flex-row gap-2 font-jackey2">
                         <div className="relative w-fit h-fit flex flex-row gap-2">
                           <svg
                             fill="none"
@@ -104,12 +103,15 @@ const Gallery: FunctionComponent<{
                             />
                           </svg>
                           <div className="relative w-fit h-fit flex items-center justify-center gap-2">
-                            <div className="relative w-fit h-fit flex items-center justify-center">
-                              {Number(
-                                (nft as NFTData)?.prices?.[priceIndex?.[index]]
-                                  ?.price
-                              ) /
-                                10 ** 18}{" "}
+                            <div className="relative w-fit h-fit flex items-center justify-center lg:text-base text-xs">
+                              {(
+                                Number(
+                                  (nft as NFTData)?.prices?.[
+                                    priceIndex?.[index]
+                                  ]?.price
+                                ) /
+                                10 ** 18
+                              )?.toFixed(0)}{" "}
                               {
                                 TOKENS?.find(
                                   (tok) =>
@@ -167,10 +169,12 @@ const Gallery: FunctionComponent<{
                       </div>
                     </div>
                   ) : (
-                    <div className={`w-fit h-fit flex relative animate-pulse`}>
+                    <div
+                      className={`w-full sm:w-fit h-fit flex relative animate-pulse`}
+                    >
                       <div
                         key={`placeholder-${index}`}
-                        className="w-56 h-56 rounded-3xl bg-white flex p-2 relative pixel-border-6 gap-2"
+                        className="w-full sm:w-40 h-80 sm:h-40 xl:w-56 xl:h-56 rounded-3xl bg-white flex p-2 relative pixel-border-6 gap-2"
                       >
                         <div className="relative w-full h-full flex bg-mochi pixel-border-7 rounded-lg">
                           <div className="relative w-full h-full bg-mochi p-2 rounded-sm"></div>

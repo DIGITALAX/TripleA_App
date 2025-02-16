@@ -14,17 +14,17 @@ const Mint: FunctionComponent<MintProps> = ({
 }): JSX.Element => {
   return (
     <div className="relative w-full h-full flex items-start justify-between font-nerd text-windows flex-col gap-4">
-      <div className="relative w-full h-full flex flex-col sm:flex-row items-start justify-center gap-10">
+      <div className="relative w-full h-full flex flex-col md:flex-row items-center md:items-start justify-start md:justify-center gap-10">
         {mintData?.agents?.length > 0 && (
-          <div className="relative flex w-fit h-fit flex flex-col gap-2 items-start justify-start">
-            <div className="relative flex w-fit h-fit max-h-60 overflow-y-scroll text-left text-base">
+          <div className="relative flex flex-col gap-2 items-center justify-start w-full h-fit max-h-60 overflow-y-scroll">
+            <div className="relative w-fit h-fit flex text-center text-base">
               Agent Costs
             </div>
             {mintData?.agents?.map((agent, index) => {
               return (
                 <div
                   key={index}
-                  className="relative text-xxs text-white w-full h-fit px-2 py-1 rounded-lg bg-pink rounded-md flex flex-col gap-2 items-center justify-center"
+                  className="relative text-xxs text-white w-full md:w-fit h-fit px-2 py-1 rounded-lg bg-pink rounded-md flex flex-col gap-2 items-center justify-center"
                 >
                   <div className="relative w-fit h-fit flex">
                     {agent?.agent?.title}
@@ -57,8 +57,8 @@ const Mint: FunctionComponent<MintProps> = ({
             })}
           </div>
         )}
-        <div className="relative w-full sm:w-fit h-fit flex">
-          <div className="relative w-full sm:w-80 h-60 flex items-center justify-center">
+        <div className="relative w-full md:w-fit h-fit flex">
+          <div className="relative w-full md:w-80 h-60 flex items-center justify-center">
             {mintData.image && (
               <Image
                 src={URL.createObjectURL(mintData.image)}
@@ -70,8 +70,8 @@ const Mint: FunctionComponent<MintProps> = ({
           </div>
         </div>
 
-        <div className="relative w-fit h-fit sm:h-full flex flex-col gap-3 items-start justify-start">
-          <div className="relative flex w-fit h-10 text-center font-dos uppercase text-2xl">
+        <div className="relative w-full h-fit flex flex-col gap-3 items-center justify-start">
+          <div className="relative flex w-fit h-fit text-center font-dos uppercase text-2xl">
             {mintData.title} {`( ${mintData.collectionType} )`}
           </div>
           {mintData.collectionType == CollectionType.IRL && (
@@ -84,7 +84,7 @@ const Mint: FunctionComponent<MintProps> = ({
             {allDrops?.find((drop) => mintData.dropId == Number(drop.id))
               ?.title || mintData?.dropTitle}
           </div>
-          <div className="relative w-fit h-fit flex items-center justify-between flex-row gap-4 text-pink text-sm">
+          <div className="relative w-fit h-fit flex items-center justify-between flex-row gap-4 text-pink text-xs text-center">
             {mintData.amount +
               ` x (${mintData.prices?.map(
                 (price, index) =>
@@ -96,7 +96,7 @@ const Mint: FunctionComponent<MintProps> = ({
               )})`}
           </div>
           <div
-            className="relative flex w-full sm:w-fit max-w-96 h-fit max-h-60 overflow-y-scroll text-left text-black text-windows"
+            className="relative flex w-full h-fit max-h-60 overflow-y-scroll text-center text-black text-windows items-start justify-center"
             dangerouslySetInnerHTML={{
               __html: descriptionRegex(mintData?.description, false),
             }} 

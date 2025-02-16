@@ -66,3 +66,14 @@ export interface Fulfiller {
   orderHistory: string[];
   activeOrders: string[];
 }
+
+export type MiniGalleryProps = {
+  text: string;
+  loader: boolean;
+  content: {
+    cover: string;
+    id: string;
+    username?: string;
+  }[];
+  route?: boolean;
+};

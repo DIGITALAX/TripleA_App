@@ -11,10 +11,10 @@ const Footer: FunctionComponent = (): JSX.Element => {
   const [openDetails, setOpenDetails] = useState<boolean>(false);
   return (
     <div className="relative w-full h-fit bg-gradient-to-r from-[#EA5EFF] to-[#9568F6] border-2 border-black flex flex-col items-center justify-between">
-      <div className="relative w-full h-10 flex flex-row text-base uppercase gap-3 items-center justify-center font-nerd bg-black">
+      <div className="relative w-full h-10 flex flex-row text-xs sm:text-base uppercase gap-3 items-center justify-center font-nerd bg-black">
         <div className="relative flex text-[#00FFEE] flex flex-row w-fit h-full items-center justify-center gap-2">
           <div className="relative w-fit h-fit flex">
-            <div className="relative w-7 h-7 flex">
+            <div className="relative w-4 h-4 sm:w-7 sm:h-7 flex">
               <Image
                 src={`${INFURA_GATEWAY}/ipfs/Qma5pNQqqy1Z17FwvhvWbFnCxfHk3Bj9gJuift9thVNsWW`}
                 draggable={false}
@@ -43,7 +43,7 @@ const Footer: FunctionComponent = (): JSX.Element => {
           </MarqueeText>
         </div>
       </div>
-      <div className="relative w-full h-[33rem] flex">
+      <div className="relative w-full h-[10rem] sm:h-[20rem] lg:h-[33rem] flex">
         <video
           muted
           autoPlay
@@ -57,14 +57,14 @@ const Footer: FunctionComponent = (): JSX.Element => {
           />
         </video>
         <div
-          className={`absolute bottom-3 right-3 w-fit h-fit flex cursor-canP  ${
+          className={`absolute bottom-3 right-3 w-fit h-fit flex cursor-canP ${
             openDetails && "rotate-180"
           }`}
           onClick={() => setOpenDetails(!openDetails)}
         >
           <div
             className={`relative flex ${
-              openDetails ? "w-12 h-12" : "w-20 h-20"
+              openDetails ? "w-12 h-12" : "w-12 sm:w-20 h-12 sm:h-20"
             }`}
           >
             <Image

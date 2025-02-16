@@ -27,6 +27,7 @@ export default {
       zIndex: {
         100: "100",
         200: "200",
+        250: "250"
       },
       fontFamily: {
         jackey: "Jackey",
@@ -45,6 +46,10 @@ export default {
         canP: "url('https://thedial.infura-ipfs.io/ipfs/QmRet46G3agnioVtrfgnWKhw5r1FZNqcpDT9xtpbgZ8RB2'), pointer",
         can: "url('https://thedial.infura-ipfs.io/ipfs/QmbCFJeTGrXsP917jhH758BkYKAN12LHJC9qnwysbCdBRb'), default",
       },
+      screens: {
+        tablet: "800px",
+        galaxy: "400px"
+      }
     },
   },
   plugins: [],

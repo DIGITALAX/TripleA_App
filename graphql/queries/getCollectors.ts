@@ -3,7 +3,7 @@ import { FetchResult, gql } from "@apollo/client";
 
 const COLLECTORS = gql`
   query ($collectionId: Int!) {
-    orders(
+    collectionPurchaseds(
       where: { collectionId: $collectionId }
       orderDirection: desc
       orderBy: blockTimestamp

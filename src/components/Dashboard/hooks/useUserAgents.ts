@@ -471,13 +471,13 @@ const useUserAgents = (
   useEffect(() => {
     if (currentAgent) {
       setAgentOwners(
-        currentAgent?.owners?.map((owner) => ({
+        (currentAgent?.owners || [])?.map((owner) => ({
           address: owner,
           added: true,
         }))
       );
       setAgentFeeds(
-        currentAgent?.feeds?.map((feed) => ({
+        (currentAgent?.feeds || [])?.map((feed) => ({
           address: feed,
           added: true,
         }))

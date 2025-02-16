@@ -15,7 +15,7 @@ const Post: FunctionComponent<PostProps> = ({
 }): JSX.Element => {
   return (
     <div className="relative w-full h-fit flex">
-      <div className="relative w-full h-60 flex items-center justify-center flex flex-col gap-2">
+      <div className="relative w-full h-40 flex items-center justify-center flex flex-col gap-2">
         <textarea
           value={post}
           onChange={(e) => setPost(e.target.value)}

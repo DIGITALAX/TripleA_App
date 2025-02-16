@@ -173,7 +173,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
     default:
       return (
         <div className="relative w-full h-screen min-h-80 flex items-center justify-center">
-          <div className="relative w-full h-fit flex flex-wrap gap-10 items-center justify-center">
+          <div className="relative w-full h-fit flex flex-wrap gap-10 items-center justify-center md:px-0 px-6">
             {[
               {
                 svg: (

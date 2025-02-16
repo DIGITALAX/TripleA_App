@@ -297,8 +297,8 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                         {token.symbol}
                       </div>
                     </div>
-                    <div className="flex relative w-full h-fit items-center justify-between gap-2 flex-row text-xs text-left">
-                      <div className="relative w-full h-fit flex flex-col gap-1 items-start justify-start">
+                    <div className="flex relative w-full h-fit items-center justify-between gap-2 flex-wrap md:flex-row text-xs text-left">
+                      <div className="relative w-fit md:w-full h-fit flex flex-col gap-1 items-start justify-start">
                         <div className="relative flex w-fit h-fit">
                           Max Total Rent
                         </div>
@@ -322,7 +322,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                         </div>
                       </div>
                       <div
-                        className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start ${
+                        className={`relative w-fit md:w-full h-fit flex flex-col gap-1 items-start justify-start ${
                           Number(mintData?.prices?.[key]) >=
                           Number(
                             tokenThresholds?.find(
@@ -354,7 +354,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                       {mintData?.collectionType == CollectionType.IRL && (
                         <>
                           <div
-                            className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start text-black`}
+                            className={`relative w-fit md:w-full h-fit flex flex-col gap-1 items-start justify-start text-black`}
                           >
                             <div className="relative flex w-fit h-fit">Vig</div>
                             <div className="relative flex w-fit h-fit">
@@ -369,7 +369,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                             </div>
                           </div>
                           <div
-                            className={`relative w-full h-fit flex flex-col gap-1 items-start justify-start ${
+                            className={`relative w-fit md:w-full h-fit flex flex-col gap-1 items-start justify-start ${
                               Number(mintData?.prices?.[key]) * 10 ** 18 >=
                               Number(
                                 tokenThresholds?.find(
@@ -430,7 +430,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                           })
                         }
                       >
-                        <div className="relative w-24 h-24 flex">
+                        <div className="relative w-full sm:w-24 h-40 sm:h-24 flex">
                           <Image
                             src={`${INFURA_GATEWAY}/ipfs/${
                               fulfiller.cover?.split("ipfs://")?.[1]
@@ -576,7 +576,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                     <div className="relative w-fit h-fit flex items-start justify-start text-left">
                       IRL Formats
                     </div>
-                    <div className="relative w-full h-fit flex flex-row gap-3 text-viol">
+                    <div className="relative w-full h-fit flex flex-wrap md:flex-row gap-3 text-viol">
                       {TYPES.map((item, index) => {
                         return (
                           <div
@@ -603,7 +603,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                       <div className="relative w-fit h-fit flex items-start justify-start text-left">
                         Sizes
                       </div>
-                      <div className="relative w-full h-fit flex flex-row gap-3 text-viol">
+                      <div className="relative w-full h-fit flex flex-wrap md:flex-row gap-3 text-viol">
                         {SIZES[mintData.format].map((item, index) => {
                           return (
                             <div
@@ -647,8 +647,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                           <div className="relative w-fit h-fit flex items-start justify-start text-left">
                             Colors
                           </div>
-
-                          <div className="relative w-full h-fit flex flex-row gap-3">
+                          <div className="relative w-full h-fit flex flex-wrap md:flex-row gap-3">
                             {COLORS.map((item, index) => {
                               return (
                                 <div
@@ -688,7 +687,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
 
     default:
       return (
-        <div className="relative w-full h-full flex flex-row gap-6 items-center justify-center">
+        <div className="relative w-full h-full flex flex-wrap md:flex-row gap-6 items-center justify-center">
           <div className="relative w-fit h-fit flex flex-col items-center justify-center gap-3">
             <div className="relative w-fit h-fit flex text-center">
               {CollectionType.IRL}

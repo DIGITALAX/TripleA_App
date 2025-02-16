@@ -417,7 +417,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       <div className="relative w-fit h-fit flex items-start justify-start text-left">
                         Sizes
                       </div>
-                      <div className="relative w-full h-fit flex flex-row gap-3 text-viol">
+                      <div className="relative w-full h-fit flex flex-wrap md:flex-row gap-3 text-viol">
                         {nft?.sizes?.map((item, index) => {
                           return (
                             <div
@@ -458,8 +458,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                           <div className="relative w-fit h-fit flex items-start justify-start text-left">
                             Colors
                           </div>
-
-                          <div className="relative w-full h-fit flex flex-row gap-3">
+                          <div className="relative w-full h-fit flex gap-3 flex-wrap md:flex-row">
                             {nft?.colors?.map((item, index) => {
                               return (
                                 <div
@@ -503,7 +502,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                     {nft?.isAgent ? "Minted By Agent" : "Minted By Hand"}
                   </div>
                   {Number(nft?.remixId) > 0 && (
-                    <div className="w-full h-fit flex relative flex-row justify-between items-center">
+                    <div className="w-full h-fit flex relative flex-wrap galaxy:flex-row justify-between items-center">
                       <div className="relative w-fit h-fit text-right flex text-sm font-nerd">
                         Remix Of
                       </div>
@@ -609,14 +608,14 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               )}
             </div>
           ) : screen == 2 ? (
-            <div className="relative w-full gap-3 flex flex-col h-full">
+            <div className="relative w-full gap-3 flex flex-col h-full justify-between">
               {Number(nft?.agentActivity?.length || 0) < 1 ? (
                 <div className="relative w-full h-full flex items-center justify-center text-sm text-gray-600 font-jack">
                   No Agent Activity Yet.
                 </div>
               ) : (
                 <div
-                  className="relative w-full h-[50%] overflow-y-scroll"
+                  className="relative w-full h-[20rem] overflow-y-scroll"
                   id="scrollableDiv"
                 >
                   <InfiniteScroll

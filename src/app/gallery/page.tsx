@@ -6,6 +6,7 @@ import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import { AnimationContext, ModalContext } from "../providers";
 import { useRouter } from "next/navigation";
+import MiniGallery from "@/components/Common/modules/MiniGallery";
 
 export default function Gallery() {
   const context = useContext(ModalContext);
@@ -14,10 +15,10 @@ export default function Gallery() {
   const [choice, setChoice] = useState<string>("All Minted");
   const router = useRouter();
   return (
-    <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-10 gap-24">
-      <div className="relative w-full h-fit flex flex-row justify-between items-start gap-6">
+    <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-3 sm:px-10 gap-24">
+      <div className="relative w-full h-fit flex flex-col xl:flex-row justify-between xl:items-start items-end gap-6">
         <div className="relative w-fit h-fit flex items-start justify-start">
-          <div className="relative w-80 h-60 flex top-20 left-10">
+          <div className="relative w-40 xl:w-80 h-28 xl:h-60 flex xl:top-20 xl:left-10">
             <Image
               src={`${INFURA_GATEWAY}/ipfs/QmbxJAdseh52v72wdSztAVWghF1FTDE3Uee2gJJ2wHR17a`}
               draggable={false}
@@ -25,9 +26,9 @@ export default function Gallery() {
             />
           </div>
         </div>
-        <div className="relative flex flex-col w-fit h-fit items-between justify-start gap-5">
-          <div className="relative w-full h-fit flex justify-between items-center flex-row gap-3">
-            <div className="relative w-fit h-fit flex font-nim text-white text-3xl uppercase left-12">
+        <div className="relative flex flex-col w-full xl:w-fit h-fit items-between justify-start gap-6 md:gap-5">
+          <div className="relative w-full h-fit flex justify-between items-center flex-col sm:flex-row gap-3">
+            <div className="relative w-fit h-fit flex font-nim text-white text-lg md:text-3xl uppercase md:left-12">
               Agent Art Market
             </div>
             <div
@@ -67,100 +68,17 @@ export default function Gallery() {
           <GalleryItems lensClient={context?.lensClient!} choice={choice} />
         </div>
       </div>
-      <div className="relative w-full h-fit flex items-center justify-center">
-        <div className="relative w-5/6 flex items-center justify-center flex-col gap-3 h-fit">
-          <div className="relative w-fit h-fit flex font-nim text-white text-3xl uppercase">
-            {"<= AGENTS ONBOARD =>"}
-          </div>
-          <div className="relative w-full h-fit flex overflow-x-scroll">
-            <div className="relative w-fit h-fit flex flex-row gap-6">
-              {context?.agentsLoading
-                ? Array.from({ length: 20 }).map((_, index) => {
-                    return (
-                      <div
-                        className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
-                        key={index}
-                      >
-                        <div className="relative animate-pulse flex w-56 h-56 rounded-md bg-pink p-4">
-                          <div className="pixel-border-6 w-full h-full relative bg-mochi rounded-3xl"></div>
-                        </div>
-                        <div className="relative w-fit h-fit flex items-center justify-center">
-                          <div className="relative w-20 h-20 flex">
-                            <Image
-                              layout="fill"
-                              src={`${INFURA_GATEWAY}/ipfs/${
-                                index % 3 === 0
-                                  ? "QmNVgB6TBsVeH2AwHck1MJwgHZTFtxWqrxGkGPsXRJhvs2"
-                                  : index % 3 === 1
-                                  ? "QmXHLgjrzCrDCzhfejFnNEcapxUqawuKLt5LSBd6je6G7V"
-                                  : "QmT8fNjUqmjarmC3BHoYUomcTSvR9YLd4CxiLQftkUquWR"
-                              }`}
-                              objectFit="contain"
-                              draggable={false}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                : context?.agents.map((agent, index) => {
-                    return (
-                      <div
-                        className="relative w-fit h-fit flex flex-row gap-6 items-center justify-center"
-                        key={index}
-                      >
-                        <div
-                          className="relative cursor-canP flex w-56 h-56 rounded-md bg-pink p-4"
-                          onClick={() => {
-                            animationContext?.setPageChange?.(true);
-                            router.prefetch(`/agent/${agent.id}`);
-                            router.push(`/agent/${agent.id}`);
-                          }}
-                        >
-                          <div className="pixel-border-3 w-full h-full relative bg-mochi rounded-xl">
-                            <Image
-                              draggable={false}
-                              layout="fill"
-                              objectFit="cover"
-                              src={`${INFURA_GATEWAY}/ipfs/${
-                                agent.cover?.split("ipfs://")?.[1]
-                              }`}
-                            />
-                          </div>
-                        </div>
-                        <div className="relative w-fit h-fit flex items-center justify-center">
-                          <div className="relative w-20 h-20 flex">
-                            <Image
-                              layout="fill"
-                              src={`${INFURA_GATEWAY}/ipfs/${
-                                index % 3 === 0
-                                  ? "QmNVgB6TBsVeH2AwHck1MJwgHZTFtxWqrxGkGPsXRJhvs2"
-                                  : index % 3 === 1
-                                  ? "QmXHLgjrzCrDCzhfejFnNEcapxUqawuKLt5LSBd6je6G7V"
-                                  : "QmT8fNjUqmjarmC3BHoYUomcTSvR9YLd4CxiLQftkUquWR"
-                              }`}
-                              objectFit="contain"
-                              draggable={false}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-            </div>
-          </div>
-          <div className="absolute top-0 -right-10 flex w-fit h-fit z-30">
-            <div className="relative w-40 h-20 flex rotate-[0.5rad]">
-              <Image
-                src={`${INFURA_GATEWAY}/ipfs/QmdXC6EZpvSU1U25ikHvTwX7RjAhA8FXJ7ZYLieN52gFyP`}
-                draggable={false}
-                layout="fill"
-                objectFit="contain"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <MiniGallery
+        text={"<= AGENTS ONBOARD =>"}
+        loader={context?.agentsLoading!}
+        content={
+          context?.agents?.map((ag) => ({
+            id: ag?.id,
+            cover: ag?.cover,
+          }))!
+        }
+        route
+      />
     </div>
   );
 }

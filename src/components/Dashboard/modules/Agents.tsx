@@ -122,9 +122,9 @@ const Agents: FunctionComponent<AgentProps> = ({
                       >
                         <div className="relative bg-white pixel-border-7 rounded-xl w-full h-full rounded-md flex">
                           <Image
-                            objectFit="contain"
+                            objectFit="cover"
                             layout="fill"
-                            className="rounded-xl"
+                            className="rounded-md"
                             draggable={false}
                             alt={agent?.title}
                             src={`${INFURA_GATEWAY}/ipfs/${
