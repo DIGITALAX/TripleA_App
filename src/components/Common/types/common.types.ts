@@ -11,6 +11,8 @@ export interface NFTData {
   collectionType: CollectionType;
   colors?: string[];
   sizes?: string[];
+  prompt?: string;
+  model?: string;
   prices: { price: string; token: string }[];
   agentIds: string[];
   artist: string;
@@ -49,6 +51,7 @@ export interface TokenThreshold {
   rentRemix: string;
   rentPublish: string;
   threshold: string;
+  rentMint: string;
   token: string;
   vig: string;
   rentLead: string;

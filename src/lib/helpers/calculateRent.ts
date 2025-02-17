@@ -22,6 +22,12 @@ const calculateRent = (tokenThreshold: TokenThreshold, agent: Worker) => {
       Number(agent?.remixFrequency || 0);
   }
 
+  if (agent?.mint) {
+    total +=
+      (Number(tokenThreshold?.rentMint || 0) / 10 ** 18) *
+      Number(agent?.mintFrequency || 0);
+  }
+
   return Number(parseFloat(total.toFixed(3)).toString());
 };
 

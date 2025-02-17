@@ -167,7 +167,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             blocktimestamp: collection?.blockTimestamp,
             prices: collection?.prices,
             tokens: collection?.tokens,
-            agents: collection?.agents,
+            agentIds: collection?.agentIds,
             artist: collection?.artist,
             amountSold: collection?.amountSold,
             tokenIds: collection?.tokenIds,

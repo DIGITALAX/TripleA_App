@@ -46,6 +46,8 @@ const AGENTS_PAGINATED = gql`
       workers {
         remixFrequency
         remix
+        mintFrequency
+        mint
         publishFrequency
         publish
         leadFrequency

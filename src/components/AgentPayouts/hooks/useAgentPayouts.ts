@@ -5,6 +5,7 @@ import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 import { getDevTreasuryPaid } from "../../../../graphql/queries/getDevTreasuryPaid";
+import { getArtistPaid } from "../../../../graphql/queries/getArtistsPaid";
 
 const useAgentPayouts = (lensClient: PublicClient) => {
   const accountCache = new Map<string, any>();
@@ -16,6 +17,24 @@ const useAgentPayouts = (lensClient: PublicClient) => {
       amount: number;
       blockTimestamp: string;
       owner: string;
+      token: string;
+      transactionHash: string;
+      profile?: Account;
+      collection: {
+        uri: string;
+        artist: string;
+        collectionId: string;
+        metadata: {
+          image: string;
+        };
+      };
+    }[]
+  >([]);
+  const [artistsPaid, setArtistsPaid] = useState<
+    {
+      amount: number;
+      blockTimestamp: string;
+      artist: string;
       token: string;
       transactionHash: string;
       profile?: Account;
@@ -69,19 +88,23 @@ const useAgentPayouts = (lensClient: PublicClient) => {
     owners: boolean;
     collectors: boolean;
     dev: boolean;
+    artists: boolean;
   }>({
     owners: true,
     collectors: true,
     dev: true,
+    artists: true,
   });
   const [paginated, setPaginated] = useState<{
     owners: number;
     collectors: number;
     dev: number;
+    artists: number;
   }>({
     owners: 0,
     collectors: 0,
     dev: 0,
+    artists: 0,
   });
 
   const fetchAccountData = async (artist: string) => {
@@ -139,12 +162,14 @@ const useAgentPayouts = (lensClient: PublicClient) => {
       const owners = await getOwnersPaid(0);
       const collectors = await getCollectorsPaid(0);
       const dev = await getDevTreasuryPaid(0);
+      const artists = await getArtistPaid(0);
 
       setHasMore({
         collectors:
           collectors?.data?.collectorPaids?.length < 20 ? false : true,
         owners: owners?.data?.ownerPaids?.length < 20 ? false : true,
         dev: dev?.data?.devTreasuryPaids?.length < 20 ? false : true,
+        artists: artists?.data?.artistPaids?.length < 20 ? false : true,
       });
 
       setPaginated({
@@ -160,6 +185,10 @@ const useAgentPayouts = (lensClient: PublicClient) => {
           dev?.data?.devTreasuryPaids?.length == 20
             ? paginated?.dev + 20
             : paginated?.dev,
+        artists:
+          artists?.data?.artistPaids?.length == 20
+            ? paginated?.artists + 20
+            : paginated?.artists,
       });
 
       let collectors_info = await Promise.all(
@@ -209,9 +238,27 @@ const useAgentPayouts = (lensClient: PublicClient) => {
         })
       );
 
+      let artists_info = await Promise.all(
+        (artists?.data?.artistPaids || [])?.map(async (collect: any) => {
+          const profile = await fetchAccountData(collect?.collection?.artist);
+          await fetchMetadata(collect?.collection);
+
+          return {
+            amount: collect?.amount,
+            blockTimestamp: collect?.blockTimestamp,
+            artist: collect?.forArtist,
+            token: collect?.token,
+            transactionHash: collect?.transactionHash,
+            collection: collect?.collection,
+            profile,
+          };
+        })
+      );
+
       setOwnersPaid(owners_info);
       setCollectorsPaid(collectors_info);
       setDevTreasuryPaid(devs_info);
+      setArtistsPaid(artists_info);
     } catch (err: any) {
       console.error(err.message);
     }
@@ -223,9 +270,11 @@ const useAgentPayouts = (lensClient: PublicClient) => {
       let hasMoreOwner: boolean = false,
         hasMoreCollector: boolean = false,
         hasMoreDev: boolean = false,
+        hasMoreArtist: boolean = false,
         paginatedOwner: number = paginated.owners,
         paginatedCollector: number = paginated.collectors,
-        paginatedDev: number = paginated.dev;
+        paginatedDev: number = paginated.dev,
+        paginatedArtist: number = paginated.artists;
 
       if (hasMore.collectors) {
         const collectors = await getCollectorsPaid(paginatedCollector);
@@ -252,6 +301,34 @@ const useAgentPayouts = (lensClient: PublicClient) => {
         if (collectors?.data?.collectorPaids?.length == 20) {
           hasMoreCollector = true;
           paginatedCollector = paginated?.collectors + 20;
+        }
+      }
+
+      if (hasMore.artists) {
+        const artists = await getArtistPaid(paginatedArtist);
+
+        let artists_info = await Promise.all(
+          artists?.data?.artistPaids?.map(async (collect: any) => {
+            const profile = await fetchAccountData(collect?.collection?.artist);
+            await fetchMetadata(collect?.collection);
+
+            return {
+              amount: collect?.amount,
+              blockTimestamp: collect?.blockTimestamp,
+              artist: collect?.forArtist,
+              token: collect?.token,
+              transactionHash: collect?.transactionHash,
+              collection: collect?.collection,
+              profile,
+            };
+          })
+        );
+
+        setArtistsPaid([...artistsPaid, ...artists_info] as any);
+
+        if (artists?.data?.artistPaids?.length == 20) {
+          hasMoreArtist = true;
+          paginatedArtist = paginated?.artists + 20;
         }
       }
 
@@ -312,12 +389,14 @@ const useAgentPayouts = (lensClient: PublicClient) => {
         owners: hasMoreOwner,
         collectors: hasMoreCollector,
         dev: hasMoreDev,
+        artists: hasMoreArtist,
       });
 
       setPaginated({
         owners: paginatedOwner,
         collectors: paginatedCollector,
         dev: paginatedDev,
+        artists: paginatedArtist,
       });
     } catch (err: any) {
       console.error(err.message);
@@ -339,6 +418,7 @@ const useAgentPayouts = (lensClient: PublicClient) => {
     hasMore,
     handleMorePaid,
     devTreasuryPaid,
+    artistsPaid
   };
 };
 

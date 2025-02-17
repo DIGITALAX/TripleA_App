@@ -4,7 +4,12 @@ import {
   NFTData,
   TokenThreshold,
 } from "@/components/Common/types/common.types";
-import { Account, Post, PublicClient, SessionClient } from "@lens-protocol/client";
+import {
+  Account,
+  Post,
+  PublicClient,
+  SessionClient,
+} from "@lens-protocol/client";
 import { SetStateAction } from "react";
 import { StorageClient } from "@lens-protocol/storage-node-client";
 
@@ -58,6 +63,7 @@ export type MintSwitchProps = {
   lensConnected: LensConnected;
   tokenThresholds: TokenThreshold[];
   fulfillers: Fulfiller[];
+  setToolTip: (e: SetStateAction<boolean>) => void;
 };
 
 export type DropsProps = {
@@ -109,6 +115,7 @@ export type ChooseAgentProps = {
   mintData: MintData;
   setMintData: (e: SetStateAction<MintData>) => void;
   tokenThresholds: TokenThreshold[];
+  setToolTip: (e: SetStateAction<boolean>) => void;
 };
 
 export type AgentProps = {
@@ -117,7 +124,7 @@ export type AgentProps = {
   address: `0x${string}` | undefined;
   setNotification: (e: SetStateAction<string | undefined>) => void;
   setAgents: (e: SetStateAction<Agent[]>) => void;
-  sessionClient: SessionClient
+  sessionClient: SessionClient;
 };
 
 export type AccountProps = {
@@ -135,9 +142,11 @@ export type MintData = {
     publishFrequency: number;
     remixFrequency: number;
     leadFrequency: number;
+    mintFrequency: number;
     publish: boolean;
     remix: boolean;
     lead: boolean;
+    mint: boolean;
   }[];
   prices: number[];
   tokens: string[];
@@ -192,15 +201,18 @@ export enum CollectionWorkerType {
   Publish = "Publish",
   Lead = "Lead Gen",
   Remix = "Remix",
+  Mint = "Mint",
 }
 
 export interface Worker {
   leadFrequency: number;
   publishFrequency: number;
   remixFrequency: number;
+  mintFrequency: number;
   remix: boolean;
   publish: boolean;
   lead: boolean;
+  mint: boolean;
   instructions: string;
   profile?: Account;
   collectionId: string;
@@ -314,17 +326,21 @@ export type AgentEditSwitchProps = {
   handleEditAgent: () => Promise<void>;
   agentEditLoading: boolean;
   agentMetadata: AgentMetadata;
-  agentOwners: {address: string; added: boolean}[];
+  agentOwners: { address: string; added: boolean }[];
   revokeOwner: (index: number) => Promise<void>;
   addOwner: (index: number) => Promise<void>;
-  setAgentOwners: (e: SetStateAction<{address: string; added: boolean}[]>) => void;
+  setAgentOwners: (
+    e: SetStateAction<{ address: string; added: boolean }[]>
+  ) => void;
   revokeLoading: boolean[];
   addOwnerLoading: boolean[];
   setAgentMetadata: (e: SetStateAction<AgentMetadata>) => void;
   feedsLoading: boolean;
   handleNewFeeds: () => Promise<void>;
-  agentFeeds: {address: string; added: boolean}[];
-  setAgentFeeds: (e: SetStateAction<{address: string; added: boolean}[]>) => void;
+  agentFeeds: { address: string; added: boolean }[];
+  setAgentFeeds: (
+    e: SetStateAction<{ address: string; added: boolean }[]>
+  ) => void;
   addFeedLoading: boolean[];
-  addFeedRule: (index: number) => Promise<void>
+  addFeedRule: (index: number) => Promise<void>;
 };

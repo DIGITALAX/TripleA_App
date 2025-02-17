@@ -5,10 +5,7 @@ import {
 } from "@/components/Common/types/common.types";
 import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
 import { useEffect, useState } from "react";
-import {
-  getCollection,
-  getCollectionRemix,
-} from "../../../../graphql/queries/getCollection";
+import { getCollection } from "../../../../graphql/queries/getCollection";
 import {
   Account,
   evmAddress,
@@ -174,7 +171,7 @@ const useNFT = (
       }
 
       const res = await getCollectors(Number(id));
-   
+
       let collectors: Collector[] = [];
       const profileCache = new Map<string, Account>();
       const pictureCache = new Map<string, string>();
@@ -300,6 +297,8 @@ const useNFT = (
         amount: collection?.amount,
         isAgent: collection?.isAgent,
         remixId: collection?.remixId,
+        prompt: collection?.metadata?.prompt,
+        model: collection?.metadata?.model,
         remix,
         profile: {
           ...result.value.items?.[0]?.account,

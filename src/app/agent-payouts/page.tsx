@@ -22,6 +22,7 @@ export default function AgentPayouts() {
     handleMorePaid,
     hasMore,
     devTreasuryPaid,
+    artistsPaid,
   } = useAgentPayouts(context?.lensClient!);
 
   return (
@@ -30,7 +31,7 @@ export default function AgentPayouts() {
         <div className="relative w-full h-fit flex flex-row justify-between items-center">
           <div
             className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
-            onClick={() => setScreen(screen > 0 ? screen - 1 : 2)}
+            onClick={() => setScreen(screen > 0 ? screen - 1 : 3)}
           >
             <svg
               className="size-6"
@@ -50,11 +51,13 @@ export default function AgentPayouts() {
               ? "Agent Owners Paid"
               : screen == 1
               ? "Collectors Paid"
-              : "Dev Treasury Paid"}
+              : screen == 2
+              ? "Dev Treasury Paid"
+              : "Artists Paid"}
           </div>
           <div
             className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
-            onClick={() => setScreen(screen < 3 ? screen + 1 : 0)}
+            onClick={() => setScreen(screen < 4 ? screen + 1 : 0)}
           >
             <svg
               fill="none"
@@ -82,7 +85,9 @@ export default function AgentPayouts() {
                   ? ownersPaid
                   : screen == 1
                   ? collectorsPaid
-                  : devTreasuryPaid
+                  : screen == 2
+                  ? devTreasuryPaid
+                  : artistsPaid
                 )?.length || 1
               }
               next={handleMorePaid}
@@ -91,7 +96,9 @@ export default function AgentPayouts() {
                   ? hasMore?.owners
                   : screen == 1
                   ? hasMore?.collectors
-                  : hasMore?.dev
+                  : screen == 2
+                  ? hasMore?.dev
+                  : hasMore?.artists
               }
               loader={<div key={0} />}
               className="relative w-full gap-6 flex flex-col"
@@ -101,7 +108,9 @@ export default function AgentPayouts() {
                 ? ownersPaid
                 : screen == 1
                 ? collectorsPaid
-                : devTreasuryPaid
+                : screen == 2
+                ? devTreasuryPaid
+                : artistsPaid
               )?.length < 1
                 ? Array.from({ length: 10 }).map((_, key) => {
                     return (
@@ -115,7 +124,9 @@ export default function AgentPayouts() {
                     ? ownersPaid
                     : screen == 1
                     ? collectorsPaid
-                    : devTreasuryPaid
+                    : screen == 2
+                    ? devTreasuryPaid
+                    : artistsPaid
                   )?.map((item, key) => {
                     return (
                       <div
@@ -213,10 +224,12 @@ export default function AgentPayouts() {
                               </div>
                             </div>
                           )}
-                          {screen < 2 && (
+                          {(screen < 2 || screen == 3) && (
                             <div className="relative w-fit h-fit flex text-xs">
                               {(screen < 1
                                 ? (item as any)?.owner
+                                : screen == 3
+                                ? (item as any)?.artist
                                 : (item as any)?.collector
                               )?.slice(0, 10) + " ..."}
                             </div>

@@ -5,7 +5,10 @@ import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
 import { MARKET_CONTRACT } from "@/lib/constants";
 import { CollectData } from "../types/nft.types";
-import { CollectionType } from "@/components/Dashboard/types/dashboard.types";
+import {
+  Agent,
+  CollectionType,
+} from "@/components/Dashboard/types/dashboard.types";
 
 const usePurchase = (
   nft: NFTData,
@@ -18,11 +21,13 @@ const usePurchase = (
       | (CollectData & {
           id: number;
           fulfiller: string;
+          agentId: number;
         })
       | undefined
     >
   ) => void,
-  fulfillers: Fulfiller[]
+  fulfillers: Fulfiller[],
+  agents: Agent[]
 ) => {
   const [purchaseLoading, setPurchaseLoading] = useState<boolean>(false);
   const [collectData, setCollectData] = useState<CollectData>({
@@ -205,6 +210,13 @@ const usePurchase = (
         id: Number(nft.id),
         fulfiller: fulfillers?.find((ful) => ful.fulfillerId == nft.fulfillerId)
           ?.wallet!,
+        agentId: Number(
+          agents?.find((ag) =>
+            ag?.wallets
+              ?.map((w) => w.toLowerCase())
+              ?.includes(nft?.artist?.toLowerCase())
+          )?.id
+        ),
       });
       return;
     }
@@ -221,7 +233,19 @@ const usePurchase = (
         abi: MarketAbi,
         functionName: "buy",
         chain: chains.testnet,
-        args: ["", collectData?.token, Number(nft.id), collectData?.amount],
+        args: [
+          "",
+          collectData?.token,
+          Number(nft.id),
+          collectData?.amount,
+          Number(
+            agents?.find((ag) =>
+              ag?.wallets
+                ?.map((w) => w.toLowerCase())
+                ?.includes(nft?.artist?.toLowerCase())
+            )?.id
+          ),
+        ],
         account: address,
       });
 

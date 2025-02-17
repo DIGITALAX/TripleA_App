@@ -25,9 +25,11 @@ const useAgentsCollection = (
       publishFrequency: number;
       remixFrequency: number;
       leadFrequency: number;
+      mintFrequency: number;
       publish: boolean;
       remix: boolean;
       lead: boolean;
+      mint: boolean;
     }[]
   >([]);
   const [priceAdjusted, setPriceAdjusted] = useState<
@@ -56,6 +58,7 @@ const useAgentsCollection = (
           priceAdjusted?.[index]?.token,
           Number(collection?.id),
           priceAdjusted?.[index]?.price * 10 ** 18,
+          0
         ],
         account: address,
       });
@@ -86,7 +89,7 @@ const useAgentsCollection = (
         abi: CollectionManagerAbi,
         functionName: "updateCollectionWorkerAndDetails",
         chain: chains.testnet,
-        args: [frequencies, customInstructions, ids, Number(collection?.id)],
+        args: [frequencies, customInstructions, ids, Number(collection?.id), 0],
         account: address,
       });
 
@@ -122,7 +125,7 @@ const useAgentsCollection = (
         abi: CollectionManagerAbi,
         functionName: functionName,
         chain: chains.testnet,
-        args: [Number(collection?.id)],
+        args: [Number(collection?.id), 0],
         account: address,
       });
 
@@ -185,6 +188,12 @@ const useAgentsCollection = (
                     (col) => Number(col?.collectionId) == Number(collection?.id)
                   )?.leadFrequency
                 ) || 0,
+              mintFrequency:
+                Number(
+                  ag?.workers?.find(
+                    (col) => Number(col?.collectionId) == Number(collection?.id)
+                  )?.mintFrequency
+                ) || 0,
               lead:
                 ag?.workers?.find(
                   (col) => Number(col?.collectionId) == Number(collection?.id)
@@ -197,6 +206,10 @@ const useAgentsCollection = (
                 ag?.workers?.find(
                   (col) => Number(col?.collectionId) == Number(collection?.id)
                 )?.publish || false,
+              mint:
+                ag?.workers?.find(
+                  (col) => Number(col?.collectionId) == Number(collection?.id)
+                )?.mint || false,
             }))
           );
           setCustomInstructions(

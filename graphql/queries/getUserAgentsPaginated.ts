@@ -32,6 +32,8 @@ const USER_AGENTS = gql`
       workers {
         remixFrequency
         remix
+        mintFrequency
+        mint
         publishFrequency
         publish
         leadFrequency

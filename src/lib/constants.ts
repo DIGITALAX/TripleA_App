@@ -12,7 +12,9 @@ export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
   "0x6B434299F649eE8A908A67eeeAE4BE1E57720788";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
   "0x44F12767C03bfC102e70603403d64EC83aA2Fa53";
-export const AGENT_FEED_RULE: `0x${string}` = "0x";
+export const AGENT_FEED_RULE: `0x${string}` = "0x27dfD1dc2867850E6c0930c1B5066854de0182e4";
+export const ZERO_ADDRESS: `0x${string}` = "0x0000000000000000000000000000000000000000";
+
 
 export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   {
@@ -47,7 +49,7 @@ export const FOOTER_TEXT: string[] = [
   "Either way, you start by assigning agents to your collections.<br/><br/>Getting a team ready to pull for you.",
   "Once you hit more than one sale on your collection, it's your agent's time to shine.",
   "Your agents earn 10% commission from each sale moving forward.",
-  "Every cycle, your agents publish and remix new content related to your Lens collections, attracting new attention.",
+  "Every cycle, your agents publish, remix and mint new content related to your Lens collections, attracting new attention.",
   "Agents pay rent too, so they can stay in the game.",
   "When winnings are greater than rent, bonus splits are shared:<br/><br/>- The first 30% goes to the agent owners.",
   "- The next 40% funds developer grants to power agentic innovation.",

@@ -55,7 +55,6 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
   );
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
-
   return (
     <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
       <div className="relative w-full min-h-[30rem] h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6">
@@ -82,20 +81,20 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
             </svg>
           </div>
         </div>
-        <div className="flex relative w-full h-full items-center justify-start overflow-x-scroll">
+        <div className="flex relative w-full h-full items-center justify-start">
           <div
             className={`relative h-full flex flex-row gap-6 ${
-              collection?.agentIds?.length > 1 ? "w-fit" : "w-full"
+              collection?.agentIds?.length > 0 ? "w-fit" : "w-full"
             }`}
           >
-            <div className="relative w-fit h-full flex items-center justify-between flex-col gap-4">
+            <div className="relative w-fit flex items-center justify-between flex-col gap-4">
               <div className="relative w-fit h-fit flex text-sm uppercase">
                 {collection?.title?.length > 12
                   ? collection?.title?.slice(0, 9) + "..."
                   : collection?.title}
               </div>
               <div
-                className="relative w-fit h-full flex cursor-canP"
+                className="relative w-fit h-fit flex cursor-canP"
                 onClick={() => {
                   animationContext?.setPageChange?.(true);
                   router.prefetch(
@@ -217,12 +216,12 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
             </div>
             <div
               className={`relative w-full h-full flex items-start flex-col gap-3 justify-start relative  ${
-                collection?.agentIds?.length > 1 && "overflow-x-scroll"
+                collection?.agentIds?.length > 0 && "overflow-x-scroll"
               }`}
             >
               <div
                 className={`relative h-full flex flex-row gap-6 ${
-                  collection?.agentIds?.length > 1 ? "w-fit" : "w-full"
+                  collection?.agentIds?.length > 0 ? "w-fit" : "w-full"
                 }`}
               >
                 {collection?.agentIds?.length < 1 ? (
@@ -283,6 +282,12 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                                 key: "remixFrequency",
                                 on: frequencies[key]?.remix,
                               },
+                              {
+                                type: CollectionWorkerType.Mint,
+                                value: frequencies[key]?.mintFrequency,
+                                key: "mintFrequency",
+                                on: frequencies[key]?.mint,
+                              },
                             ].map((item, index) => {
                               return (
                                 <div
@@ -310,6 +315,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                                               publish: boolean;
                                               remix: boolean;
                                               lead: boolean;
+                                              mint: boolean;
                                             }
                                           ] = !freq[key][
                                             item.key.replace(
@@ -319,6 +325,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                                               publish: boolean;
                                               remix: boolean;
                                               lead: boolean;
+                                              mint: boolean;
                                             }
                                           ] as boolean;
 
@@ -353,6 +360,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                                             publishFrequency: number;
                                             remixFrequency: number;
                                             leadFrequency: number;
+                                            mintFrequency: number;
                                           }
                                         ] = value;
 
@@ -364,7 +372,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                               );
                             })}
                             <textarea
-                              className="relative w-full h-40 flex overflow-y-scroll p-1 bg-viol text-sm rounded-md cursor-text focus:outline-none"
+                              className="relative w-full h-20 flex overflow-y-scroll p-1 bg-viol text-sm rounded-md cursor-text focus:outline-none"
                               placeholder="Add custom instructions for your agent."
                               style={{
                                 resize: "none",

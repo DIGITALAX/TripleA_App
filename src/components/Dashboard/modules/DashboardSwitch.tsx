@@ -104,6 +104,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
               lensConnected={context?.lensConnected!}
               tokenThresholds={context?.tokenThresholds!}
               fulfillers={context?.fulfillers!}
+              setToolTip={context?.setToolTip!}
             />
             <div className="relative w-full h-fit flex items-end justify-between flex-row gap-4">
               <div

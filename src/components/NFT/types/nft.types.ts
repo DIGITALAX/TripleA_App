@@ -36,11 +36,13 @@ export type PurchaseProps = {
       | (CollectData & {
           id: number;
           fulfiller: string;
+          agentId: number
         })
       | undefined
     >
   ) => void;
   fulfillers: Fulfiller[];
+  setToolTip: (e: SetStateAction<boolean>) => void;
 };
 
 export interface CollectData {

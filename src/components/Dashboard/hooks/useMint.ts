@@ -9,6 +9,7 @@ import {
   COLLECTION_MANAGER_CONTRACT,
   INFURA_GATEWAY,
   TOKENS,
+  ZERO_ADDRESS,
 } from "@/lib/constants";
 import CollectionManagerAbi from "@abis/CollectionManagerAbi.json";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
@@ -161,14 +162,17 @@ const useMint = (
                 : 0,
             remixId: mintData.remixId,
             remixable: mintData.remixable,
+            forArtist: ZERO_ADDRESS,
           },
           mintData?.agents?.map((ag) => ({
             publishFrequency: Number(ag.publishFrequency),
             remixFrequency: Number(ag.remixFrequency),
             leadFrequency: Number(ag.leadFrequency),
+            mintFrequency: Number(ag.mintFrequency),
             publish: ag.publish,
             remix: ag.remix,
             lead: ag.lead,
+            mint: ag.mint,
             instructions: ag.customInstructions,
           })),
           dropMetadata,

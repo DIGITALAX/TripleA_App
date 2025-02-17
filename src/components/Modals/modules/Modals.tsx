@@ -8,12 +8,14 @@ import Indexer from "./Indexer";
 import Notification from "./Notification";
 import Signless from "./Signless";
 import Fulfillment from "./Fulfillment";
+import Tooltip from "./Tooltip";
 
 const Modals: FunctionComponent = (): JSX.Element => {
   const context = useContext(ModalContext);
   const { address } = useAccount();
   return (
     <>
+      {context?.toolTip && <Tooltip setTooltip={context?.setToolTip} />}
       {context?.indexer && (
         <Indexer indexer={context?.indexer} setIndexer={context?.setIndexer} />
       )}

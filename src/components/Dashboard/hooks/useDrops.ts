@@ -72,7 +72,7 @@ const useDrops = (
             title: collection?.metadata?.title,
             description: collection?.metadata?.description,
             prices: collection?.prices,
-            agents: collection?.agents,
+            agentIds: collection?.agentIds,
             active: collection?.active,
             amountSold: collection?.amountSold,
             amount: collection?.amount,

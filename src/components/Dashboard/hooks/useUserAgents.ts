@@ -417,7 +417,7 @@ const useUserAgents = (
     try {
       const res = await updateFeedRules(sessionClient, {
         toAdd: {
-          anyOf: [
+          required: [
             {
               unknownRule: {
                 executeOn: [FeedRuleExecuteOn.CreatingPost],

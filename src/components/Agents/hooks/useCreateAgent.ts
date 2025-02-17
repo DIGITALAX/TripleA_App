@@ -2,7 +2,10 @@ import { chains } from "@lens-network/sdk/viem";
 import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
-import { SKYHUNTERS_AGENTS_MANAGER_CONTRACT, AGENT_FEED_RULE } from "@/lib/constants";
+import {
+  SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
+  AGENT_FEED_RULE,
+} from "@/lib/constants";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
 import { StorageClient } from "@lens-protocol/storage-node-client";
@@ -471,8 +474,9 @@ const useCreateAgent = (
     if (
       feed.name.trim() == "" ||
       feed.title.trim() == "" ||
-      feed.description.trim() == "" ||
-      !agentWallet
+      feed.description.trim() == ""
+      //  ||
+      // !agentWallet
     )
       return;
     setCreateFeedLoading(true);
@@ -503,9 +507,12 @@ const useCreateAgent = (
 
         const resFeed = await createFeed(builder.value, {
           metadataUri: uri,
-          admins: [address, agentWallet?.address],
+          admins: [
+            address,
+            // , agentWallet?.address
+          ],
           rules: {
-            anyOf: [
+            required: [
               {
                 unknownRule: {
                   executeOn: [FeedRuleExecuteOn.CreatingPost],
@@ -530,21 +537,23 @@ const useCreateAgent = (
           console.log({ feeds });
 
           if (feeds.isOk()) {
-            setAgentDetails({
-              ...agentDetails,
-              feeds: [
-                {
-                  address: feeds?.value?.items?.[0]?.address,
-                  added: true,
-                },
-                ...agentDetails.feeds,
-              ],
-            });
-            setFeed({
-              title: "",
-              description: "",
-              name: "",
-            });
+            if (feeds?.value?.items?.[0]?.address) {
+              setAgentDetails({
+                ...agentDetails,
+                feeds: [
+                  {
+                    address: feeds?.value?.items?.[0]?.address,
+                    added: true,
+                  },
+                  ...agentDetails.feeds,
+                ],
+              });
+              setFeed({
+                title: "",
+                description: "",
+                name: "",
+              });
+            }
           }
         }
       }
@@ -566,7 +575,7 @@ const useCreateAgent = (
     try {
       const res = await updateFeedRules(lensConnected?.sessionClient!, {
         toAdd: {
-          anyOf: [
+          required: [
             {
               unknownRule: {
                 executeOn: [FeedRuleExecuteOn.CreatingPost],

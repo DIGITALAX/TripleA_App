@@ -1,20 +1,16 @@
 "use client";
 
-import { AnimationContext, ModalContext } from "@/app/providers";
+import { ModalContext } from "@/app/providers";
 import MiniGallery from "@/components/Common/modules/MiniGallery";
 import useNFT from "@/components/NFT/hooks/useNFT";
 import Data from "@/components/NFT/modules/Data";
 import Purchase from "@/components/NFT/modules/Purchase";
-import { INFURA_GATEWAY } from "@/lib/constants";
-import Image from "next/legacy/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useContext } from "react";
 
 export default function NFT() {
   const id = useParams();
   const context = useContext(ModalContext);
-  const animationContext = useContext(AnimationContext);
-  const router = useRouter();
   const {
     nft,
     nftLoading,
@@ -58,6 +54,7 @@ export default function NFT() {
           setImageView={context?.setImageView!}
           agents={context?.agents!}
           fulfillers={context?.fulfillers!}
+          setToolTip={context?.setToolTip!}
         />
       </div>
       <MiniGallery

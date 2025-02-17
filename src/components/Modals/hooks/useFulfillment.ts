@@ -18,12 +18,14 @@ const useFulfillment = (
   details: CollectData & {
     id: number;
     fulfiller: string;
+    agentId: number;
   },
   setFulfillmentOpen: (
     e: SetStateAction<
       | (CollectData & {
           id: number;
           fulfiller: string;
+          agentId: number;
         })
       | undefined
     >
@@ -44,7 +46,10 @@ const useFulfillment = (
     country: "",
     zip: "",
   });
-  const client = new LitNodeClient({ litNetwork:LIT_NETWORK.DatilDev, debug: false });
+  const client = new LitNodeClient({
+    litNetwork: LIT_NETWORK.DatilDev,
+    debug: false,
+  });
 
   const handlePurchase = async () => {
     if (fulfillmentEncrypted.trim() == "") return;
@@ -65,6 +70,7 @@ const useFulfillment = (
           details?.token,
           details.id,
           details?.amount,
+          details?.agentId,
         ],
         account: address,
       });
@@ -151,7 +157,6 @@ const useFulfillment = (
             state: fulfillmentInfo.state,
           })
         ),
-        
       });
 
       setFulfillmentEncrypted(

@@ -20,6 +20,7 @@ import { useContext } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { createPublicClient, http } from "viem";
 import { useAccount } from "wagmi";
+import { CiCircleQuestion } from "react-icons/ci";
 
 export default function Agent() {
   const id = useParams();
@@ -646,6 +647,14 @@ export default function Agent() {
                       </div>
                     ) : (
                       <div className="relative w-full h-fit flex flex-col gap-2 items-start justify-start">
+                        <div className="relative w-full h-fit flex items-center justify-center">
+                          <CiCircleQuestion
+                            size={20}
+                            className="cursor-canP"
+                            onClick={() => context?.setToolTip(true)}
+                            color="#0000f5"
+                          />
+                        </div>
                         <div className="relative w-fit h-fit flex items-center justify-center text-sm text-pink font-nim">
                           Recharge to put this agent to work.
                         </div>
@@ -878,6 +887,26 @@ export default function Agent() {
                                                   thr?.token?.toLowerCase() ==
                                                   chosenTokens?.[key]
                                               )?.rentRemix || 0
+                                            ) /
+                                              10 ** 18)}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {collection?.mint && (
+                                      <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                        <div className="relative w-fit h-fit flex">
+                                          Mint Rate:
+                                        </div>
+                                        <div className="relative w-fit h-fit flex">
+                                          {Number(
+                                            collection?.mintFrequency || 0
+                                          ) *
+                                            (Number(
+                                              context?.tokenThresholds?.find(
+                                                (thr) =>
+                                                  thr?.token?.toLowerCase() ==
+                                                  chosenTokens?.[key]
+                                              )?.rentMint || 0
                                             ) /
                                               10 ** 18)}
                                         </div>

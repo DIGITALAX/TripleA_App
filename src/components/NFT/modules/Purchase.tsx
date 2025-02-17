@@ -21,6 +21,7 @@ import {
 } from "@/components/Dashboard/types/dashboard.types";
 import calculateRent from "@/lib/helpers/calculateRent";
 import descriptionRegex from "@/lib/helpers/descriptionRegex";
+import { CiCircleQuestion } from "react-icons/ci";
 
 const Purchase: FunctionComponent<PurchaseProps> = ({
   nft,
@@ -40,6 +41,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
   handlePosts,
   setFulfillmentOpen,
   fulfillers,
+  setToolTip,
 }): JSX.Element => {
   const { isConnected, address } = useAccount();
   const router = useRouter();
@@ -68,7 +70,8 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
     publicClient,
     setNotification,
     setFulfillmentOpen,
-    fulfillers
+    fulfillers,
+    agents
   );
   const {
     rechargeLoading,
@@ -123,7 +126,9 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   screen > 0
                     ? screen - 1
                     : Number(nft?.agentIds?.length || 0) > 0
-                    ? 3
+                    ? nft?.isAgent
+                      ? 4
+                      : 3
                     : 1
                 )
               }
@@ -149,7 +154,9 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                   ? "Collectors"
                   : screen == 2
                   ? "Agents On Lens"
-                  : "Agent Recharge Station"
+                  : screen == 3
+                  ? "Agent Recharge Station"
+                  : "CC0 GenArt"
                 : screen < 1
                 ? "Collect"
                 : "Collectors"}
@@ -158,7 +165,12 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               className="relative w-fit h-fit flex items-center justiy-center cursor-canP"
               onClick={() =>
                 setScreen(
-                  screen < (Number(nft?.agentIds?.length || 0) > 0 ? 3 : 1)
+                  screen <
+                    (Number(nft?.agentIds?.length || 0) > 0
+                      ? nft?.isAgent
+                        ? 4
+                        : 3
+                      : 1)
                     ? screen + 1
                     : 0
                 )
@@ -487,9 +499,11 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 </>
               )}
               <div className="relative w-full h-full flex flex-col gap-3 items-start justify-between">
-                <div className={`relative w-full h-full flex py-4 overflow-y-scroll ${
-                      Number(nft?.remixId) > 0 ? "max-h-28" : "max-h-32"
-                    }`}>
+                <div
+                  className={`relative w-full h-full flex py-4 overflow-y-scroll ${
+                    Number(nft?.remixId) > 0 ? "max-h-28" : "max-h-32"
+                  }`}
+                >
                   <div
                     className={`py-3 h-fit flex relative items-start justify-start text-left text-sm font-nerd break-all w-full`}
                     dangerouslySetInnerHTML={{
@@ -653,9 +667,17 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                 success={success}
               />
             </div>
-          ) : (
-            <div className="relative w-full h-full overflow-y-scroll flex items-start justify-start">
-              <div className="relative w-full h-fit flex flex-col items-start justify-start  gap-3">
+          ) : screen == 3 ? (
+            <div className="relative w-full h-full flex-col gap-3 overflow-y-scroll flex items-start justify-start">
+              <div className="relative w-full h-fit flex items-center justify-center">
+                <CiCircleQuestion
+                  size={20}
+                  className="cursor-canP"
+                  onClick={() => setToolTip(true)}
+                  color="#0000f5"
+                />
+              </div>
+              <div className="relative w-full h-fit flex flex-col items-start justify-start gap-3">
                 {agents
                   ?.filter((ag) => nft?.agentIds?.includes(ag?.id))
                   ?.map((agent, key) => {
@@ -679,7 +701,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                               router.push(`/agent/${agent?.id}`);
                             }}
                           >
-                            <div className="relative w-20 h-20 flex">
+                            <div className="relative w-8 h-8 flex rounded-sm">
                               <Image
                                 src={`${INFURA_GATEWAY}/ipfs/${
                                   agent?.cover?.split("ipfs://")?.[1]
@@ -687,12 +709,13 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                 alt="pfp"
                                 draggable={false}
                                 layout="fill"
+                                className="rounded-sm"
                                 objectFit="contain"
                               />
                             </div>
                           </div>
                           <input
-                            className="relative w-full h-full p-1 bg-viol text-sm text-windows focus:outline-none pixel-border-7"
+                            className="relative w-full h-8 p-1 bg-viol text-sm text-windows focus:outline-none pixel-border-7"
                             placeholder="1"
                             type="number"
                             disabled={rechargeLoading[key]}
@@ -820,6 +843,24 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                                 </div>
                               </div>
                             )}
+                            {worker?.mint && (
+                              <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
+                                <div className="relative w-fit h-fit flex">
+                                  Mint Rate:
+                                </div>
+                                <div className="relative w-fit h-fit flex">
+                                  {Number(worker?.mintFrequency || 0) *
+                                    (Number(
+                                      tokenThresholds?.find(
+                                        (thr) =>
+                                          thr?.token?.toLowerCase() ==
+                                          collectData?.token
+                                      )?.rentMint || 0
+                                    ) /
+                                      10 ** 18)}
+                                </div>
+                              </div>
+                            )}
                             {worker?.lead && (
                               <div className="relative w-fit h-fit flex items-start justify-between flex-col gap-1">
                                 <div className="relative w-fit h-fit flex">
@@ -872,6 +913,26 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       </div>
                     );
                   })}
+              </div>
+            </div>
+          ) : (
+            <div className="relative font-nerd text-sm w-full h-full flex flex-col gap-5 items-start justify-between">
+              <div className="relative w-full h-fit flex flex-row gap-3 items-start justify-between flex-wrap">
+                <div className="relative w-fit hit flex">Image Model:</div>
+                <div className="relative w-fit h-fit flex">{nft?.model}</div>
+              </div>
+              <div className="relative w-full h-full flex flex-col gap-3 items-start justify-start">
+                <div className="relative w-fit hit flex">Image Prompt:</div>
+                <div
+                  className={`relative w-full h-full flex overflow-y-scroll max-h-60`}
+                >
+                  <div
+                    className={`h-fit flex relative items-start justify-start text-left break-all w-full`}
+                    dangerouslySetInnerHTML={{
+                      __html: descriptionRegex(nft?.prompt || "", false),
+                    }}
+                  ></div>
+                </div>
               </div>
             </div>
           )}

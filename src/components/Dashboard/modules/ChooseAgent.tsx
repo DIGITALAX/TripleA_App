@@ -8,6 +8,7 @@ import Image from "next/legacy/image";
 import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import { ImSwitch } from "react-icons/im";
 import calculateRent from "@/lib/helpers/calculateRent";
+import { CiCircleQuestion } from "react-icons/ci";
 
 const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
   agents,
@@ -15,10 +16,11 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
   setMintData,
   mintData,
   tokenThresholds,
+  setToolTip,
 }): JSX.Element => {
   return (
     <div
-      className={`flex relative w-full h-[29rem] items-center justify-start ${
+      className={`flex relative w-full h-[32rem] items-center justify-start ${
         Number(mintData?.amount || 0) <= 2 ||
         mintData?.prices?.filter(
           (price, index) =>
@@ -82,6 +84,8 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                             publish: true,
                             lead: true,
                             remix: true,
+                            mint: true,
+                            mintFrequency: 1,
                           },
                         ];
                       }
@@ -108,6 +112,22 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                           className="rounded-lg"
                         />
                       </div>
+                    </div>
+                  )}
+                  {mintData.agents
+                    ?.map((ag) => ag?.agent?.id)
+                    .includes(agent?.id) && (
+                    <div className="relative w-full h-fit flex items-center justify-center">
+                      <CiCircleQuestion
+                        size={20}
+                        className="cursor-canP"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setToolTip(true);
+                        }}
+                        color="#0000f5"
+                      />
                     </div>
                   )}
                   <div className="relative w-full h-full flex flex-col items-start justify-start gap-3 pt-4">
@@ -205,6 +225,16 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                           on: mintData?.agents?.find(
                             (ag) => ag?.agent?.id == agent?.id
                           )?.remix,
+                        },
+                        {
+                          type: CollectionWorkerType.Mint,
+                          value: mintData?.agents?.find(
+                            (ag) => ag?.agent?.id == agent?.id
+                          )?.mintFrequency,
+                          key: "mintFrequency",
+                          on: mintData?.agents?.find(
+                            (ag) => ag?.agent?.id == agent?.id
+                          )?.mint,
                         },
                       ].map((item, index) => {
                         return (

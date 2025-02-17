@@ -26,6 +26,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
   lensConnected,
   tokenThresholds,
   fulfillers,
+  setToolTip
 }): JSX.Element => {
   const { address } = useAccount();
   const router = useRouter();
@@ -60,6 +61,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
           agents={agents}
           agentsLoading={agentsLoading}
           tokenThresholds={tokenThresholds}
+          setToolTip={setToolTip}
         />
       );
 
@@ -297,7 +299,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                         {token.symbol}
                       </div>
                     </div>
-                    <div className="flex relative w-full h-fit items-center justify-between gap-2 flex-wrap md:flex-row text-xs text-left">
+                    <div className="flex relative w-full h-fit items-center justify-between gap-2 md:flex-nowrap flex-wrap md:flex-row text-xs text-left">
                       <div className="relative w-fit md:w-full h-fit flex flex-col gap-1 items-start justify-start">
                         <div className="relative flex w-fit h-fit">
                           Max Total Rent
@@ -316,6 +318,8 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                               remixFrequency: 1,
                               lead: true,
                               leadFrequency: 1,
+                              mint: true,
+                              mintFrequency: 1
                             } as any
                           )}
                           {" " + token.symbol}

@@ -15,6 +15,7 @@ export type FulfillmentProps = {
       | (CollectData & {
           id: number;
           fulfiller: string;
+          agentId: number;
         })
       | undefined
     >
@@ -22,6 +23,7 @@ export type FulfillmentProps = {
   details: CollectData & {
     id: number;
     fulfiller: string;
+    agentId: number;
   };
   setNotification: (e: SetStateAction<string | undefined>) => void;
 };
@@ -51,4 +53,8 @@ export type NotificationProps = {
 export type SignlessProps = {
   lensConnected: LensConnected | undefined;
   setSignless: (e: SetStateAction<boolean>) => void;
+};
+
+export type ToolTipProps = {
+  setTooltip: (e: SetStateAction<boolean>) => void;
 };

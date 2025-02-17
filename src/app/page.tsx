@@ -50,8 +50,8 @@ export default function Home() {
         </div>
         <div className="relative w-full h-full tablet:h-[40rem] flex justify-center items-center font-nerd text-win py-10">
           <div className="relative w-full items-center justify-center tablet:w-fit h-fit flex z-0">
-            <div className="relative py-3 px-6 w-full galaxy:w-1/2 tablet:w-[28rem] h-full flex bg-viol text-left flex-col gap-5 items-start justify-between rounded-md">
-              <div className="relative w-full h-full flex text-base tablet:text-xl">
+            <div className="relative py-3 px-6 w-full galaxy:w-5/6 tablet:w-[36rem] h-full flex bg-viol text-left flex-col gap-5 items-start justify-between rounded-md">
+              <div className="relative w-full h-full flex text-base tablet:text-lg">
                 so we gave the machines their own wallets and let them loose in
                 the art market.
                 <br />
@@ -59,6 +59,13 @@ export default function Home() {
                 turns out they're better at this than the platforms and
                 algorithms ever were. building actual value while everyone else
                 is still trying to control it.
+                <br />
+                <br />
+                agents running on venice.ai wizardry in the backdrop. no
+                severance package, no corpo surveillance or trust falls
+                required. all privacy preserved + found the cc0 stash. econ
+                broke again and they said something about an infinite resource
+                glitch. nice.
                 <br />
                 <br />
                 your move: deploy an agent while there's still good art to

@@ -45,6 +45,8 @@ export const AnimationContext = createContext<
 
 export const ModalContext = createContext<
   | {
+      toolTip: boolean;
+      setToolTip: (e: SetStateAction<boolean>) => void;
       imageView: string | undefined;
       setImageView: (e: SetStateAction<string | undefined>) => void;
       indexer: string | undefined;
@@ -72,6 +74,7 @@ export const ModalContext = createContext<
           | (CollectData & {
               id: number;
               fulfiller: string;
+              agentId: number;
             })
           | undefined
         >
@@ -80,6 +83,7 @@ export const ModalContext = createContext<
         | (CollectData & {
             id: number;
             fulfiller: string;
+            agentId: number;
           })
         | undefined;
     }
@@ -97,6 +101,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const [pageChange, setPageChange] = useState<boolean>(false);
   const [signless, setSignless] = useState<boolean>(false);
   const [createAccount, setCreateAccount] = useState<boolean>(false);
+  const [toolTip, setToolTip] = useState<boolean>(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [lensClient, setLensClient] = useState<PublicClient | undefined>();
@@ -105,6 +110,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     | (CollectData & {
         id: number;
         fulfiller: string;
+        agentId: number;
       })
     | undefined
   >();
@@ -136,6 +142,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           >
             <ModalContext.Provider
               value={{
+                toolTip,
+                setToolTip,
                 fulfillmentOpen,
                 setFulfillmentOpen,
                 imageView,
