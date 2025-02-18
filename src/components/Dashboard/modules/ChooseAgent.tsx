@@ -145,7 +145,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                       </div>
                     ) : (
                       <div
-                        className={`relative w-full h-fit flex text-xs flex-col items-center justify-center gap-2`}
+                        className={`relative w-full h-fit flex text-xxs flex-col items-center justify-center gap-2`}
                       >
                         <div className="relative w-fit h-fit flex">
                           Total Rent:

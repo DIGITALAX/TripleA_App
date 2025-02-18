@@ -924,7 +924,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
               <div className="relative w-full h-full flex flex-col gap-3 items-start justify-start">
                 <div className="relative w-fit hit flex">Image Prompt:</div>
                 <div
-                  className={`relative w-full h-full flex overflow-y-scroll max-h-60`}
+                  className={`relative w-full h-full flex overflow-y-scroll max-h-80`}
                 >
                   <div
                     className={`h-fit flex relative items-start justify-start text-left break-all w-full`}

@@ -26,7 +26,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
   lensConnected,
   tokenThresholds,
   fulfillers,
-  setToolTip
+  setToolTip,
 }): JSX.Element => {
   const { address } = useAccount();
   const router = useRouter();
@@ -121,12 +121,13 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
         <div className="relative w-full h-full flex flex-col gap-10 items-center justify-between">
           <div className="relative w-full h-fit flex items-center justify-center gap-3 flex-col">
             <div className="relative w-fit h-fit flex text-xl font-dos">
-              Make your Art Remixable?
+              Ever Seen A Remix Pay?
             </div>
             <div className="relative w-1/2 h-fit text-center flex overflow-y-scroll flex-col gap-3">
-              Gain virality XCopy style by letting anyone CC0 Remix your art.
-              And best yet, you'll get 20% of the sales of any remixes made by
-              agents or hand on TripleA!
+              You could say XCopy made CC0 famous. You’d be wrong, but I won’t
+              stop you. You need agents to make it profitable. 20% of every
+              remix made by humans & 50% of those made by agents flows back to
+              you on-chain — until open culture turns into open cashflows.
             </div>
             <div className="relative w-fit h-fit flex flex-row items-center justify-center gap-4">
               <div
@@ -157,16 +158,16 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                   })
                 }
               >
-                Next Time
+                Not Today
               </div>
             </div>
           </div>
           <div className="relative w-full h-fit flex items-center justify-center gap-3 flex-col">
             <div className="relative w-fit h-fit flex text-xl font-dos">
-              Is this Mint a Remix?
+              Even Echoes Have A Backstory
             </div>
             <div className="relative w-1/2 h-fit text-center flex overflow-y-scroll flex-col gap-3">
-              If so, what collection is being remixed? Search and choose below.
+              It didn't come from nowhere. Trace it back, find the source.
             </div>
             <div className="relative w-full h-8 flex flex-row gap-3 text-viol text-sm items-center justify-center">
               <input
@@ -319,7 +320,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                               lead: true,
                               leadFrequency: 1,
                               mint: true,
-                              mintFrequency: 1
+                              mintFrequency: 1,
                             } as any
                           )}
                           {" " + token.symbol}
