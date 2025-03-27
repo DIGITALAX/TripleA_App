@@ -6,7 +6,7 @@ import {
   evmAddress,
   PublicClient as PublicLensClient,
 } from "@lens-protocol/client";
-import { MARKET_CONTRACT, STORAGE_NODE } from "@/lib/constants";
+import { MARKET_CONTRACT,  } from "@/lib/constants";
 import {
   checkAndSignAuthMessage,
   LitNodeClient,
@@ -56,7 +56,6 @@ const useCollects = (
       const data = await getOrders(address);
 
       const profileCache = new Map<string, Account>();
-      const pictureCache = new Map<string, string>();
 
       const collects: Order[] = await Promise.all(
         data?.data?.collectionPurchaseds?.map(async (collect: any) => {
@@ -76,18 +75,9 @@ const useCollects = (
             profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
-          let picture = "";
           const profile = profileCache.get(artistAddress);
 
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-            if (!pictureCache.has(pictureKey)) {
-              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await response.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-            picture = pictureCache.get(pictureKey) || "";
-          }
+         
 
           return {
             id: collect?.id,
@@ -112,13 +102,7 @@ const useCollects = (
             buyer: collect?.buyer,
             fulfilled: collect?.fulfilled,
             fulfillment: collect?.fulfillment,
-            profile: {
-              ...profile,
-              metadata: {
-                ...profile?.metadata!,
-                picture,
-              },
-            },
+            profile,
           };
         })
       );

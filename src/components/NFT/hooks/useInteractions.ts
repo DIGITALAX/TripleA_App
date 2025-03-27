@@ -1,7 +1,6 @@
-import { MainContentFocus, Post, SessionClient } from "@lens-protocol/client";
+import {  Post, SessionClient } from "@lens-protocol/client";
 import { SetStateAction, useEffect, useState } from "react";
 import { StorageClient } from "@lens-chain/storage-client";
-import { v4 as uuidv4 } from "uuid";
 import { NFTData } from "@/components/Common/types/common.types";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import pollResult from "@/lib/helpers/pollResult";

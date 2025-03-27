@@ -5,7 +5,6 @@ import { createWalletClient, custom } from "viem";
 import { chains } from "@lens-network/sdk/viem";
 import pollResult from "@/lib/helpers/pollResult";
 import { StorageClient } from "@lens-chain/storage-client";
-import { STORAGE_NODE } from "@/lib/constants";
 import {
   createAccountWithUsername,
   fetchAccount,
@@ -46,7 +45,7 @@ const useCreateAccount = (
         account: address,
       });
 
-      let picture = {};
+      let picture = undefined;
 
       if (account?.pfp) {
         const res = await fetch("/api/ipfs", {
@@ -54,20 +53,14 @@ const useCreateAccount = (
           body: account?.pfp,
         });
         const json = await res.json();
-        const { uri } = await storageClient.uploadAsJson({
-          type: "image/png",
-          item: "ipfs://" + json?.cid,
-        });
 
-        picture = {
-          picture: uri,
-        };
+        picture = "ipfs://" + json?.cid;
       }
 
       const schema = accountMetadata({
         name: account?.localname,
         bio: account?.bio,
-        ...picture,
+        picture,
       });
       const acl = immutable(chains.testnet.id);
       const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
@@ -124,27 +117,9 @@ const useCreateAccount = (
               });
 
             if (ownerSigner?.isOk()) {
-              let picture = "";
-              const cadena = await fetch(
-                `${STORAGE_NODE}/${
-                  newAcc.value?.metadata?.picture?.split("lens://")?.[1]
-                }`
-              );
-
-              if (cadena) {
-                const json = await cadena.json();
-                picture = json.item;
-              }
-
               setLensConnected?.({
                 ...lensConnected,
-                profile: {
-                  ...newAcc.value,
-                  metadata: {
-                    ...(newAcc.value?.metadata as any),
-                    picture,
-                  },
-                },
+                profile: newAcc.value,
                 sessionClient: ownerSigner?.value,
               });
               setCreateAccount(false);

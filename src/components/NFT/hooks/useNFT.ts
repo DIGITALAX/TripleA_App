@@ -3,7 +3,7 @@ import {
   LensConnected,
   NFTData,
 } from "@/components/Common/types/common.types";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import { getCollection } from "../../../../graphql/queries/getCollection";
 import {
@@ -99,36 +99,6 @@ const useNFT = (
         setHasMore(false);
       }
 
-      posts = await Promise.all(
-        posts?.map(async (post) => {
-          let picture = post?.author?.metadata?.picture;
-
-          if (post?.author?.metadata?.picture) {
-            const cadena = await fetch(
-              `${STORAGE_NODE}/${
-                post?.author?.metadata?.picture?.split("lens://")?.[1]
-              }`
-            );
-
-            if (cadena) {
-              const json = await cadena.json();
-              picture = json.item;
-            }
-          }
-
-          return {
-            ...post,
-            author: {
-              ...post?.author,
-              metadata: {
-                ...post?.author?.metadata,
-                picture,
-              },
-            },
-          } as Post;
-        })
-      );
-
       if (!reset) {
         return posts;
       } else {
@@ -174,7 +144,6 @@ const useNFT = (
 
       let collectors: Collector[] = [];
       const profileCache = new Map<string, Account>();
-      const pictureCache = new Map<string, string>();
 
       await Promise.all(
         res?.data?.collectionPurchaseds?.map(async (order: any) => {
@@ -198,26 +167,13 @@ const useNFT = (
           }
 
           const profile = profileCache.get(buyerAddress);
-          let picture = "";
-
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-
-            if (!pictureCache.has(pictureKey)) {
-              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await response.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-
-            picture = pictureCache.get(pictureKey) || "";
-          }
 
           collectors.push({
             transactionHash: order?.transactionHash,
             blockTimestamp: order?.blockTimestamp,
             amount: order?.amount,
             address: order?.buyer,
-            pfp: picture,
+            pfp: profile?.metadata?.picture,
             localName: profile?.username?.localName,
             name: profile?.metadata?.name!,
           });
@@ -228,20 +184,6 @@ const useNFT = (
         false,
         collection?.metadata?.title?.replaceAll(" ", "")?.toLowerCase()!
       );
-
-      let picture = "";
-      const cadena = await fetch(
-        `${STORAGE_NODE}/${
-          result.value.items?.[0]?.account?.metadata?.picture?.split(
-            "lens://"
-          )?.[1]
-        }`
-      );
-
-      if (cadena) {
-        const json = await cadena.json();
-        picture = json.item;
-      }
 
       let remix = undefined;
 
@@ -300,13 +242,7 @@ const useNFT = (
         prompt: collection?.metadata?.prompt,
         model: collection?.metadata?.model,
         remix,
-        profile: {
-          ...result.value.items?.[0]?.account,
-          metadata: {
-            ...result.value.items?.[0]?.account?.metadata!,
-            picture,
-          },
-        },
+        profile: result.value.items?.[0]?.account,
         collectors,
         agentActivity: posts || [],
         collectionType:
@@ -384,36 +320,6 @@ const useNFT = (
         setActivityCursor(undefined);
       }
 
-      posts = await Promise.all(
-        posts?.map(async (post) => {
-          let picture = post?.author?.metadata?.picture;
-
-          if (post?.author?.metadata?.picture) {
-            const cadena = await fetch(
-              `${STORAGE_NODE}/${
-                post?.author?.metadata?.picture?.split("lens://")?.[1]
-              }`
-            );
-
-            if (cadena) {
-              const json = await cadena.json();
-              picture = json.item;
-            }
-          }
-
-          return {
-            ...post,
-            author: {
-              ...post?.author,
-              metadata: {
-                ...post?.author?.metadata,
-                picture,
-              },
-            },
-          } as Post;
-        })
-      );
-
       setNft({
         ...(nft as NFTData),
         agentActivity: [...(nft?.agentActivity || []), ...posts],
@@ -458,31 +364,11 @@ const useNFT = (
             return;
           }
 
-          let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value.items?.[0]?.account?.metadata?.picture?.split(
-                "lens://"
-              )?.[1]
-            }`
-          );
-
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
-          }
-
           return {
             id: Number(col?.id),
             image: col?.metadata?.image,
             artist: col?.artist,
-            profile: {
-              ...result.value.items?.[0]?.account,
-              metadata: {
-                ...result.value.items?.[0]?.account?.metadata,
-                picture,
-              },
-            },
+            profile: result.value.items?.[0]?.account,
           };
         })
       );

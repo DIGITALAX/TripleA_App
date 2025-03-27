@@ -6,8 +6,10 @@ import {
   PublicClient,
 } from "@lens-protocol/client";
 import { useEffect, useState } from "react";
-import { STORAGE_NODE } from "@/lib/constants";
-import { fetchPost, fetchPostReferences, fetchPosts } from "@lens-protocol/client/actions";
+import {
+  fetchPost,
+  fetchPostReferences,
+} from "@lens-protocol/client/actions";
 
 const usePost = (
   lensConnected: LensConnected | undefined,
@@ -50,35 +52,7 @@ const usePost = (
         setActivityCursor(postsRes.value?.pageInfo?.next);
       }
 
-      posts = await Promise.all(
-        posts?.map(async (post) => {
-          let picture = post?.author?.metadata?.picture;
-
-          if (post?.author?.metadata?.picture) {
-            const cadena = await fetch(
-              `${STORAGE_NODE}/${
-                post?.author?.metadata?.picture?.split("lens://")?.[1]
-              }`
-            );
-
-            if (cadena) {
-              const json = await cadena.json();
-              picture = json.item;
-            }
-          }
-
-          return {
-            ...post,
-            author: {
-              ...post?.author,
-              metadata: {
-                ...post?.author?.metadata,
-                picture,
-              },
-            },
-          } as Post;
-        })
-      );
+      
       setActivity(posts);
     } catch (err: any) {
       console.error(err.message);
@@ -115,36 +89,6 @@ const usePost = (
         setActivityCursor(postsRes?.value?.pageInfo?.next);
       }
 
-      posts = await Promise.all(
-        posts?.map(async (post) => {
-          let picture = post?.author?.metadata?.picture;
-
-          if (post?.author?.metadata?.picture) {
-            const cadena = await fetch(
-              `${STORAGE_NODE}/${
-                post?.author?.metadata?.picture?.split("lens://")?.[1]
-              }`
-            );
-
-            if (cadena) {
-              const json = await cadena.json();
-              picture = json.item;
-            }
-          }
-
-          return {
-            ...post,
-            author: {
-              ...post?.author,
-              metadata: {
-                ...post?.author?.metadata,
-                picture,
-              },
-            },
-          } as Post;
-        })
-      );
-
       setActivity([...activity, ...posts]);
     } catch (err: any) {
       console.error(err.message);
@@ -163,37 +107,10 @@ const usePost = (
         return;
       }
 
-      let picture = (res.value as Post)?.author?.metadata?.picture;
-
-      if ((res.value as Post)?.author?.metadata?.picture) {
-        const cadena = await fetch(
-          `${STORAGE_NODE}/${
-            (res.value as Post)?.author?.metadata?.picture?.split(
-              "lens://"
-            )?.[1]
-          }`
-        );
-
-        if (cadena) {
-          const json = await cadena.json();
-          picture = json.item;
-        }
-      }
 
       await handleActivity();
 
-      setPostData([
-        {
-          ...(res.value as Post),
-          author: {
-            ...(res.value as Post)?.author,
-            metadata: {
-              ...(res.value as Post)?.author?.metadata!,
-              picture,
-            },
-          },
-        },
-      ]);
+      setPostData([res.value as Post]);
     } catch (err: any) {
       console.error(err.message);
     }

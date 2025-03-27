@@ -10,7 +10,7 @@ import { SetStateAction, useEffect, useState } from "react";
 import { createWalletClient, custom } from "viem";
 import { Fulfiller, LensConnected, NFTData } from "../types/common.types";
 import { getCollectionSearch } from "../../../../graphql/queries/getCollectionSearch";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import {
   fetchAccounts,
   fetchAccountsAvailable,
@@ -49,7 +49,6 @@ const useHeader = (
 
       const metadataCache = new Map<string, any>();
       const profileCache = new Map<string, Account>();
-      const pictureCache = new Map<string, string>();
 
       const colls: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds?.map(async (collection: any) => {
@@ -77,18 +76,7 @@ const useHeader = (
             profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
-          let picture = "";
           const profile = profileCache.get(artistAddress);
-
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-            if (!pictureCache.has(pictureKey)) {
-              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await response.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-            picture = pictureCache.get(pictureKey) || "";
-          }
 
           return {
             id: collection?.collectionId,
@@ -96,13 +84,7 @@ const useHeader = (
             title: collection?.metadata?.title,
             description: collection?.metadata?.description,
             artist: collection?.artist,
-            profile: {
-              ...profile,
-              metadata: {
-                ...profile?.metadata,
-                picture,
-              },
-            },
+            profile,
           };
         })
       );
@@ -123,28 +105,6 @@ const useHeader = (
       if (res.isOk()) {
         handles = res.value?.items as Account[];
       }
-
-      handles = await Promise.all(
-        handles?.map(async (han) => {
-          let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${han?.metadata?.picture?.split("lens://")?.[1]}`
-          );
-
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
-          }
-
-          return {
-            ...han,
-            metadata: {
-              ...han?.metadata,
-              picture,
-            },
-          } as Account;
-        })
-      );
 
       setSearchItems({
         nfts: colls,
@@ -175,7 +135,6 @@ const useHeader = (
         return;
       }
 
-
       if (accounts.value.items?.[0]?.account?.address) {
         const authenticated = await lensClient.login({
           accountOwner: {
@@ -194,29 +153,9 @@ const useHeader = (
 
         const sessionClient = authenticated.value;
 
-        let picture = "";
-        const cadena = await fetch(
-          `${STORAGE_NODE}/${
-            accounts.value.items?.[0]?.account?.metadata?.picture?.split(
-              "lens://"
-            )?.[1]
-          }`
-        );
-
-        if (cadena) {
-          const json = await cadena.json();
-          picture = json.item;
-        }
-
         setLensConnected?.({
           sessionClient,
-          profile: {
-            ...accounts.value.items?.[0]?.account,
-            metadata: {
-              ...accounts.value.items?.[0]?.account?.metadata!,
-              picture,
-            },
-          },
+          profile: accounts.value.items?.[0]?.account,
         });
       } else {
         const authenticatedOnboarding = await lensClient.login({
@@ -263,29 +202,9 @@ const useHeader = (
           return;
         }
 
-        let picture = "";
-        const cadena = await fetch(
-          `${STORAGE_NODE}/${
-            accounts.value.items?.[0]?.account?.metadata?.picture?.split(
-              "lens://"
-            )?.[1]
-          }`
-        );
-
-        if (cadena) {
-          const json = await cadena.json();
-          picture = json.item;
-        }
-
         setLensConnected?.({
           ...lensConnected,
-          profile: {
-            ...accounts.value.items?.[0]?.account,
-            metadata: {
-              ...accounts.value.items?.[0]?.account?.metadata!,
-              picture,
-            },
-          },
+          profile: accounts.value.items?.[0]?.account,
           sessionClient: resumed?.value,
         });
       }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Order } from "../types/dashboard.types";
 import { getSales } from "../../../../graphql/queries/getSales";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 
 const useSales = (
@@ -20,7 +20,6 @@ const useSales = (
 
       const metadataCache = new Map<string, any>();
       const profileCache = new Map<string, Account>();
-      const pictureCache = new Map<string, string>();
       const sales: Order[] = await Promise.all(
         data?.data?.collectionPurchaseds?.map(async (sale: any) => {
           const artistAddress = evmAddress(sale?.collection?.artist);
@@ -39,18 +38,7 @@ const useSales = (
             profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
-          let picture = "";
           const profile = profileCache.get(artistAddress);
-
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-            if (!pictureCache.has(pictureKey)) {
-              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await response.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-            picture = pictureCache.get(pictureKey) || "";
-          }
 
           if (!sale?.collection?.metadata) {
             const metadataUri =
@@ -80,13 +68,7 @@ const useSales = (
               title: sale?.collection?.metadata?.title,
             },
             buyer: sale?.buyer,
-            profile: {
-              ...profile,
-              metadata: {
-                ...profile?.metadata,
-                picture,
-              },
-            },
+            profile,
           };
         })
       );

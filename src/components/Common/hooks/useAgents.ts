@@ -1,8 +1,13 @@
 import { SetStateAction, useEffect } from "react";
 import { Agent } from "../../Dashboard/types/dashboard.types";
 import { getAgents } from "../../../../graphql/queries/getAgents";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
-import { Account, evmAddress, PublicClient, SessionClient } from "@lens-protocol/client";
+import { INFURA_GATEWAY } from "@/lib/constants";
+import {
+  Account,
+  evmAddress,
+  PublicClient,
+  SessionClient,
+} from "@lens-protocol/client";
 import { TokenThreshold } from "../types/common.types";
 import { getTokenThresholds } from "../../../../graphql/queries/getTokenThresholds";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
@@ -20,9 +25,8 @@ const useAgents = (
     try {
       const data = await getAgents();
 
-      const metadataCache = new Map<string, any>();
       const profileCache = new Map<string, Account>();
-      const pictureCache = new Map<string, string>();
+      const metadataCache = new Map<string, Account>();
 
       const allAgents: Agent[] = await Promise.all(
         data?.data?.agentCreateds?.map(async (agent: any) => {
@@ -51,17 +55,7 @@ const useAgents = (
             profileCache.set(creatorAddress, result.value.items?.[0]?.account);
           }
 
-          let picture = "";
           const profile = profileCache.get(creatorAddress);
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-            if (!pictureCache.has(pictureKey)) {
-              const cadena = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await cadena.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-            picture = pictureCache.get(pictureKey) || "";
-          }
 
           return {
             id: agent?.SkyhuntersAgentManager_id,
@@ -76,13 +70,7 @@ const useAgents = (
             wallets: agent?.wallets,
             activeCollectionIds: agent?.activeCollectionIds,
             collectionIdHistory: agent?.collectionIdHistory,
-            profile: {
-              ...profile,
-              metadata: {
-                ...profile?.metadata,
-                picture,
-              },
-            },
+            profile,
           };
         })
       );

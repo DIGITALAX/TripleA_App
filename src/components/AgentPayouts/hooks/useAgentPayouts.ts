@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getOwnersPaid } from "../../../../graphql/queries/getOwnersPaid";
 import { getCollectorsPaid } from "../../../../graphql/queries/getCollectorsPaid";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 import { getDevTreasuryPaid } from "../../../../graphql/queries/getDevTreasuryPaid";
 import { getArtistPaid } from "../../../../graphql/queries/getArtistsPaid";
@@ -120,28 +120,7 @@ const useAgentPayouts = (lensClient: PublicClient) => {
       return null;
     }
 
-    let picture = "";
-    if (result.value.items?.[0]?.account?.metadata?.picture) {
-      const cadena = await fetch(
-        `${STORAGE_NODE}/${
-          result.value.items?.[0]?.account?.metadata?.picture?.split(
-            "lens://"
-          )?.[1]
-        }`
-      );
-      if (cadena) {
-        const json = await cadena.json();
-        picture = json.item;
-      }
-    }
-
-    const accountData = {
-      ...result.value.items?.[0]?.account,
-      metadata: {
-        ...result.value.items?.[0]?.account?.metadata!,
-        picture,
-      },
-    };
+    const accountData = result.value.items?.[0]?.account;
 
     accountCache.set(artist, accountData);
     return accountData;
@@ -418,7 +397,7 @@ const useAgentPayouts = (lensClient: PublicClient) => {
     hasMore,
     handleMorePaid,
     devTreasuryPaid,
-    artistsPaid
+    artistsPaid,
   };
 };
 

@@ -1,7 +1,7 @@
 import { LensConnected, NFTData } from "@/components/Common/types/common.types";
 import { useEffect, useState } from "react";
 import { getCollections } from "../../../../graphql/queries/getGallery";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 

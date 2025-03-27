@@ -20,7 +20,6 @@ import { getUserAgents } from "../../../../graphql/queries/getUserAgents";
 import {
   SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
   INFURA_GATEWAY,
-  STORAGE_NODE,
   AGENT_FEED_RULE,
 } from "@/lib/constants";
 import { chains } from "@lens-network/sdk/viem";
@@ -252,7 +251,6 @@ const useUserAgents = (
 
       const metadataCache = new Map<string, any>();
       const profileCache = new Map<string, Account>();
-      const pictureCache = new Map<string, string>();
       const allAgents: Agent[] = await Promise.all(
         data?.data?.agentCreateds.map(async (agent: any) => {
           if (!agent.metadata) {
@@ -283,18 +281,8 @@ const useUserAgents = (
             profileCache.set(creatorAddress, result.value.items?.[0]?.account);
           }
 
-          let picture = "";
           const profile = profileCache.get(creatorAddress);
 
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-            if (!pictureCache.has(pictureKey)) {
-              const response = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await response.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-            picture = pictureCache.get(pictureKey) || "";
-          }
 
           return {
             id: agent?.SkyhuntersAgentManager_id,
@@ -307,13 +295,7 @@ const useUserAgents = (
             workers: agent?.workers,
             creator: agent?.creator,
             owners: agent?.owners,
-            profile: {
-              ...profile,
-              metadata: {
-                ...profile?.metadata,
-                picture,
-              },
-            },
+            profile,
           };
         })
       );

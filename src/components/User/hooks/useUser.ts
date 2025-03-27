@@ -5,7 +5,6 @@ import {
 } from "@/components/Dashboard/types/dashboard.types";
 import { Account, AccountStats, PublicClient } from "@lens-protocol/client";
 import { useEffect, useState } from "react";
-import { STORAGE_NODE } from "@/lib/constants";
 import { getDropCollections } from "../../../../graphql/queries/getDropCollections";
 import { getUserAgentsPaginated } from "../../../../graphql/queries/getUserAgentsPaginated";
 import { getOrdersPaginated } from "../../../../graphql/queries/getOrdersPaginated";
@@ -51,23 +50,11 @@ const useUser = (username: string, lensClient: PublicClient) => {
           localName: username,
         },
       });
-      let ownerPicture = "";
       let ownerProfile: any;
 
       if (newAcc.isErr()) {
         setInfoLoading(false);
         return;
-      }
-
-      const cadena = await fetch(
-        `${STORAGE_NODE}/${
-          newAcc.value?.metadata?.picture?.split("lens://")?.[1]
-        }`
-      );
-
-      if (cadena) {
-        const json = await cadena.json();
-        ownerPicture = json.item;
       }
 
       const stats = await fetchAccountStats(lensClient, {
@@ -79,14 +66,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
         return;
       }
 
-      ownerProfile = {
-        ...newAcc.value,
-        metadata: {
-          ...newAcc.value?.metadata,
-          picture: ownerPicture,
-        },
-        stats: stats,
-      };
+      ownerProfile = newAcc.value;
 
       if (newAcc.value?.owner) {
         setUserInfo(ownerProfile);
@@ -113,10 +93,10 @@ const useUser = (username: string, lensClient: PublicClient) => {
 
       setHasMore({
         agents: agents?.data?.agentCreateds?.length == 20 ? true : false,
-        collected: collected?.data?.collectionPurchaseds?.length == 20 ? true : false,
+        collected:
+          collected?.data?.collectionPurchaseds?.length == 20 ? true : false,
         drops: drops?.data?.dropCreateds?.length == 20 ? true : false,
       });
-
 
       setPaginated({
         agents:

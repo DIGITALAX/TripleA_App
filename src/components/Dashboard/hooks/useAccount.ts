@@ -1,9 +1,7 @@
 import { LensConnected } from "@/components/Common/types/common.types";
 import { SetStateAction, useState } from "react";
 import pollResult from "@/lib/helpers/pollResult";
-import { v4 as uuidv4 } from "uuid";
 import { StorageClient } from "@lens-chain/storage-client";
-import { STORAGE_NODE } from "@/lib/constants";
 import {
   fetchAccount,
   setAccountMetadata,
@@ -33,7 +31,7 @@ const useAccount = (
     if (!lensConnected?.sessionClient) return;
     setAccountLoading(true);
     try {
-      let picture = {};
+      let picture = undefined;
 
       if (newAccount?.pfp && newAccount.pfp instanceof Blob) {
         const res = await fetch("/api/ipfs", {
@@ -42,20 +40,13 @@ const useAccount = (
         });
         const json = await res.json();
 
-        const { uri } = await storageClient.uploadAsJson({
-          type: "image/png",
-          item: "ipfs://" + json?.cid,
-        });
-
-        picture = {
-          picture: uri,
-        };
+        picture = "ipfs://" + json?.cid;
       }
 
       const schema = account({
         name: newAccount?.localname,
         bio: newAccount?.bio,
-        ...picture,
+        picture,
       });
       const acl = immutable(chains.testnet.id);
       const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
@@ -88,28 +79,11 @@ const useAccount = (
             return;
           }
 
-          let picture = "";
-          const cadena = await fetch(
-            `${STORAGE_NODE}/${
-              result.value?.metadata?.picture?.split("lens://")?.[1]
-            }`
-          );
-
-          if (cadena) {
-            const json = await cadena.json();
-            picture = json.item;
-          }
-
+         
           if (result.value?.__typename == "Account") {
             setLensConnected?.({
               ...lensConnected,
-              profile: {
-                ...result.value,
-                metadata: {
-                  ...result.value?.metadata!,
-                  picture,
-                },
-              },
+              profile: result.value,
             });
           }
         } else {

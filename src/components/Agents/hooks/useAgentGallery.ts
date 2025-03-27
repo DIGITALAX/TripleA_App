@@ -1,5 +1,5 @@
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { SetStateAction, useEffect, useState } from "react";
 import { getAgentsPaginated } from "../../../../graphql/queries/getAgentsPaginated";
@@ -52,24 +52,9 @@ const useAgentGallery = (
               return;
             }
 
-            let picture = "";
             const profile = result.value.items?.[0]?.account;
-            if (profile?.metadata?.picture) {
-              const imageUri = profile.metadata.picture.split("lens://")?.[1];
-              const cadena = await fetch(`${STORAGE_NODE}/${imageUri}`);
-              if (cadena) {
-                const json = await cadena.json();
-                picture = json.item;
-              }
-            }
 
-            profileCache.set(agent?.creator, {
-              ...profile,
-              metadata: {
-                ...profile?.metadata,
-                picture,
-              } as any,
-            });
+            profileCache.set(agent?.creator, profile);
           }
 
           return {

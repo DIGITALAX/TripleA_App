@@ -101,7 +101,7 @@ const useCreateAgent = (
     if (!address || !lensConnected?.sessionClient) return;
     setLensLoading(true);
     try {
-      let picture = {};
+      let picture = undefined;
 
       if (agentLensDetails?.pfp || agentDetails?.cover) {
         const res = await fetch("/api/ipfs", {
@@ -111,14 +111,8 @@ const useCreateAgent = (
             : agentDetails?.cover,
         });
         const json = await res.json();
-        const { uri } = await storageClient.uploadAsJson({
-          type: "image/png",
-          item: "ipfs://" + json?.cid,
-        });
 
-        picture = {
-          picture: uri,
-        };
+        picture = "ipfs://" + json?.cid;
       }
 
       const schema = account({
@@ -130,7 +124,7 @@ const useCreateAgent = (
           agentLensDetails?.bio?.trim() == ""
             ? agentDetails?.bio
             : agentLensDetails?.bio,
-        ...picture,
+        picture,
       });
       const acl = immutable(chains.testnet.id);
       const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;

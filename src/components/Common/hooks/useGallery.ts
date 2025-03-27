@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NFTData } from "../types/common.types";
 import { getCollections } from "../../../../graphql/queries/getGallery";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { FetchResult } from "@apollo/client";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
@@ -9,7 +9,6 @@ import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 const useGallery = (lensClient: PublicClient, choice: string) => {
   const metadataCache = new Map<string, any>();
   const profileCache = new Map<string, Account>();
-  const pictureCache = new Map<string, string>();
   const [nfts, setNfts] = useState<NFTData[]>([]);
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -56,17 +55,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
-          let picture = "";
           const profile = profileCache.get(artistAddress);
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-            if (!pictureCache.has(pictureKey)) {
-              const cadena = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await cadena.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-            picture = pictureCache.get(pictureKey) || "";
-          }
 
           return {
             id: collection?.collectionId,
@@ -80,13 +69,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             amountSold: collection?.amountSold,
             tokenIds: collection?.tokenIds,
             amount: collection?.amount,
-            profile: {
-              ...profile,
-              metadata: {
-                ...profile?.metadata,
-                picture,
-              },
-            },
+            profile,
           };
         })
       );
@@ -150,15 +133,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
 
           let picture = "";
           const profile = profileCache.get(artistAddress);
-          if (profile?.metadata?.picture) {
-            const pictureKey = profile.metadata.picture.split("lens://")?.[1];
-            if (!pictureCache.has(pictureKey)) {
-              const cadena = await fetch(`${STORAGE_NODE}/${pictureKey}`);
-              const json = await cadena.json();
-              pictureCache.set(pictureKey, json.item);
-            }
-            picture = pictureCache.get(pictureKey) || "";
-          }
+
           return {
             id: collection?.id,
             image: collection?.metadata?.image,
@@ -172,13 +147,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
             amountSold: collection?.amountSold,
             tokenIds: collection?.tokenIds,
             amount: collection?.amount,
-            profile: {
-              ...profile,
-              metadata: {
-                ...profile?.metadata,
-                picture,
-              },
-            },
+            profile,
           };
         })
       );

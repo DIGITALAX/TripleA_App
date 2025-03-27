@@ -12,11 +12,10 @@ import {
   PageSize,
   Post,
   PublicClient,
-  TextOnlyMetadata,
 } from "@lens-protocol/client";
 import { SetStateAction, useEffect, useState } from "react";
 import { getAgent } from "../../../../graphql/queries/getAgent";
-import { INFURA_GATEWAY, STORAGE_NODE } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { getAgentRent } from "../../../../graphql/queries/getAgentRent";
 import { getCollectionArtist } from "../../../../graphql/queries/getCollectionArtist";
 import {
@@ -170,36 +169,6 @@ const useAgent = (
         posts = postsRes?.value?.items as Post[];
       }
 
-      posts = await Promise.all(
-        posts?.map(async (post) => {
-          let picture = post?.author?.metadata?.picture;
-
-          if (post?.author?.metadata?.picture) {
-            const cadena = await fetch(
-              `${STORAGE_NODE}/${
-                post?.author?.metadata?.picture?.split("lens://")?.[1]
-              }`
-            );
-
-            if (cadena) {
-              const json = await cadena.json();
-              picture = json.item;
-            }
-          }
-
-          return {
-            ...post,
-            author: {
-              ...post?.author,
-              metadata: {
-                ...post?.author?.metadata,
-                picture,
-              },
-            },
-          } as Post;
-        })
-      );
-
       if (postsRes.value?.pageInfo?.next) {
         setHasMore(true);
         setActivityCursor(postsRes.value?.pageInfo?.next);
@@ -246,7 +215,6 @@ const useAgent = (
           includeOwned: true,
         }
       );
-      let picture = "";
       let profile: any;
 
       if (result.isErr()) {
@@ -254,26 +222,7 @@ const useAgent = (
         return;
       }
 
-      const cadena = await fetch(
-        `${STORAGE_NODE}/${
-          result.value.items?.[0]?.account?.metadata?.picture?.split(
-            "lens://"
-          )?.[1]
-        }`
-      );
-
-      if (cadena) {
-        const json = await cadena.json();
-        picture = json.item;
-      }
-
-      profile = {
-        ...result.value.items?.[0]?.account,
-        metadata: {
-          ...result.value.items?.[0]?.account?.metadata,
-          picture,
-        },
-      };
+      profile = result.value.items?.[0]?.account;
       const resultOwner = await fetchAccountsAvailable(
         lensConnected?.sessionClient || lensClient,
         {
@@ -281,29 +230,9 @@ const useAgent = (
           includeOwned: true,
         }
       );
-      let ownerPicture = "";
       let ownerProfile: any;
       if (resultOwner.isOk()) {
-        const cadena = await fetch(
-          `${STORAGE_NODE}/${
-            resultOwner.value.items?.[0]?.account?.metadata?.picture?.split(
-              "lens://"
-            )?.[1]
-          }`
-        );
-
-        if (cadena) {
-          const json = await cadena.json();
-          ownerPicture = json.item;
-        }
-
-        ownerProfile = {
-          ...resultOwner.value.items?.[0]?.account,
-          metadata: {
-            ...resultOwner.value.items?.[0]?.account?.metadata,
-            picture: ownerPicture,
-          },
-        };
+        ownerProfile = resultOwner.value.items?.[0]?.account;
       }
 
       const posts = await handleActivity(
@@ -532,36 +461,6 @@ const useAgent = (
         setHasMore(false);
         setActivityCursor(undefined);
       }
-
-      posts = await Promise.all(
-        posts?.map(async (post) => {
-          let picture = post?.author?.metadata?.picture;
-
-          if (post?.author?.metadata?.picture) {
-            const cadena = await fetch(
-              `${STORAGE_NODE}/${
-                post?.author?.metadata?.picture?.split("lens://")?.[1]
-              }`
-            );
-
-            if (cadena) {
-              const json = await cadena.json();
-              picture = json.item;
-            }
-          }
-
-          return {
-            ...post,
-            author: {
-              ...post?.author,
-              metadata: {
-                ...post?.author?.metadata,
-                picture,
-              },
-            },
-          } as Post;
-        })
-      );
 
       setAgent({
         ...(agent as Agent),
