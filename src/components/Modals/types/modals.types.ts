@@ -1,6 +1,6 @@
 import { LensConnected } from "@/components/Common/types/common.types";
 import { SetStateAction } from "react";
-import { StorageClient } from "@lens-protocol/storage-node-client";
+import { StorageClient } from "@lens-chain/storage-client";
 import { CollectData } from "@/components/NFT/types/nft.types";
 
 export type ImageViewerProps = {

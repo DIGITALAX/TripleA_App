@@ -1,6 +1,6 @@
 import { MainContentFocus, Post, SessionClient } from "@lens-protocol/client";
 import { SetStateAction, useEffect, useState } from "react";
-import { StorageClient } from "@lens-protocol/storage-node-client";
+import { StorageClient } from "@lens-chain/storage-client";
 import { v4 as uuidv4 } from "uuid";
 import { NFTData } from "@/components/Common/types/common.types";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
@@ -10,6 +10,9 @@ import {
   post as createPost,
   repost,
 } from "@lens-protocol/client/actions";
+import { textOnly } from "@lens-protocol/metadata";
+import { immutable } from "@lens-chain/storage-client";
+import { chains } from "@lens-network/sdk/viem";
 
 const useInteractions = (
   sessionClient: SessionClient,
@@ -63,21 +66,17 @@ const useInteractions = (
     if (post?.trim() == "") return;
     setPostLoading(true);
     try {
-      const { uri } = await storageClient.uploadAsJson({
-        $schema: "https://json-schemas.lens.dev/posts/text-only/3.0.0.json",
-        lens: {
-          mainContentFocus: MainContentFocus.TextOnly,
-          content: post,
-          id: uuidv4(),
-          locale: "en",
-          tags: [
-            "tripleA",
-            (data as any)?.title
-              ? (data as any)?.title?.replaceAll(" ", "")?.toLowerCase()
-              : undefined,
-          ]?.filter(Boolean),
-        },
+      const schema = textOnly({
+        content: post,
+        tags: [
+          "tripleA",
+          (data as any)?.title
+            ? (data as any)?.title?.replaceAll(" ", "")?.toLowerCase()
+            : undefined,
+        ]?.filter(Boolean),
       });
+      const acl = immutable(chains.testnet.id);
+      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
 
       const res = await createPost(sessionClient!, {
         contentUri: uri,
@@ -117,21 +116,18 @@ const useInteractions = (
     if (!commentQuote) return;
     setPostLoading(true);
     try {
-      const { uri } = await storageClient.uploadAsJson({
-        $schema: "https://json-schemas.lens.dev/posts/text-only/3.0.0.json",
-        lens: {
-          mainContentFocus: MainContentFocus.TextOnly,
-          content: post,
-          id: uuidv4(),
-          locale: "en",
-          tags: [
-            "tripleA",
-            (data as any)?.title
-              ? (data as any)?.title?.replaceAll(" ", "")?.toLowerCase()
-              : undefined,
-          ]?.filter(Boolean),
-        },
+      const schema = textOnly({
+        content: post,
+
+        tags: [
+          "tripleA",
+          (data as any)?.title
+            ? (data as any)?.title?.replaceAll(" ", "")?.toLowerCase()
+            : undefined,
+        ]?.filter(Boolean),
       });
+      const acl = immutable(chains.testnet.id);
+      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
 
       const res = await createPost(sessionClient!, {
         contentUri: uri,
@@ -221,9 +217,16 @@ const useInteractions = (
 
               da[0] = {
                 ...da[0],
+                stats: {
+                  ...da[0]?.stats!,
+                  upvotes:
+                    reaction == "UPVOTE"
+                      ? da[0]?.stats?.upvotes + 1
+                      : da[0]?.stats?.upvotes - 1,
+                },
                 operations: {
                   ...da[0]?.operations!,
-                  hasUpvoted: true,
+                  hasUpvoted: reaction == "UPVOTE" ? true : false,
                 },
               };
               return da;
@@ -254,7 +257,7 @@ const useInteractions = (
                     operations: {
                       ...activity[index].operations!,
 
-                      hasUpvoted: true,
+                      hasUpvoted: reaction == "UPVOTE" ? true : false,
                     },
                   };
 
@@ -275,7 +278,7 @@ const useInteractions = (
                     operations: {
                       ...activity[index].operations!,
 
-                      hasUpvoted: true,
+                      hasUpvoted: reaction == "UPVOTE" ? true : false,
                     },
                   };
 
@@ -297,7 +300,7 @@ const useInteractions = (
                   },
                   operations: {
                     ...activity[index].operations!,
-                    hasUpvoted: true,
+                    hasUpvoted: reaction == "UPVOTE" ? true : false,
                   },
                 };
 
@@ -396,9 +399,18 @@ const useInteractions = (
 
             da[0] = {
               ...da[0],
+              stats: {
+                ...da[0]?.stats!,
+                reposts: da[0]?.stats?.reposts + 1,
+              },
               operations: {
                 ...da[0]?.operations!,
-                hasUpvoted: true,
+                hasReposted: {
+                  ...da[0]?.operations?.hasReposted!,
+
+                  onChain: true,
+                  optimistic: true,
+                },
               },
             };
             return da;
@@ -512,21 +524,18 @@ const useInteractions = (
     if (!commentQuote) return;
     setPostLoading(true);
     try {
-      const { uri } = await storageClient.uploadAsJson({
-        $schema: "https://json-schemas.lens.dev/posts/text-only/3.0.0.json",
-        lens: {
-          mainContentFocus: MainContentFocus.TextOnly,
-          content: post,
-          id: uuidv4(),
-          locale: "en",
-          tags: [
-            "tripleA",
-            (data as any)?.title
-              ? (data as any)?.title?.replaceAll(" ", "")?.toLowerCase()
-              : undefined,
-          ]?.filter(Boolean),
-        },
+      const schema = textOnly({
+        content: post,
+
+        tags: [
+          "tripleA",
+          (data as any)?.title
+            ? (data as any)?.title?.replaceAll(" ", "")?.toLowerCase()
+            : undefined,
+        ]?.filter(Boolean),
       });
+      const acl = immutable(chains.testnet.id);
+      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
 
       const res = await createPost(sessionClient!, {
         contentUri: uri,

@@ -4,13 +4,14 @@ import { evmAddress } from "@lens-protocol/client";
 import { createWalletClient, custom } from "viem";
 import { chains } from "@lens-network/sdk/viem";
 import pollResult from "@/lib/helpers/pollResult";
-import { v4 as uuidv4 } from "uuid";
-import { StorageClient } from "@lens-protocol/storage-node-client";
+import { StorageClient } from "@lens-chain/storage-client";
 import { STORAGE_NODE } from "@/lib/constants";
 import {
   createAccountWithUsername,
   fetchAccount,
 } from "@lens-protocol/client/actions";
+import { immutable } from "@lens-chain/storage-client";
+import { account as accountMetadata } from "@lens-protocol/metadata";
 
 const useCreateAccount = (
   address: `0x${string}` | undefined,
@@ -63,15 +64,13 @@ const useCreateAccount = (
         };
       }
 
-      const { uri } = await storageClient.uploadAsJson({
-        $schema: "https://json-schemas.lens.dev/account/1.0.0.json",
-        lens: {
-          id: uuidv4(),
-          name: account?.localname,
-          bio: account?.bio,
-          ...picture,
-        },
+      const schema = accountMetadata({
+        name: account?.localname,
+        bio: account?.bio,
+        ...picture,
       });
+      const acl = immutable(chains.testnet.id);
+      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
 
       const accountResponse = await createAccountWithUsername(
         lensConnected?.sessionClient,

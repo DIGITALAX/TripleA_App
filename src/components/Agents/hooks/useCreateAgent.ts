@@ -8,8 +8,7 @@ import {
 } from "@/lib/constants";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
 import { LensConnected } from "@/components/Common/types/common.types";
-import { StorageClient } from "@lens-protocol/storage-node-client";
-import { v4 as uuidv4 } from "uuid";
+import { StorageClient } from "@lens-chain/storage-client";
 import {
   evmAddress,
   FeedRuleExecuteOn,
@@ -27,6 +26,8 @@ import {
   fetchFeeds,
   updateFeedRules,
 } from "@lens-protocol/client/actions";
+import { account, feed as feedMetadata } from "@lens-protocol/metadata";
+import { immutable } from "@lens-chain/storage-client";
 
 const useCreateAgent = (
   publicClient: PublicClient,
@@ -46,11 +47,9 @@ const useCreateAgent = (
   const [id, setId] = useState<string | undefined>();
   const [feed, setFeed] = useState<{
     name: string;
-    title: string;
     description: string;
   }>({
     name: "",
-    title: "",
     description: "",
   });
   const [agentAccountAddress, setAgentAccountAddress] = useState<
@@ -122,21 +121,19 @@ const useCreateAgent = (
         };
       }
 
-      const { uri } = await storageClient.uploadAsJson({
-        $schema: "https://json-schemas.lens.dev/account/1.0.0.json",
-        lens: {
-          id: uuidv4(),
-          name:
-            agentLensDetails?.localname?.trim() == ""
-              ? agentDetails?.title
-              : agentLensDetails?.localname,
-          bio:
-            agentLensDetails?.bio?.trim() == ""
-              ? agentDetails?.bio
-              : agentLensDetails?.bio,
-          ...picture,
-        },
+      const schema = account({
+        name:
+          agentLensDetails?.localname?.trim() == ""
+            ? agentDetails?.title
+            : agentLensDetails?.localname,
+        bio:
+          agentLensDetails?.bio?.trim() == ""
+            ? agentDetails?.bio
+            : agentLensDetails?.bio,
+        ...picture,
       });
+      const acl = immutable(chains.testnet.id);
+      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
 
       const provider = new JsonRpcProvider(
         "https://rpc.testnet.lens.dev",
@@ -473,7 +470,6 @@ const useCreateAgent = (
   const handleCreateFeed = async () => {
     if (
       feed.name.trim() == "" ||
-      feed.title.trim() == "" ||
       feed.description.trim() == ""
       //  ||
       // !agentWallet
@@ -495,15 +491,13 @@ const useCreateAgent = (
       });
 
       if (builder.isOk()) {
-        const { uri } = await storageClient.uploadAsJson({
-          $schema: "https://json-schemas.lens.dev/feed/1.0.0.json",
-          lens: {
-            id: uuidv4(),
-            name: feed.name,
-            title: feed.title,
-            description: feed.description,
-          },
+        const schema = feedMetadata({
+          name: feed.name,
+          description: feed.description,
         });
+
+        const acl = immutable(chains.testnet.id);
+        const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
 
         const resFeed = await createFeed(builder.value, {
           metadataUri: uri,
@@ -549,7 +543,6 @@ const useCreateAgent = (
                 ],
               });
               setFeed({
-                title: "",
                 description: "",
                 name: "",
               });

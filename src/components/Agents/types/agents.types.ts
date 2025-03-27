@@ -1,6 +1,6 @@
 import { LensConnected } from "@/components/Common/types/common.types";
 import { PublicClient } from "@lens-protocol/client";
-import { StorageClient } from "@lens-protocol/storage-node-client";
+import { StorageClient } from "@lens-chain/storage-client";
 import { SetStateAction } from "react";
 
 export enum AgentSwitcher {

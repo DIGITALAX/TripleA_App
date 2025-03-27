@@ -65,6 +65,7 @@ const AgentGallery: FunctionComponent = (): JSX.Element => {
                             layout="fill"
                             objectFit="cover"
                             draggable={false}
+                            objectPosition="top"
                           />
                         </div>
                       </div>

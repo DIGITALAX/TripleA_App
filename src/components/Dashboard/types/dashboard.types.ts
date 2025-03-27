@@ -11,7 +11,7 @@ import {
   SessionClient,
 } from "@lens-protocol/client";
 import { SetStateAction } from "react";
-import { StorageClient } from "@lens-protocol/storage-node-client";
+import { StorageClient } from "@lens-chain/storage-client";
 
 export enum Switcher {
   Home,

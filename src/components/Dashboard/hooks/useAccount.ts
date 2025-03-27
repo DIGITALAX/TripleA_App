@@ -2,12 +2,15 @@ import { LensConnected } from "@/components/Common/types/common.types";
 import { SetStateAction, useState } from "react";
 import pollResult from "@/lib/helpers/pollResult";
 import { v4 as uuidv4 } from "uuid";
-import { StorageClient } from "@lens-protocol/storage-node-client";
+import { StorageClient } from "@lens-chain/storage-client";
 import { STORAGE_NODE } from "@/lib/constants";
 import {
   fetchAccount,
   setAccountMetadata,
 } from "@lens-protocol/client/actions";
+import { account } from "@lens-protocol/metadata";
+import { immutable } from "@lens-chain/storage-client";
+import { chains } from "@lens-network/sdk/viem";
 
 const useAccount = (
   lensConnected: LensConnected | undefined,
@@ -49,15 +52,13 @@ const useAccount = (
         };
       }
 
-      const { uri } = await storageClient.uploadAsJson({
-        $schema: "https://json-schemas.lens.dev/account/1.0.0.json",
-        lens: {
-          id: uuidv4(),
-          name: newAccount?.localname,
-          bio: newAccount?.bio,
-          ...picture,
-        },
+      const schema = account({
+        name: newAccount?.localname,
+        bio: newAccount?.bio,
+        ...picture,
       });
+      const acl = immutable(chains.testnet.id);
+      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
 
       const accountResponse = await setAccountMetadata(
         lensConnected?.sessionClient,

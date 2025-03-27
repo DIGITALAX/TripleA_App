@@ -175,6 +175,7 @@ const useHeader = (
         return;
       }
 
+
       if (accounts.value.items?.[0]?.account?.address) {
         const authenticated = await lensClient.login({
           accountOwner: {

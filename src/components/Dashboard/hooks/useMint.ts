@@ -123,14 +123,21 @@ const useMint = (
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({
-          title: mintData.title,
-          description: mintData.description,
-          image: "ipfs://" + responseImageJSON.cid,
-          sizes: mintData.sizes,
-          colors: mintData.colors,
-          format: mintData.format,
-        }),
+        body:
+          mintData.collectionType == CollectionType.IRL
+            ? JSON.stringify({
+                title: mintData.title,
+                description: mintData.description,
+                image: "ipfs://" + responseImageJSON.cid,
+                sizes: mintData.sizes,
+                colors: mintData.colors,
+                format: mintData.format,
+              })
+            : JSON.stringify({
+                title: mintData.title,
+                description: mintData.description,
+                image: "ipfs://" + responseImageJSON.cid,
+              }),
       });
 
       let responseJSON = await response.json();
