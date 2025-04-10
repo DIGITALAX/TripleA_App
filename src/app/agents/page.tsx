@@ -5,11 +5,9 @@ import {
   AgentSwitcher,
   CreateSwitcher,
 } from "@/components/Agents/types/agents.types";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { AnimationContext, ModalContext } from "../providers";
-import { useRouter } from "next/navigation";
 import useArt from "@/components/Agents/hooks/useArt";
 import { useAccount } from "wagmi";
 import { useModal } from "connectkit";
@@ -21,13 +19,7 @@ export default function Agents() {
   const [createSwitcher, setCreateSwitcher] = useState<CreateSwitcher>(
     CreateSwitcher.Details
   );
-  const router = useRouter();
-  const context = useContext(ModalContext);
-  const animationContext = useContext(AnimationContext);
-  const { moreArt, moreArtLoading } = useArt(
-    context?.lensClient!,
-    context?.lensConnected!
-  );
+  const { moreArt, moreArtLoading } = useArt();
   const { isConnected } = useAccount();
   const { setOpen } = useModal();
 

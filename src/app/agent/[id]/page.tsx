@@ -11,7 +11,7 @@ import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import calculateRent from "@/lib/helpers/calculateRent";
 import descriptionRegex from "@/lib/helpers/descriptionRegex";
 import { downloadEliza } from "@/lib/helpers/downloadEliza";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import { useModal } from "connectkit";
 import moment from "moment";
 import Image from "next/legacy/image";
@@ -21,18 +21,19 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { createPublicClient, http } from "viem";
 import { useAccount } from "wagmi";
 import { CiCircleQuestion } from "react-icons/ci";
+import { handleProfilePicture } from "@/lib/helpers/handleProfilePicture";
 
 export default function Agent() {
   const id = useParams();
   const router = useRouter();
   const { isConnected, address } = useAccount();
-  const animationContext = useContext(AnimationContext);
   const context = useContext(ModalContext);
+  const animationContext = useContext(AnimationContext);
   const { setOpen } = useModal();
   const publicClient = createPublicClient({
-    chain: chains.testnet,
+    chain: chains.mainnet,
     transport: http(
-      "https://rpc.testnet.lens.dev"
+      "https://rpc.lens.xyz"
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
@@ -49,13 +50,7 @@ export default function Agent() {
     followLoading,
     handleFollow,
     agentRent,
-  } = useAgent(
-    id?.id as string,
-    context?.lensClient!,
-    context?.lensConnected,
-    context?.setNotification!,
-    context?.setSignless!
-  );
+  } = useAgent(id?.id as string);
 
   const {
     handlePost,
@@ -70,16 +65,7 @@ export default function Agent() {
     commentQuote,
     setCommentQuote,
     success,
-  } = useInteractions(
-    context?.lensConnected?.sessionClient!,
-    context?.setSignless!,
-    context?.storageClient!,
-    context?.setIndexer!,
-    context?.setNotification!,
-    setAgent,
-    agent,
-    handleActivity
-  );
+  } = useInteractions(setAgent, agent, handleActivity);
 
   const {
     rechargeLoading,
@@ -90,12 +76,7 @@ export default function Agent() {
     setRechargeAmount,
     chosenTokens,
     setChosenTokens,
-  } = useRecharge(
-    publicClient,
-    address,
-    context?.setNotification!,
-    agent?.workers || []
-  );
+  } = useRecharge(publicClient, address, agent?.workers || []);
 
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-3 sm:px-10 gap-24 text-windows">
@@ -213,19 +194,15 @@ export default function Agent() {
                         </div>
                         <div className="relative w-fit h-fit flex items-center justify-start gap-2 flex-row">
                           <div className="relative flex rounded-full w-8 h-8 bg-morado border border-morado">
-                            {agent?.ownerProfile?.metadata?.picture && (
-                              <Image
-                                src={`${INFURA_GATEWAY}/ipfs/${
-                                  agent?.ownerProfile?.metadata?.picture?.split(
-                                    "ipfs://"
-                                  )?.[1]
-                                }`}
-                                draggable={false}
-                                className="rounded-full"
-                                layout="fill"
-                                objectFit="cover"
-                              />
-                            )}
+                            <Image
+                              src={handleProfilePicture(
+                                agent?.ownerProfile?.metadata?.picture
+                              )}
+                              draggable={false}
+                              className="rounded-full"
+                              layout="fill"
+                              objectFit="cover"
+                            />
                           </div>
                           <div className="relative flex w-fit h-fit text-xs">
                             {agent?.ownerProfile?.username?.localName
@@ -244,19 +221,15 @@ export default function Agent() {
                         </div>
                         <div className="relative w-fit h-fit flex items-center justify-start gap-2 flex-row">
                           <div className="relative flex rounded-full w-8 h-8 bg-morado border border-morado">
-                            {agent?.profile?.metadata?.picture && (
-                              <Image
-                                src={`${INFURA_GATEWAY}/ipfs/${
-                                  agent?.profile?.metadata?.picture?.split(
-                                    "ipfs://"
-                                  )?.[1]
-                                }`}
-                                draggable={false}
-                                className="rounded-full"
-                                layout="fill"
-                                objectFit="cover"
-                              />
-                            )}
+                            <Image
+                              src={handleProfilePicture(
+                                agent?.profile?.metadata?.picture
+                              )}
+                              draggable={false}
+                              className="rounded-full"
+                              layout="fill"
+                              objectFit="cover"
+                            />
                           </div>
                           <div className="relative flex w-fit h-fit text-xs">
                             {agent?.profile?.username?.localName
@@ -389,14 +362,12 @@ export default function Agent() {
                     >
                       <Comments
                         comments={agent?.activity || []}
-                        setImageView={context?.setImageView!}
                         interactionsLoading={interactionsLoading}
                         handleLike={handleLike}
                         handleMirror={handleMirror}
                         setCommentQuote={setCommentQuote}
                         postLoading={postLoading}
                         commentQuote={commentQuote}
-                        agents={context?.agents!}
                       />
                     </InfiniteScroll>
                   </div>
@@ -430,7 +401,7 @@ export default function Agent() {
                               className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2 text-xs"
                               onClick={() =>
                                 window.open(
-                                  `https://block-explorer.testnet.lens.dev/tx/${rent?.transactionHash}`
+                                  `https://explorer.lens.xyz/tx/${rent?.transactionHash}`
                                 )
                               }
                             >

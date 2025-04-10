@@ -1,13 +1,13 @@
-import { FunctionComponent, JSX } from "react";
-import { ToolTipProps } from "../types/modals.types";
+import { ModalContext } from "@/app/providers";
+import { FunctionComponent, JSX, useContext } from "react";
 
-const Tooltip: FunctionComponent<ToolTipProps> = ({
-  setTooltip,
-}): JSX.Element => {
+const Tooltip: FunctionComponent = (): JSX.Element => {
+  const context = useContext(ModalContext);
+
   return (
     <div
       className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-canP items-center justify-center"
-      onClick={() => setTooltip(false)}
+      onClick={() => context?.setToolTip(false)}
     >
       <div className="relative w-full h-fit flex items-center justify-center">
         <div

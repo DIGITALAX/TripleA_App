@@ -1,31 +1,19 @@
 import Image from "next/legacy/image";
-import { FunctionComponent, JSX } from "react";
+import { FunctionComponent, JSX, useContext } from "react";
 import { CreateAccountProps } from "../types/modals.types";
 import useCreateAccount from "../hooks/useCreateAccount";
+import { ModalContext } from "@/app/providers";
 
 const CreateAccount: FunctionComponent<CreateAccountProps> = ({
   address,
-  lensConnected,
-  setLensConnected,
-  setCreateAccount,
-  setIndexer,
-  storageClient,
-  setNotification
 }): JSX.Element => {
+  const context = useContext(ModalContext);
   const { account, accountLoading, setAccount, handleCreateAccount } =
-    useCreateAccount(
-      address,
-      lensConnected,
-      setLensConnected,
-      setCreateAccount,
-      setIndexer,
-      storageClient,
-      setNotification
-    );
+    useCreateAccount(address);
   return (
     <div
       className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-canP items-center justify-center"
-      onClick={() => setCreateAccount(false)}
+      onClick={() => context?.setCreateAccount(false)}
     >
       <div
         className="pixel-border-5 rounded-md text-windows bg-viol w-96 h-fit text-sm flex items-center justify-start p-3 cursor-default flex-col gap-6 font-nerd"
@@ -111,7 +99,6 @@ const CreateAccount: FunctionComponent<CreateAccountProps> = ({
                   bio: e.target.value,
                 })
               }
-              
               className="relative w-full text-viol bg-windows h-14 overflow-y-scroll border border-windows focus:outline-none p-1"
               value={account?.bio}
               style={{

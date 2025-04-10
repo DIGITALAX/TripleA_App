@@ -1,16 +1,17 @@
 import { Worker } from "@/components/Dashboard/types/dashboard.types";
 import { AGENTS_CONTRACT } from "@/lib/constants";
-import { chains } from "@lens-network/sdk/viem";
-import { SetStateAction, useEffect, useState } from "react";
+import { chains } from "@lens-chain/sdk/viem";
+import { useContext, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
 import AgentAbi from "@abis/AgentAbi.json";
+import { ModalContext } from "@/app/providers";
 
 const useRecharge = (
   publicClient: PublicClient,
   address: `0x${string}` | undefined,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
   collections: Worker[]
 ) => {
+  const context = useContext(ModalContext);
   const [rechargeLoading, setRechargeLoading] = useState<boolean[]>([]);
   const [rechargeAmount, setRechargeAmount] = useState<number[]>([]);
   const [approvedRecharge, setApprovedRecharge] = useState<boolean[]>([]);
@@ -19,7 +20,7 @@ const useRecharge = (
   const handleApproveRecharge = async (index: number) => {
     const amount = rechargeAmount[index];
     if (amount <= 0) {
-      setNotification?.("Invalid Recharge Amount :/");
+      context?.setNotification?.("Invalid Recharge Amount :/");
       return;
     }
 
@@ -33,7 +34,7 @@ const useRecharge = (
 
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -66,7 +67,7 @@ const useRecharge = (
           },
         ],
         functionName: "approve",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [AGENTS_CONTRACT, BigInt(amount * 10 ** 18)],
         account: address,
       });
@@ -101,7 +102,7 @@ const useRecharge = (
   ) => {
     const amount = rechargeAmount[index];
     if (amount <= 0) {
-      setNotification?.("Invalid Recharge Amount :/");
+      context?.setNotification?.("Invalid Recharge Amount :/");
       return;
     }
 
@@ -114,7 +115,7 @@ const useRecharge = (
     });
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -146,9 +147,8 @@ const useRecharge = (
         account: address,
       });
 
-
       if (balance < BigInt(amount * 10 ** 18)) {
-        setNotification?.("Not Enough Tokens in Your Wallet :(");
+        context?.setNotification?.("Not Enough Tokens in Your Wallet :(");
         setRechargeLoading((prev) => {
           let ref = [...prev];
 
@@ -163,7 +163,7 @@ const useRecharge = (
         address: AGENTS_CONTRACT,
         abi: AgentAbi,
         functionName: "rechargeAgentRentBalance",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [
           token,
           Number(agentId),
@@ -178,7 +178,7 @@ const useRecharge = (
         hash: res,
       });
 
-      setNotification?.("Success! You recharged the agent!");
+      context?.setNotification?.("Success! You recharged the agent!");
       setApprovedRecharge((prev) => {
         let ref = [...prev];
 
@@ -188,7 +188,7 @@ const useRecharge = (
       });
     } catch (err: any) {
       if (err?.message?.includes("Insufficient")) {
-        setNotification?.("Not Enough Tokens in Your Wallet :(");
+        context?.setNotification?.("Not Enough Tokens in Your Wallet :(");
       }
       console.error(err.message);
     }

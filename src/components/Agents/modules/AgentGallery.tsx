@@ -10,11 +10,7 @@ import { Agent } from "@/components/Dashboard/types/dashboard.types";
 const AgentGallery: FunctionComponent = (): JSX.Element => {
   const context = useContext(ModalContext);
   const animationContext = useContext(AnimationContext);
-  const { agentGalleryLoading, handleMoreAgents, hasMore } = useAgentGallery(
-    context?.agents,
-    context?.setAgents!,
-    context?.lensClient
-  );
+  const { agentGalleryLoading, handleMoreAgents, hasMore } = useAgentGallery();
   const router = useRouter();
 
   return (

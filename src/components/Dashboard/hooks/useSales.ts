@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Order } from "../types/dashboard.types";
 import { getSales } from "../../../../graphql/queries/getSales";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useSales = (
-  address: `0x${string}` | undefined,
-  lensClient: PublicClient
-) => {
+const useSales = (address: `0x${string}` | undefined) => {
+  const context = useContext(ModalContext);
   const [salesLoading, setSalesLoading] = useState<boolean>(false);
   const [allSales, setAllSales] = useState<Order[]>([]);
 
@@ -25,7 +24,7 @@ const useSales = (
           const artistAddress = evmAddress(sale?.collection?.artist);
 
           if (!profileCache.has(artistAddress)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: artistAddress,
               includeOwned: true,
             });
@@ -81,10 +80,10 @@ const useSales = (
   };
 
   useEffect(() => {
-    if (allSales?.length < 1 && lensClient && address) {
+    if (allSales?.length < 1 && context?.lensClient && address) {
       handleSales();
     }
-  }, [lensClient, address]);
+  }, [context?.lensClient, address]);
 
   return {
     allSales,

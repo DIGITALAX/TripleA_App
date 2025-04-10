@@ -12,6 +12,8 @@ import { Account } from "@lens-protocol/client";
 import { useModal } from "connectkit";
 import Slider from "./Slider";
 import useAgents from "../hooks/useAgents";
+import { handleProfilePicture } from "@/lib/helpers/handleProfilePicture";
+import { chains } from "@lens-chain/sdk/viem";
 
 const Header: FunctionComponent = (): JSX.Element => {
   const router = useRouter();
@@ -31,25 +33,9 @@ const Header: FunctionComponent = (): JSX.Element => {
     handleSearch,
     setSearchItems,
     logout,
-  } = useHeader(
-    address,
-    context?.lensClient,
-    context?.setIndexer,
-    context?.setCreateAccount,
-    context?.setLensConnected,
-    context?.lensConnected,
-    context?.setFulfillers!,
-    context?.fulfillers!
-  );
+  } = useHeader(address);
 
-  useAgents(
-    context?.agents!,
-    context?.setAgents!,
-    context?.lensClient!,
-    context?.tokenThresholds!,
-    context?.setTokenThresholds!,
-    context?.setAgentsLoading!
-  );
+  useAgents();
 
   return (
     <div className="relative w-full h-fit flex flex-col gap-3 bg-white">
@@ -181,13 +167,9 @@ const Header: FunctionComponent = (): JSX.Element => {
                               <div className="relative w-fit h-fit flex  items-center justify-center">
                                 <div className="relative w-12 h-12 rounded-full flex items-center justify-center bg-morado">
                                   <Image
-                                    src={`${INFURA_GATEWAY}/ipfs/${
-                                      (
-                                        item as Account
-                                      )?.metadata?.picture?.split(
-                                        "ipfs://"
-                                      )?.[1]
-                                    }`}
+                                    src={handleProfilePicture(
+                                      (item as Account)?.metadata?.picture
+                                    )}
                                     alt="nft"
                                     draggable={false}
                                     objectFit="cover"
@@ -218,11 +200,9 @@ const Header: FunctionComponent = (): JSX.Element => {
               {context?.lensConnected?.profile?.metadata?.picture ? (
                 <div className="relative rounded-full w-10 h-10 bg-crema border border-morado">
                   <Image
-                    src={`${INFURA_GATEWAY}/ipfs/${
-                      context?.lensConnected?.profile?.metadata?.picture?.split(
-                        "ipfs://"
-                      )?.[1]
-                    }`}
+                    src={handleProfilePicture(
+                      context?.lensConnected?.profile?.metadata?.picture
+                    )}
                     draggable={false}
                     className="rounded-full"
                     layout="fill"
@@ -273,11 +253,9 @@ const Header: FunctionComponent = (): JSX.Element => {
                     {context?.lensConnected?.profile?.metadata?.picture ? (
                       <div className="relative rounded-full w-6 h-6 bg-crema border border-morado">
                         <Image
-                          src={`${INFURA_GATEWAY}/ipfs/${
-                            context?.lensConnected?.profile?.metadata?.picture?.split(
-                              "ipfs://"
-                            )?.[1]
-                          }`}
+                          src={handleProfilePicture(
+                            context?.lensConnected?.profile?.metadata?.picture
+                          )}
                           draggable={false}
                           className="rounded-full"
                           layout="fill"
@@ -343,7 +321,7 @@ const Header: FunctionComponent = (): JSX.Element => {
                     onClick={() =>
                       isConnected
                         ? openProfile?.()
-                        : chainId !== 37111
+                        : chainId !== Number(chains.mainnet)
                         ? openSwitchNetworks?.()
                         : openOnboarding?.()
                     }

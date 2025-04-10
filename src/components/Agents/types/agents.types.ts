@@ -1,6 +1,3 @@
-import { LensConnected } from "@/components/Common/types/common.types";
-import { PublicClient } from "@lens-protocol/client";
-import { StorageClient } from "@lens-chain/storage-client";
 import { SetStateAction } from "react";
 
 export enum AgentSwitcher {
@@ -21,11 +18,6 @@ export enum CreateSwitcher {
 export type CreateSwitchProps = {
   createSwitcher: CreateSwitcher;
   setCreateSwitcher: (e: SetStateAction<CreateSwitcher>) => void;
-  lensConnected: LensConnected | undefined;
-  setIndexer: (e: SetStateAction<string | undefined>) => void;
-  storageClient: StorageClient;
-  setNotifcation: (e: SetStateAction<string | undefined>) => void;
-  lensClient: PublicClient;
 };
 
 export type AgentSwitchProps = {

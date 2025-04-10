@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimationContext, ModalContext } from "@/app/providers";
+import { AnimationContext } from "@/app/providers";
 import { DropInterface } from "@/components/Dashboard/types/dashboard.types";
 import useUser from "@/components/User/hooks/useUser";
 import UserInfo from "@/components/User/modules/UserInfo";
@@ -14,7 +14,6 @@ export default function User() {
   const id = useParams();
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
-  const context = useContext(ModalContext);
   const {
     screen,
     setScreen,
@@ -25,7 +24,7 @@ export default function User() {
     itemsLoading,
     hasMore,
     handleMoreItems,
-  } = useUser(id?.id as string, context?.lensClient!);
+  } = useUser(id?.id as string);
 
   return (
     <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-white">

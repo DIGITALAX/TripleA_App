@@ -1,13 +1,11 @@
 import { INFURA_GATEWAY } from "@/lib/constants";
 import Image from "next/legacy/image";
-import { FunctionComponent, JSX } from "react";
+import { FunctionComponent, JSX, useContext } from "react";
 import { DataProps } from "../types/nft.types";
+import { ModalContext } from "@/app/providers";
 
-const Data: FunctionComponent<DataProps> = ({
-  url,
-  id,
-  setImageView,
-}): JSX.Element => {
+const Data: FunctionComponent<DataProps> = ({ url, id }): JSX.Element => {
+  const context = useContext(ModalContext);
   return (
     <div className="relative w-5/6 h-[30rem] md:h-full flex">
       {url && (
@@ -19,7 +17,9 @@ const Data: FunctionComponent<DataProps> = ({
           objectFit="contain"
           className="cursor-canP"
           onClick={() =>
-            setImageView(`${INFURA_GATEWAY}/ipfs/${url?.split("ipfs://")?.[1]}`)
+            context?.setImageView(
+              `${INFURA_GATEWAY}/ipfs/${url?.split("ipfs://")?.[1]}`
+            )
           }
         />
       )}

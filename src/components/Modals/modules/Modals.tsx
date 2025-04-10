@@ -15,48 +15,13 @@ const Modals: FunctionComponent = (): JSX.Element => {
   const { address } = useAccount();
   return (
     <>
-      {context?.toolTip && <Tooltip setTooltip={context?.setToolTip} />}
-      {context?.indexer && (
-        <Indexer indexer={context?.indexer} setIndexer={context?.setIndexer} />
-      )}
-      {context?.imageView && (
-        <ImageViewer
-          imageView={context?.imageView}
-          setImageView={context?.setImageView}
-        />
-      )}
-
-      {context?.createAccount && (
-        <CreateAccount
-          address={address}
-          setLensConnected={context?.setLensConnected}
-          lensConnected={context?.lensConnected}
-          setCreateAccount={context?.setCreateAccount}
-          setIndexer={context?.setIndexer}
-          storageClient={context?.storageClient!}
-          setNotification={context?.setNotification}
-        />
-      )}
-      {context?.fulfillmentOpen && (
-        <Fulfillment
-          address={address}
-          details={context?.fulfillmentOpen}
-          setFulfillmentOpen={context?.setFulfillmentOpen}
-          setNotification={context?.setNotification}
-        />
-      )}
-      {context?.signless && (
-        <Signless
-          setSignless={context?.setSignless}
-          lensConnected={context?.lensConnected}
-        />
-      )}
-      {context?.notification && (
-        <Notification
-          notification={context?.notification}
-          setNotification={context?.setNotification}
-        />
-      )}
+      {context?.toolTip && <Tooltip />}
+      {context?.indexer && <Indexer />}
+      {context?.imageView && <ImageViewer />}
+      {context?.createAccount && <CreateAccount address={address} />}
+      {context?.fulfillmentOpen && <Fulfillment address={address} />}
+      {context?.signless && <Signless />}
+      {context?.notification && <Notification />}
     </>
   );
 };

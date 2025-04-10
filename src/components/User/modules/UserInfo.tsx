@@ -2,6 +2,7 @@ import { FunctionComponent, JSX } from "react";
 import { UserInfoProps } from "../types/user.types";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
+import { handleProfilePicture } from "@/lib/helpers/handleProfilePicture";
 
 const UserInfo: FunctionComponent<UserInfoProps> = ({
   userInfo,
@@ -21,17 +22,13 @@ const UserInfo: FunctionComponent<UserInfoProps> = ({
             <div className="relative w-full h-fit flex flex-col gap-3 items-center justify-center">
               <div className="relative items-center justify-center flex w-fit h-fit">
                 <div className="relative w-20 rounded-full h-20 flex items-center justify-center border border-windows bg-white">
-                  {userInfo?.metadata?.picture && (
-                    <Image
-                      src={`${INFURA_GATEWAY}/ipfs/${
-                        userInfo?.metadata?.picture?.split("ipfs://")?.[1]
-                      }`}
-                      objectFit="cover"
-                      layout="fill"
-                      draggable={false}
-                      className="rounded-full"
-                    />
-                  )}
+                  <Image
+                    src={handleProfilePicture(userInfo?.metadata?.picture)}
+                    objectFit="cover"
+                    layout="fill"
+                    draggable={false}
+                    className="rounded-full"
+                  />
                 </div>
               </div>
             </div>

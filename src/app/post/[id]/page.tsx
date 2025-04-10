@@ -1,17 +1,14 @@
 "use client";
 
-import { ModalContext } from "@/app/providers";
 import useInteractions from "@/components/NFT/hooks/useInteractions";
 import Comments from "@/components/NFT/modules/Comments";
 import MakePost from "@/components/NFT/modules/Post";
 import usePost from "@/components/Post/hooks/usePost";
 import { useParams } from "next/navigation";
-import { useContext } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function Post() {
   const id = useParams();
-  const context = useContext(ModalContext);
   const {
     postData,
     handleActivity,
@@ -22,7 +19,7 @@ export default function Post() {
     setActivity,
     setPostData,
     postDataLoading,
-  } = usePost(context?.lensConnected, context?.lensClient!, id?.id as string);
+  } = usePost(id?.id as string);
   const {
     handlePost,
     postLoading,
@@ -38,11 +35,6 @@ export default function Post() {
     success,
     interactionsLoadingPost,
   } = useInteractions(
-    context?.lensConnected?.sessionClient!,
-    context?.setSignless!,
-    context?.storageClient!,
-    context?.setIndexer!,
-    context?.setNotification!,
     setActivity,
     activity,
     handleActivity,
@@ -54,14 +46,12 @@ export default function Post() {
       <div className="relative w-1/2 h-full flex px-1 sm:px-6 py-2">
         <Comments
           comments={postData}
-          setImageView={context?.setImageView!}
           interactionsLoading={interactionsLoadingPost}
           handleLike={handleLike}
           handleMirror={handleMirror}
           setCommentQuote={setCommentQuote}
           postLoading={postLoading}
           commentQuote={commentQuote}
-          agents={context?.agents!}
           post
         />
       </div>
@@ -88,14 +78,12 @@ export default function Post() {
                 >
                   <Comments
                     comments={activity || []}
-                    setImageView={context?.setImageView!}
                     interactionsLoading={interactionsLoading}
                     handleLike={handleLike}
                     handleMirror={handleMirror}
                     setCommentQuote={setCommentQuote}
                     postLoading={postLoading}
                     commentQuote={commentQuote}
-                    agents={context?.agents!}
                   />
                 </InfiniteScroll>
               </div>

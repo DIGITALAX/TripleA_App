@@ -3,18 +3,15 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { createContext, SetStateAction, useEffect, useState } from "react";
-import { chains } from "@lens-network/sdk/viem";
-import { Context, PublicClient, testnet } from "@lens-protocol/client";
+import { chains } from "@lens-chain/sdk/viem";
+import { Context, PublicClient, mainnet } from "@lens-protocol/client";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import {
   Fulfiller,
   LensConnected,
   TokenThreshold,
 } from "@/components/Common/types/common.types";
-import {
-  StorageClient,
-  testnet as storageTestnet,
-} from "@lens-protocol/storage-node-client";
+import { StorageClient } from "@lens-chain/storage-client";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import { CollectData } from "@/components/NFT/types/nft.types";
 
@@ -25,9 +22,9 @@ export const config = createConfig(
       .NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
     appUrl: "https://triplea.agentmeme.xyz",
     appIcon: "https://triplea.agentmeme.xyz/favicon.ico",
-    chains: [chains.testnet],
+    chains: [chains.mainnet],
     transports: {
-      [chains.testnet.id]: http("https://rpc.testnet.lens.dev"),
+      [chains.mainnet.id]: http("https://rpc.lens.xyz"),
     },
     ssr: true,
   })
@@ -114,13 +111,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       })
     | undefined
   >();
-  const storageClient = StorageClient.create(storageTestnet);
+  const storageClient = StorageClient.create();
 
   useEffect(() => {
     if (!lensClient) {
       setLensClient(
         PublicClient.create({
-          environment: testnet,
+          environment: mainnet,
           storage: window.localStorage,
         })
       );

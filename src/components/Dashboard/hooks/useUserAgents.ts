@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useContext, useEffect, useState } from "react";
 import {
   Agent,
   AgentEditSwitcher,
@@ -22,21 +22,19 @@ import {
   INFURA_GATEWAY,
   AGENT_FEED_RULE,
 } from "@/lib/constants";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
 import {
   fetchAccountsAvailable,
   updateFeedRules,
 } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
 const useUserAgents = (
-  lensClient: PublicClient,
-  sessionClient: SessionClient,
   publicClient: LensPublicClient,
-  address: `0x${string}` | undefined,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
-  setAgents: (e: SetStateAction<Agent[]>) => void
+  address: `0x${string}` | undefined
 ) => {
+  const context = useContext(ModalContext);
   const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [agentEditLoading, setAgentEditLoading] = useState<boolean>(false);
   const [userAgents, setUserAgents] = useState<Agent[]>([]);
@@ -70,14 +68,14 @@ const useUserAgents = (
     if (agentFeeds?.filter((fe) => fe?.address?.trim() !== "")?.length < 1)
       return;
     if (agentFeeds?.filter((f) => !f.added)?.length > 0) {
-      setNotification?.("Add Agentic Rules to All Feeds!");
+      context?.setNotification?.("Add Agentic Rules to All Feeds!");
       return;
     }
 
     setFeedsLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -110,7 +108,7 @@ const useUserAgents = (
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
         abi: AgentManagerAbi,
         functionName: "editAgent",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: ["ipfs://" + responseJSON?.cid, currentAgent?.id],
         account: address,
       });
@@ -120,7 +118,7 @@ const useUserAgents = (
         hash: res,
       });
 
-      setNotification?.("Success! Feeds Updated.");
+      context?.setNotification?.("Success! Feeds Updated.");
     } catch (err: any) {
       console.error(err.message);
     }
@@ -136,7 +134,7 @@ const useUserAgents = (
     });
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -144,7 +142,7 @@ const useUserAgents = (
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
         abi: AgentManagerAbi,
         functionName: "addOwner",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [agentOwners?.[index], currentAgent?.id],
         account: address,
       });
@@ -154,7 +152,7 @@ const useUserAgents = (
         hash: res,
       });
 
-      setAgents((prev) => {
+      context?.setAgents((prev) => {
         let ags = [...prev];
 
         return ags.map((agent) => {
@@ -168,7 +166,7 @@ const useUserAgents = (
           }
         });
       });
-      setNotification?.("Success! Owner Added.");
+      context?.setNotification?.("Success! Owner Added.");
       setAgentOwners([
         ...agentOwners,
         {
@@ -195,7 +193,7 @@ const useUserAgents = (
     });
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -203,7 +201,7 @@ const useUserAgents = (
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
         abi: AgentManagerAbi,
         functionName: "revokeOwner",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [agentOwners?.[index], currentAgent?.id],
         account: address,
       });
@@ -213,7 +211,7 @@ const useUserAgents = (
         hash: res,
       });
 
-      setAgents((prev) => {
+      context?.setAgents((prev) => {
         let ags = [...prev];
 
         return ags.map((agent) => {
@@ -229,7 +227,7 @@ const useUserAgents = (
           }
         });
       });
-      setNotification?.("Success! Owner Revoked.");
+      context?.setNotification?.("Success! Owner Revoked.");
       setAgentOwners(
         agentOwners.filter((owner) => owner !== agentOwners?.[index])
       );
@@ -268,7 +266,7 @@ const useUserAgents = (
           const creatorAddress = evmAddress(agent?.creator);
 
           if (!profileCache.has(creatorAddress)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: creatorAddress,
               includeOwned: true,
             });
@@ -282,7 +280,6 @@ const useUserAgents = (
           }
 
           const profile = profileCache.get(creatorAddress);
-
 
           return {
             id: agent?.SkyhuntersAgentManager_id,
@@ -320,7 +317,7 @@ const useUserAgents = (
     setAgentEditLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -370,7 +367,7 @@ const useUserAgents = (
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
         abi: AgentManagerAbi,
         functionName: "editAgent",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: ["ipfs://" + responseJSON?.cid, currentAgent?.id],
         account: address,
       });
@@ -380,7 +377,9 @@ const useUserAgents = (
         hash: res,
       });
 
-      setNotification?.("Success! Everything will be on chain soon :)");
+      context?.setNotification?.(
+        "Success! Everything will be on chain soon :)"
+      );
     } catch (err: any) {
       console.error(err.message);
     }
@@ -397,19 +396,22 @@ const useUserAgents = (
       return feeds;
     });
     try {
-      const res = await updateFeedRules(sessionClient, {
-        toAdd: {
-          required: [
-            {
-              unknownRule: {
-                executeOn: [FeedRuleExecuteOn.CreatingPost],
-                address: AGENT_FEED_RULE,
+      const res = await updateFeedRules(
+        context?.lensConnected?.sessionClient!,
+        {
+          toAdd: {
+            required: [
+              {
+                unknownRule: {
+                  executeOn: [FeedRuleExecuteOn.CreatingPost],
+                  address: AGENT_FEED_RULE,
+                },
               },
-            },
-          ],
-        },
-        feed: agentFeeds?.[index]?.address,
-      });
+            ],
+          },
+          feed: agentFeeds?.[index]?.address,
+        }
+      );
 
       if (res.isErr()) {
         setAddFeedLoading((prev) => {
@@ -418,7 +420,7 @@ const useUserAgents = (
           feeds[index] = true;
           return feeds;
         });
-        setNotification("Something went wrong. Try again? :/");
+        context?.setNotification("Something went wrong. Try again? :/");
         return;
       }
 
@@ -432,7 +434,7 @@ const useUserAgents = (
             : feed
         )
       );
-      setNotification("Agentic Feed Rule Added!");
+      context?.setNotification("Agentic Feed Rule Added!");
     } catch (err: any) {
       console.error(err.message);
     }
@@ -445,10 +447,10 @@ const useUserAgents = (
   };
 
   useEffect(() => {
-    if (userAgents?.length < 1 && lensClient && address) {
+    if (userAgents?.length < 1 && context?.lensClient && address) {
       handleUserAgents();
     }
-  }, [lensClient, address]);
+  }, [context?.lensClient, address]);
 
   useEffect(() => {
     if (currentAgent) {

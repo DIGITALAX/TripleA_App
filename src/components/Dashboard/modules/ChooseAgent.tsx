@@ -1,4 +1,4 @@
-import { FunctionComponent, JSX } from "react";
+import { FunctionComponent, JSX, useContext } from "react";
 import {
   ChooseAgentProps,
   CollectionType,
@@ -9,15 +9,13 @@ import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import { ImSwitch } from "react-icons/im";
 import calculateRent from "@/lib/helpers/calculateRent";
 import { CiCircleQuestion } from "react-icons/ci";
+import { ModalContext } from "@/app/providers";
 
 const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
-  agents,
-  agentsLoading,
   setMintData,
   mintData,
-  tokenThresholds,
-  setToolTip,
 }): JSX.Element => {
+  const context = useContext(ModalContext);
   return (
     <div
       className={`flex relative w-full h-[32rem] items-center justify-start ${
@@ -26,7 +24,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
           (price, index) =>
             price * 10 ** 18 >=
             Number(
-              tokenThresholds?.find(
+              context?.tokenThresholds?.find(
                 (t) =>
                   t?.token?.toLowerCase() ==
                   mintData?.tokens?.[index]?.toLowerCase()
@@ -38,7 +36,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
       }`}
     >
       <div className="relative w-fit h-full flex flex-row gap-6">
-        {agentsLoading || agents?.length < 1
+        {Number(context?.agents?.length) < 1
           ? Array.from({ length: 10 }).map((_, key) => {
               return (
                 <div
@@ -47,7 +45,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                 ></div>
               );
             })
-          : agents?.map((agent, key) => {
+          : context?.agents?.map((agent, key) => {
               return (
                 <div
                   key={key}
@@ -124,7 +122,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          setToolTip(true);
+                          context?.setToolTip(true);
                         }}
                         color="#0000f5"
                       />
@@ -158,7 +156,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
                                 className="relative w-fit h-fit flex"
                               >
                                 {`${calculateRent(
-                                  tokenThresholds?.find(
+                                  context?.tokenThresholds?.find(
                                     (tok) =>
                                       tok.token?.toLowerCase() ==
                                       token?.toLowerCase()
@@ -359,7 +357,7 @@ const ChooseAgent: FunctionComponent<ChooseAgentProps> = ({
           (price, index) =>
             price * 10 ** 18 >=
             Number(
-              tokenThresholds?.find(
+              context?.tokenThresholds?.find(
                 (t) =>
                   t?.token?.toLowerCase() ==
                   mintData?.tokens?.[index]?.toLowerCase()

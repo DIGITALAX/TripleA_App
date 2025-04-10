@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NFTData } from "@/components/Common/types/common.types";
 import { DropInterface } from "../types/dashboard.types";
-import { INFURA_GATEWAY,  } from "@/lib/constants";
+import { INFURA_GATEWAY } from "@/lib/constants";
 import { getDrop } from "../../../../graphql/queries/getDrop";
-import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
+import { Account, evmAddress } from "@lens-protocol/client";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useDrops = (
-  drop: DropInterface | undefined,
-  lensClient: PublicClient
-) => {
+const useDrops = (drop: DropInterface | undefined) => {
+  const context = useContext(ModalContext);
   const [collectionsLoading, setCollectionsLoading] = useState<boolean>(false);
   const [allCollections, setAllCollections] = useState<NFTData[]>([]);
 
@@ -38,7 +37,7 @@ const useDrops = (
           const artistAddress = evmAddress(collection?.artist);
 
           if (!profileCache.has(artistAddress)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: artistAddress,
               includeOwned: true,
             });
@@ -76,10 +75,10 @@ const useDrops = (
   };
 
   useEffect(() => {
-    if (allCollections?.length < 1 && drop && lensClient) {
+    if (allCollections?.length < 1 && drop && context?.lensClient) {
       handleCollections();
     }
-  }, [lensClient]);
+  }, [context?.lensClient]);
 
   return {
     allCollections,

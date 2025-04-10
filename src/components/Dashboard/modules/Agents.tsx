@@ -4,21 +4,18 @@ import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import useUserAgents from "../hooks/useUserAgents";
 import { createPublicClient, http } from "viem";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import AgentEditSwitch from "./AgentEditSwitch";
 
 const Agents: FunctionComponent<AgentProps> = ({
   setSwitcher,
-  lensClient,
-  setNotification,
   address,
-  setAgents,
-  sessionClient,
 }): JSX.Element => {
+
   const publicClient = createPublicClient({
-    chain: chains.testnet,
+    chain: chains.mainnet,
     transport: http(
-      "https://rpc.testnet.lens.dev"
+      "https://rpc.lens.xyz"
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
@@ -45,14 +42,7 @@ const Agents: FunctionComponent<AgentProps> = ({
     addFeedLoading,
     addOwnerLoading,
     addFeedRule,
-  } = useUserAgents(
-    lensClient,
-    sessionClient,
-    publicClient,
-    address,
-    setNotification,
-    setAgents
-  );
+  } = useUserAgents(publicClient, address);
 
   switch (currentAgent) {
     case undefined:

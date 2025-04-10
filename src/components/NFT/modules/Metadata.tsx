@@ -1,16 +1,17 @@
-import { FunctionComponent, JSX } from "react";
+import { FunctionComponent, JSX, useContext } from "react";
 import { MetadataProps } from "../types/nft.types";
 import { ImageMetadata } from "@lens-protocol/client";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import descriptionRegex from "@/lib/helpers/descriptionRegex";
+import { ModalContext } from "@/app/providers";
 
 const Metadata: FunctionComponent<MetadataProps> = ({
   metadata,
   data,
-  setImageView,
   post,
 }): JSX.Element => {
+  const context = useContext(ModalContext);
   switch (metadata) {
     case "ImageMetadata":
       return (
@@ -25,7 +26,7 @@ const Metadata: FunctionComponent<MetadataProps> = ({
                 post ? " w-full sm:w-1/2 h-full" : "w-full h-60"
               }`}
               onClick={() =>
-                setImageView(
+                context?.setImageView(
                   `${INFURA_GATEWAY}/ipfs/${
                     ((data as ImageMetadata)?.image?.item as string)?.split(
                       "ipfs://"

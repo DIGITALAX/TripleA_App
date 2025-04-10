@@ -13,28 +13,24 @@ import { INFURA_GATEWAY, TOKENS, TYPES, SIZES, COLORS } from "@/lib/constants";
 import ChooseAgent from "./ChooseAgent";
 import { createPublicClient, http } from "viem";
 import { useAccount } from "wagmi";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import { useRouter } from "next/navigation";
-import { AnimationContext } from "@/app/providers";
+import { AnimationContext, ModalContext } from "@/app/providers";
 import calculateRent from "@/lib/helpers/calculateRent";
 
 const MintSwitch: FunctionComponent<MintSwitchProps> = ({
   mintSwitcher,
   setMintSwitcher,
-  agents,
   allDrops,
-  lensConnected,
-  tokenThresholds,
-  fulfillers,
-  setToolTip,
 }): JSX.Element => {
   const { address } = useAccount();
   const router = useRouter();
+  const context = useContext(ModalContext);
   const animationContext = useContext(AnimationContext);
   const publicClient = createPublicClient({
-    chain: chains.testnet,
+    chain: chains.mainnet,
     transport: http(
-      "https://rpc.testnet.lens.dev"
+      "https://rpc.lens.xyz"
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
@@ -44,7 +40,6 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
     mintLoading,
     mintData,
     setMintData,
-    agentsLoading,
     id,
     remixSearch,
     handleRemixSearch,
@@ -58,10 +53,6 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
         <ChooseAgent
           mintData={mintData}
           setMintData={setMintData}
-          agents={agents}
-          agentsLoading={agentsLoading}
-          tokenThresholds={tokenThresholds}
-          setToolTip={setToolTip}
         />
       );
 
@@ -80,7 +71,6 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
       return (
         <Mint
           mintData={mintData}
-          tokenThresholds={tokenThresholds}
           handleMint={handleMint}
           allDrops={allDrops}
           mintLoading={mintLoading}
@@ -100,12 +90,12 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                 animationContext?.setPageChange?.(true);
                 router.prefetch(
                   `/nft/${
-                    lensConnected?.profile?.username?.value?.split("lens/")?.[1]
+                    context?.lensConnected?.profile?.username?.value?.split("lens/")?.[1]
                   }/${id}`
                 );
                 router.push(
                   `/nft/${
-                    lensConnected?.profile?.username?.value?.split("lens/")?.[1]
+                    context?.lensConnected?.profile?.username?.value?.split("lens/")?.[1]
                   }/${id}`
                 );
               }}
@@ -307,7 +297,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                         </div>
                         <div className="relative flex w-fit h-fit">
                           {calculateRent(
-                            tokenThresholds?.find(
+                             context?.tokenThresholds?.find(
                               (t) =>
                                 t.token?.toLowerCase() ==
                                 token.contract?.toLowerCase()
@@ -330,7 +320,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                         className={`relative w-fit md:w-full h-fit flex flex-col gap-1 items-start justify-start ${
                           Number(mintData?.prices?.[key]) >=
                           Number(
-                            tokenThresholds?.find(
+                            context?.tokenThresholds?.find(
                               (t) =>
                                 t.token?.toLowerCase() ==
                                 token.contract?.toLowerCase()
@@ -346,7 +336,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                         </div>
                         <div className="relative flex w-fit h-fit">
                           {Number(
-                            tokenThresholds?.find(
+                             context?.tokenThresholds?.find(
                               (t) =>
                                 t.token?.toLowerCase() ==
                                 token.contract?.toLowerCase()
@@ -364,7 +354,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                             <div className="relative flex w-fit h-fit">Vig</div>
                             <div className="relative flex w-fit h-fit">
                               {Number(
-                                tokenThresholds?.find(
+                                 context?.tokenThresholds?.find(
                                   (t) =>
                                     t.token?.toLowerCase() ==
                                     token.contract?.toLowerCase()
@@ -377,7 +367,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                             className={`relative w-fit md:w-full h-fit flex flex-col gap-1 items-start justify-start ${
                               Number(mintData?.prices?.[key]) * 10 ** 18 >=
                               Number(
-                                tokenThresholds?.find(
+                                context?.tokenThresholds?.find(
                                   (t) =>
                                     t.token?.toLowerCase() ==
                                     token.contract?.toLowerCase()
@@ -392,7 +382,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                             </div>
                             <div className="relative flex w-fit h-fit">
                               {Number(
-                                tokenThresholds?.find(
+                                 context?.tokenThresholds?.find(
                                   (t) =>
                                     t.token?.toLowerCase() ==
                                     token.contract?.toLowerCase()
@@ -416,7 +406,7 @@ const MintSwitch: FunctionComponent<MintSwitchProps> = ({
                 Choose Fulfiller
               </div>
               <div className="relative w-full h-fit overflow-y-scroll flex flex-wrap gap-3 items-start justify-start">
-                {fulfillers?.map((fulfiller, index) => {
+                { context?.fulfillers?.map((fulfiller, index) => {
                   return (
                     <div
                       key={index}

@@ -1,5 +1,5 @@
-import { chains } from "@lens-network/sdk/viem";
-import { SetStateAction, useEffect, useState } from "react";
+import { chains } from "@lens-chain/sdk/viem";
+import { SetStateAction, useContext, useEffect, useState } from "react";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
 import {
@@ -7,13 +7,10 @@ import {
   AGENT_FEED_RULE,
 } from "@/lib/constants";
 import AgentManagerAbi from "@abis/AgentManagerAbi.json";
-import { LensConnected } from "@/components/Common/types/common.types";
-import { StorageClient } from "@lens-chain/storage-client";
 import {
   evmAddress,
   FeedRuleExecuteOn,
   FeedsOrderBy,
-  PublicClient as PublicClientLens,
 } from "@lens-protocol/client";
 import pollResult from "@/lib/helpers/pollResult";
 import { Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
@@ -28,17 +25,14 @@ import {
 } from "@lens-protocol/client/actions";
 import { account, feed as feedMetadata } from "@lens-protocol/metadata";
 import { immutable } from "@lens-chain/storage-client";
+import { ModalContext } from "@/app/providers";
 
 const useCreateAgent = (
   publicClient: PublicClient,
   address: `0x${string}` | undefined,
-  setCreateSwitcher: (e: SetStateAction<CreateSwitcher>) => void,
-  lensConnected: LensConnected | undefined,
-  setIndexer: (e: SetStateAction<string | undefined>) => void,
-  storageClient: StorageClient,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
-  lensClient: PublicClientLens
+  setCreateSwitcher: (e: SetStateAction<CreateSwitcher>) => void
 ) => {
+  const context = useContext(ModalContext);
   const [createAgentLoading, setCreateAgentLoading] = useState<boolean>(false);
   const [agentWallet, setAgentWallet] = useState<HDNodeWallet | undefined>();
   const [lensLoading, setLensLoading] = useState<boolean>(false);
@@ -98,7 +92,7 @@ const useCreateAgent = (
   });
 
   const handleCreateAccount = async () => {
-    if (!address || !lensConnected?.sessionClient) return;
+    if (!address || !context?.lensConnected?.sessionClient) return;
     setLensLoading(true);
     try {
       let picture = undefined;
@@ -126,28 +120,27 @@ const useCreateAgent = (
             : agentLensDetails?.bio,
         picture,
       });
-      const acl = immutable(chains.testnet.id);
-      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
+      const acl = immutable(chains.mainnet.id);
+      const { uri } = await context?.storageClient?.uploadAsJson(schema, {
+        acl,
+      })!;
 
       const provider = new JsonRpcProvider(
-        "https://rpc.testnet.lens.dev",
-        37111
+        "https://rpc.lens.xyz",
+        Number(chains.mainnet)
       );
       const agentWalletCreated = Wallet.createRandom(provider);
 
-      console.log({
-        address: agentWalletCreated.address,
-        key: agentWalletCreated.privateKey,
-      });
+  
 
-      const authenticatedOnboarding = await lensClient.login({
+      const authenticatedOnboarding = await context?.lensClient?.login({
         onboardingUser: {
           wallet: agentWalletCreated.address,
         },
         signMessage: (message) => agentWalletCreated.signMessage(message),
       });
 
-      if (authenticatedOnboarding.isOk()) {
+      if (authenticatedOnboarding?.isOk()) {
         const accountResponse = await createAccountWithUsername(
           authenticatedOnboarding.value,
           {
@@ -161,9 +154,11 @@ const useCreateAgent = (
 
         if (accountResponse.isErr()) {
           if (accountResponse.error.message.includes("The username already")) {
-            setNotification("Username Already Taken. Try something else?");
+            context?.setNotification(
+              "Username Already Taken. Try something else?"
+            );
           } else {
-            setNotification("Something went wrong. Try again? :/");
+            context?.setNotification("Something went wrong. Try again? :/");
           }
           setLensLoading(false);
           return;
@@ -172,14 +167,17 @@ const useCreateAgent = (
         if ((accountResponse.value as any)?.hash) {
           const res = await pollResult(
             (accountResponse.value as any)?.hash,
-            lensConnected?.sessionClient
+            context?.lensConnected?.sessionClient
           );
           if (res) {
-            const newAcc = await fetchAccount(lensConnected?.sessionClient, {
-              username: {
-                localName: agentLensDetails?.username,
-              },
-            });
+            const newAcc = await fetchAccount(
+              context?.lensConnected?.sessionClient,
+              {
+                username: {
+                  localName: agentLensDetails?.username,
+                },
+              }
+            );
 
             if (newAcc.isErr()) {
               setLensLoading(false);
@@ -187,7 +185,7 @@ const useCreateAgent = (
             }
 
             if (newAcc.value?.address) {
-              const authenticated = await lensClient.login({
+              const authenticated = await context?.lensClient?.login({
                 accountOwner: {
                   account: evmAddress(newAcc.value.address),
                   owner: agentWalletCreated.address?.toLowerCase(),
@@ -196,13 +194,13 @@ const useCreateAgent = (
                   agentWalletCreated.signMessage(message),
               });
 
-              if (authenticated.isOk()) {
+              if (authenticated?.isOk()) {
                 const res = await enableSignless(authenticated.value);
 
                 if (res.isErr()) {
                   console.error(res.error);
 
-                  setIndexer?.("Error with Enabling Signless");
+                  context?.setIndexer?.("Error with Enabling Signless");
                   setLensLoading(false);
                 } else {
                   const responseKey = await fetch("/api/faucet", {
@@ -239,42 +237,42 @@ const useCreateAgent = (
                       setAgentWallet(agentWalletCreated);
                       setAgentAccountAddress(newAcc.value?.address);
                     } else {
-                      setIndexer?.("Error with Enabling Signless");
+                      context?.setIndexer?.("Error with Enabling Signless");
                       setLensLoading(false);
                       return;
                     }
                   } else {
-                    setIndexer?.("Error with Enabling Signless");
+                    context?.setIndexer?.("Error with Enabling Signless");
                     setLensLoading(false);
                     return;
                   }
                 }
               } else {
                 console.error(accountResponse);
-                setIndexer?.("Error Enabling Signless Transactions.");
+                context?.setIndexer?.("Error Enabling Signless Transactions.");
                 setLensLoading(false);
                 return;
               }
             } else {
               console.error(accountResponse);
-              setIndexer?.("Error with Fetching New Account");
+              context?.setIndexer?.("Error with Fetching New Account");
               setLensLoading(false);
               return;
             }
           } else {
             console.error(accountResponse);
-            setIndexer?.("Error with Account Creation");
+            context?.setIndexer?.("Error with Account Creation");
             setLensLoading(false);
             return;
           }
         } else {
           console.error(accountResponse);
-          setIndexer?.("Error with Account Creation");
+          context?.setIndexer?.("Error with Account Creation");
           setLensLoading(false);
           return;
         }
       } else {
-        setNotification("Error creating Lens Account. Try again?");
+        context?.setNotification("Error creating Lens Account. Try again?");
         setLensLoading(false);
         return;
       }
@@ -289,7 +287,7 @@ const useCreateAgent = (
       agentDetails?.feeds?.filter((f) => !f?.added || f?.address?.trim() == "")
         ?.length > 0
     ) {
-      setNotification?.("Add Agentic Rules to All Feeds!");
+      context?.setNotification?.("Add Agentic Rules to All Feeds!");
       return;
     }
 
@@ -301,17 +299,17 @@ const useCreateAgent = (
       !agentDetails?.cover ||
       !agentWallet
     ) {
-      setNotification?.("Fill Out All Details!");
+      context?.setNotification?.("Fill Out All Details!");
       return;
     }
     if (!agentAccountAddress || !agentWallet) {
-      setNotification?.("Create your Agent's Lens Account!");
+      context?.setNotification?.("Create your Agent's Lens Account!");
       return;
     }
     setCreateAgentLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -370,7 +368,7 @@ const useCreateAgent = (
         address: SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
         abi: AgentManagerAbi,
         functionName: "createAgent",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [
           [agentWallet.address],
           [address, ...agentDetails.owners?.filter((o) => o.trim() !== "")],
@@ -426,34 +424,34 @@ const useCreateAgent = (
 
       let responseKeyJSON = await responseKey.json();
 
-      // const data = {
-      //   publicAddress: agentWallet.address,
-      //   encryptionDetails: responseKeyJSON.encryptionDetails,
-      //   id: agentId,
-      //   title: agentDetails.title,
-      //   bio: agentDetails.bio,
-      //   lore: agentDetails.lore,
-      //   knowledge: agentDetails.knowledge,
-      //   adjectives: agentDetails.adjectives,
-      //   style: agentDetails.style,
-      //   messageExamples: agentDetails.messageExamples,
-      //   cover: "ipfs://" + responseImageJSON.cid,
-      //   customInstructions: agentDetails.customInstructions,
-      //   accountAddress: agentAccountAddress,
-      // };
+      const data = {
+        publicAddress: agentWallet.address,
+        encryptionDetails: responseKeyJSON.encryptionDetails,
+        id: agentId,
+        title: agentDetails.title,
+        bio: agentDetails.bio,
+        lore: agentDetails.lore,
+        knowledge: agentDetails.knowledge,
+        adjectives: agentDetails.adjectives,
+        style: agentDetails.style,
+        messageExamples: agentDetails.messageExamples,
+        cover: "ipfs://" + responseImageJSON.cid,
+        customInstructions: agentDetails.customInstructions,
+        accountAddress: agentAccountAddress,
+      };
 
-      // const newSocket = new WebSocket(
-      //   // `ws://127.0.0.1:10000?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
-      //   `wss://aaa-6t0j.onrender.com?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
-      // );
+      const newSocket = new WebSocket(
+        // `ws://127.0.0.1:10000?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
+        `wss://triplea-66ij.onrender.com?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
+      );
 
-      // newSocket.onerror = (error) => {
-      //   console.error("WebSocket error:", error);
-      // };
+      newSocket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
 
-      // newSocket.onopen = () => {
-      //   newSocket.send(JSON.stringify(data));
-      // };
+      newSocket.onopen = () => {
+        newSocket.send(JSON.stringify(data));
+      };
       setCreateSwitcher(CreateSwitcher.Success);
     } catch (err: any) {
       console.error(err.message);
@@ -472,26 +470,28 @@ const useCreateAgent = (
     setCreateFeedLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
         account: address,
       });
 
-      const builder = await lensClient.login({
+      const builder = await context?.lensClient?.login({
         builder: {
           address,
         },
         signMessage: (message) => clientWallet.signMessage({ message } as any),
       });
 
-      if (builder.isOk()) {
+      if (builder?.isOk()) {
         const schema = feedMetadata({
           name: feed.name,
           description: feed.description,
         });
 
-        const acl = immutable(chains.testnet.id);
-        const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
+        const acl = immutable(chains.mainnet.id);
+        const { uri } = await context?.storageClient?.uploadAsJson(schema, {
+          acl,
+        })!;
 
         const resFeed = await createFeed(builder.value, {
           metadataUri: uri,
@@ -510,19 +510,21 @@ const useCreateAgent = (
             ],
           },
         });
-        console.log({ resFeed });
+       
         if (resFeed.isOk()) {
-          const feeds = await fetchFeeds(lensConnected?.sessionClient!, {
-            orderBy: FeedsOrderBy.LatestFirst,
-            filter: {
-              managedBy: {
-                includeOwners: true,
-                address,
+          const feeds = await fetchFeeds(
+            context?.lensConnected?.sessionClient!,
+            {
+              orderBy: FeedsOrderBy.LatestFirst,
+              filter: {
+                managedBy: {
+                  includeOwners: true,
+                  address,
+                },
               },
-            },
-          });
+            }
+          );
 
-          console.log({ feeds });
 
           if (feeds.isOk()) {
             if (feeds?.value?.items?.[0]?.address) {
@@ -560,19 +562,22 @@ const useCreateAgent = (
       return feeds;
     });
     try {
-      const res = await updateFeedRules(lensConnected?.sessionClient!, {
-        toAdd: {
-          required: [
-            {
-              unknownRule: {
-                executeOn: [FeedRuleExecuteOn.CreatingPost],
-                address: AGENT_FEED_RULE,
+      const res = await updateFeedRules(
+        context?.lensConnected?.sessionClient!,
+        {
+          toAdd: {
+            required: [
+              {
+                unknownRule: {
+                  executeOn: [FeedRuleExecuteOn.CreatingPost],
+                  address: AGENT_FEED_RULE,
+                },
               },
-            },
-          ],
-        },
-        feed: agentDetails.feeds?.[index]?.address,
-      });
+            ],
+          },
+          feed: agentDetails.feeds?.[index]?.address,
+        }
+      );
 
       if (res.isErr()) {
         setFeedAdminLoading((prev) => {
@@ -581,7 +586,7 @@ const useCreateAgent = (
           feeds[index] = true;
           return feeds;
         });
-        setNotification("Something went wrong. Try again? :/");
+        context?.setNotification("Something went wrong. Try again? :/");
         return;
       }
 
@@ -596,7 +601,7 @@ const useCreateAgent = (
             : feed
         ),
       }));
-      setNotification("Agentic Feed Rule Added!");
+      context?.setNotification("Agentic Feed Rule Added!");
     } catch (err: any) {
       console.error(err.message);
     }

@@ -6,14 +6,12 @@ import {
   CreateSwitcher,
 } from "../types/agents.types";
 import CreateSwitch from "./CreateSwitch";
-import { ModalContext } from "@/app/providers";
 
 const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
   agentSwitcher,
   createSwitcher,
   setCreateSwitcher,
 }): JSX.Element => {
-  const context = useContext(ModalContext);
   switch (agentSwitcher) {
     case AgentSwitcher.Create:
       return (
@@ -22,11 +20,6 @@ const AgentSwitch: FunctionComponent<AgentSwitchProps> = ({
             <CreateSwitch
               createSwitcher={createSwitcher}
               setCreateSwitcher={setCreateSwitcher}
-              setIndexer={context?.setIndexer!}
-              storageClient={context?.storageClient!}
-              lensConnected={context?.lensConnected}
-              setNotifcation={context?.setNotification!}
-              lensClient={context?.lensClient!}
             />
             <div className="relative w-full h-fit flex items-end justify-between flex-row gap-4">
               <div

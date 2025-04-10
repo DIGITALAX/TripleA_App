@@ -1,19 +1,17 @@
-import { LensConnected } from "@/components/Common/types/common.types";
-import { SetStateAction, useState } from "react";
+import { useContext, useState } from "react";
 import { enableSignless } from "@lens-protocol/client/actions";
 import { ethers } from "ethers";
+import { ModalContext } from "@/app/providers";
 
-const useSignless = (
-  lensConnected: LensConnected | undefined,
-  setSigner: (e: SetStateAction<boolean>) => void
-) => {
+const useSignless = () => {
+  const context = useContext(ModalContext);
   const [signlessLoading, setSignlessLoading] = useState<boolean>(false);
 
   const handleSignless = async () => {
-    if (!lensConnected?.sessionClient) return;
+    if (!context?.lensConnected?.sessionClient) return;
     setSignlessLoading(true);
     try {
-      const res = await enableSignless(lensConnected?.sessionClient);
+      const res = await enableSignless(context?.lensConnected?.sessionClient);
 
       if (res.isErr()) {
         console.error(res.error);
@@ -36,7 +34,7 @@ const useSignless = (
         const txResponse = await signer.sendTransaction(tx);
         await txResponse.wait();
 
-        setSigner?.(false);
+        context?.setSignless?.(false);
       }
     } catch (err: any) {
       console.error(err.message);

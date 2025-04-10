@@ -1,14 +1,8 @@
-import { chains } from "@lens-network/sdk/viem";
-import {
-  Account,
-  Context,
-  evmAddress,
-  PageSize,
-  PublicClient,
-} from "@lens-protocol/client";
-import { SetStateAction, useEffect, useState } from "react";
+import { chains } from "@lens-chain/sdk/viem";
+import { Account, evmAddress, PageSize } from "@lens-protocol/client";
+import { useContext, useEffect, useState } from "react";
 import { createWalletClient, custom } from "viem";
-import { Fulfiller, LensConnected, NFTData } from "../types/common.types";
+import { NFTData } from "../types/common.types";
 import { getCollectionSearch } from "../../../../graphql/queries/getCollectionSearch";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import {
@@ -17,19 +11,10 @@ import {
   revokeAuthentication,
 } from "@lens-protocol/client/actions";
 import { getFulfillers } from "../../../../graphql/queries/getFulfillers";
+import { ModalContext } from "@/app/providers";
 
-const useHeader = (
-  address: `0x${string}` | undefined,
-  lensClient: PublicClient<Context> | undefined,
-  setIndexer: ((e: SetStateAction<string | undefined>) => void) | undefined,
-  setCreateAccount: ((e: SetStateAction<boolean>) => void) | undefined,
-  setLensConnected:
-    | ((e: SetStateAction<LensConnected | undefined>) => void)
-    | undefined,
-  lensConnected: LensConnected | undefined,
-  setFulfillers: (e: SetStateAction<Fulfiller[]>) => void,
-  fulfillers: Fulfiller[]
-) => {
+const useHeader = (address: `0x${string}` | undefined) => {
+  const context = useContext(ModalContext);
   const [openAccount, setOpenAccount] = useState<boolean>(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [lensLoading, setLensLoading] = useState<boolean>(false);
@@ -63,7 +48,7 @@ const useHeader = (
           }
           const artistAddress = evmAddress(collection?.artist);
           if (!profileCache.has(artistAddress)) {
-            const result = await fetchAccountsAvailable(lensClient!, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: artistAddress,
               includeOwned: true,
             });
@@ -90,7 +75,7 @@ const useHeader = (
       );
 
       const res = await fetchAccounts(
-        lensConnected?.sessionClient || lensClient!,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           pageSize: PageSize.Ten,
           filter: {
@@ -117,15 +102,15 @@ const useHeader = (
   };
 
   const handleLensConnect = async () => {
-    if (!address || !lensClient) return;
+    if (!address || !context?.lensClient) return;
     setLensLoading(true);
     try {
       const signer = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom(window.ethereum!),
         account: address,
       });
-      const accounts = await fetchAccountsAvailable(lensClient, {
+      const accounts = await fetchAccountsAvailable(context?.lensClient!, {
         managedBy: evmAddress(signer.account.address),
         includeOwned: true,
       });
@@ -136,7 +121,7 @@ const useHeader = (
       }
 
       if (accounts.value.items?.[0]?.account?.address) {
-        const authenticated = await lensClient.login({
+        const authenticated = await context?.lensClient?.login({
           accountOwner: {
             account: evmAddress(accounts.value.items?.[0]?.account?.address),
             owner: signer.account.address?.toLowerCase(),
@@ -144,30 +129,30 @@ const useHeader = (
           signMessage: (message) => signer.signMessage({ message }),
         });
 
-        if (authenticated.isErr()) {
-          console.error(authenticated.error);
-          setIndexer?.("Error Authenticating");
+        if (!authenticated?.isOk()) {
+          console.error((authenticated as any)?.error);
+          context?.setIndexer?.("Error Authenticating");
           setLensLoading(false);
           return;
         }
 
         const sessionClient = authenticated.value;
 
-        setLensConnected?.({
+        context?.setLensConnected?.({
           sessionClient,
           profile: accounts.value.items?.[0]?.account,
         });
       } else {
-        const authenticatedOnboarding = await lensClient.login({
+        const authenticatedOnboarding = await context?.lensClient?.login({
           onboardingUser: {
             wallet: signer.account.address,
           },
           signMessage: (message) => signer.signMessage({ message }),
         });
 
-        if (authenticatedOnboarding.isErr()) {
-          console.error(authenticatedOnboarding.error);
-          setIndexer?.("Error Onboarding");
+        if (!authenticatedOnboarding?.isOk()) {
+          console.error((authenticatedOnboarding as any).error);
+          context?.setIndexer?.("Error Onboarding");
 
           setLensLoading(false);
           return;
@@ -175,11 +160,11 @@ const useHeader = (
 
         const sessionClient = authenticatedOnboarding.value;
 
-        setLensConnected?.({
+        context?.setLensConnected?.({
           sessionClient,
         });
 
-        setCreateAccount?.(true);
+        context?.setCreateAccount?.(true);
       }
     } catch (err: any) {
       console.error(err.message);
@@ -190,10 +175,10 @@ const useHeader = (
 
   const resumeLensSession = async () => {
     try {
-      const resumed = await lensClient?.resumeSession();
+      const resumed = await context?.lensClient?.resumeSession();
 
       if (resumed?.isOk()) {
-        const accounts = await fetchAccountsAvailable(lensClient!, {
+        const accounts = await fetchAccountsAvailable(context?.lensClient!, {
           managedBy: evmAddress(address!),
           includeOwned: true,
         });
@@ -202,11 +187,11 @@ const useHeader = (
           return;
         }
 
-        setLensConnected?.({
-          ...lensConnected,
+        context?.setLensConnected?.((prev) => ({
+          ...prev,
           profile: accounts.value.items?.[0]?.account,
           sessionClient: resumed?.value,
-        });
+        }));
       }
     } catch (err) {
       console.error("Error al reanudar la sesión:", err);
@@ -217,15 +202,19 @@ const useHeader = (
   const logout = async () => {
     setLensLoading(true);
     try {
-      const auth = await lensConnected?.sessionClient?.getAuthenticatedUser();
+      const auth =
+        await context?.lensConnected?.sessionClient?.getAuthenticatedUser();
 
       if (auth?.isOk()) {
-        const res = await revokeAuthentication(lensConnected?.sessionClient!, {
-          authenticationId: auth.value?.authenticationId,
-        });
+        const res = await revokeAuthentication(
+          context?.lensConnected?.sessionClient!,
+          {
+            authenticationId: auth.value?.authenticationId,
+          }
+        );
 
-        setLensConnected?.(undefined);
-        window.localStorage.removeItem("lens.testnet.credentials");
+        context?.setLensConnected?.(undefined);
+        window.localStorage.removeItem("lens.mainnet.credentials");
       }
     } catch (err: any) {
       console.error(err.message);
@@ -253,26 +242,26 @@ const useHeader = (
         })
       );
 
-      setFulfillers(fulfillers);
+      context?.setFulfillers(fulfillers);
     } catch (err: any) {
       console.error(err.message);
     }
   };
 
   useEffect(() => {
-    if (address && lensClient && !lensConnected?.profile) {
+    if (address && context?.lensClient && !context?.lensConnected?.profile) {
       resumeLensSession();
     }
-  }, [address, lensClient]);
+  }, [address, context?.lensClient]);
 
   useEffect(() => {
-    if (!address && lensConnected?.profile && lensClient) {
+    if (!address && context?.lensConnected?.profile && context?.lensClient) {
       logout();
     }
   }, [address]);
 
   useEffect(() => {
-    if (fulfillers?.length < 1) {
+    if (Number(context?.fulfillers?.length) < 1) {
       handleFulfillers();
     }
   }, []);

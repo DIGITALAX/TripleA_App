@@ -1,23 +1,20 @@
-import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
-import { SetStateAction, useEffect, useState } from "react";
+import { Account, evmAddress } from "@lens-protocol/client";
+import { useContext, useEffect, useState } from "react";
 import { getAgentsPaginated } from "../../../../graphql/queries/getAgentsPaginated";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useAgentGallery = (
-  agents: Agent[] | undefined,
-  setAgents: (e: SetStateAction<Agent[]>) => void,
-  lensClient: PublicClient | undefined
-) => {
+const useAgentGallery = () => {
+  const context = useContext(ModalContext);
   const [agentGalleryLoading, setAgentGalleryLoading] =
     useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [agentPaginated, setAgentPaginated] = useState<number>(20);
 
   const handleMoreAgents = async () => {
-    if (!lensClient || !hasMore) return;
-    if (Number(agents?.length) < 20) {
+    if (!context?.lensClient || !hasMore) return;
+    if (Number(context?.agents?.length) < 20) {
       setHasMore(false);
       setAgentPaginated(20);
       return;
@@ -42,7 +39,7 @@ const useAgentGallery = (
           }
 
           if (!profileCache.has(agent?.creator)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: evmAddress(agent?.creator),
               includeOwned: true,
             });
@@ -79,8 +76,8 @@ const useAgentGallery = (
         setAgentPaginated(agentPaginated + 20);
       }
 
-      setAgents?.([
-        ...(agents || []),
+      context?.setAgents?.([
+        ...(context?.agents || []),
         ...newAgents?.sort(() => Math.random() - 0.5),
       ]);
     } catch (err: any) {
@@ -90,12 +87,12 @@ const useAgentGallery = (
   };
 
   useEffect(() => {
-    if (!agents || agents?.length < 1) {
+    if (!context?.agents || context?.agents?.length < 1) {
       setAgentGalleryLoading(true);
     } else {
       setAgentGalleryLoading(false);
     }
-  }, [agents]);
+  }, [context?.agents]);
 
   return {
     agentGalleryLoading,

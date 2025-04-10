@@ -1,4 +1,3 @@
-import { LensConnected } from "@/components/Common/types/common.types";
 import {
   Agent,
   AgentCollection,
@@ -11,9 +10,8 @@ import {
   evmAddress,
   PageSize,
   Post,
-  PublicClient,
 } from "@lens-protocol/client";
-import { SetStateAction, useEffect, useState } from "react";
+import {  useContext, useEffect, useState } from "react";
 import { getAgent } from "../../../../graphql/queries/getAgent";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import { getAgentRent } from "../../../../graphql/queries/getAgentRent";
@@ -25,14 +23,10 @@ import {
   follow,
   unfollow,
 } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useAgent = (
-  id: string | undefined,
-  lensClient: PublicClient,
-  lensConnected: LensConnected | undefined,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
-  setSignless: (e: SetStateAction<boolean>) => void
-) => {
+const useAgent = (id: string | undefined) => {
+  const context = useContext(ModalContext);
   const [screen, setScreen] = useState<number>(0);
   const [agent, setAgent] = useState<Agent | undefined>();
   const [agentLoading, setAgentLoading] = useState<boolean>(false);
@@ -51,16 +45,16 @@ const useAgent = (
   >([]);
 
   const handleFollow = async () => {
-    if (!lensConnected?.sessionClient) return;
+    if (!context?.lensConnected?.sessionClient) return;
     setFollowLoading(true);
     try {
       if (agent?.profile?.operations?.isFollowedByMe) {
-        const res = await unfollow(lensConnected?.sessionClient, {
+        const res = await unfollow(context?.lensConnected?.sessionClient, {
           account: evmAddress(agent?.profile?.address),
         });
 
         if (res.isErr()) {
-          setNotification("Something went wrong. Try again? :/");
+          context?.setNotification("Something went wrong. Try again? :/");
           setFollowLoading(false);
           return;
         }
@@ -70,9 +64,9 @@ const useAgent = (
             "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
           )
         ) {
-          setSignless?.(true);
+          context?.setSignless?.(true);
         } else if ((res.value as any)?.hash) {
-          setNotification("Unfollowed!");
+          context?.setNotification("Unfollowed!");
           setStats({
             ...stats!,
             graphFollowStats: {
@@ -95,12 +89,12 @@ const useAgent = (
           });
         }
       } else {
-        const res = await follow(lensConnected?.sessionClient, {
+        const res = await follow(context?.lensConnected?.sessionClient, {
           account: evmAddress(agent?.profile?.address),
         });
 
         if (res.isErr()) {
-          setNotification("Something went wrong. Try again? :/");
+          context?.setNotification("Something went wrong. Try again? :/");
           setFollowLoading(false);
 
           return;
@@ -111,9 +105,9 @@ const useAgent = (
             "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
           )
         ) {
-          setSignless?.(true);
+          context?.setSignless?.(true);
         } else if ((res.value as any)?.hash) {
-          setNotification("Followed!");
+          context?.setNotification("Followed!");
           setStats({
             ...stats!,
             graphFollowStats: {
@@ -145,7 +139,7 @@ const useAgent = (
   ): Promise<Post[] | void> => {
     try {
       const postsRes = await fetchPosts(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           pageSize: PageSize.Fifty,
           filter: {
@@ -209,36 +203,45 @@ const useAgent = (
       }
 
       const result = await fetchAccountsAvailable(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
-          managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.creator),
+          managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.wallets?.[0]),
           includeOwned: true,
         }
       );
       let profile: any;
 
-      if (result.isErr()) {
-        setAgentLoading(false);
-        return;
+      if (result.isOk()) {
+        profile = result.value.items?.[0]?.account;
       }
 
-      profile = result.value.items?.[0]?.account;
+      let ownerProfile: any;
       const resultOwner = await fetchAccountsAvailable(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           managedBy: evmAddress(res?.data?.agentCreateds?.[0]?.creator),
           includeOwned: true,
         }
       );
-      let ownerProfile: any;
       if (resultOwner.isOk()) {
         ownerProfile = resultOwner.value.items?.[0]?.account;
       }
 
-      const posts = await handleActivity(
-        false,
-        result.value.items?.[0]?.account?.address
-      );
+      let posts: Post[] = [];
+      let stats;
+      if (profile) {
+        posts = (await handleActivity(false, profile?.address)) ?? [];
+        stats = await fetchAccountStats(
+          context?.lensConnected?.sessionClient || context?.lensClient!,
+          {
+            account: profile?.owner,
+          }
+        );
+
+        if (stats.isOk()) {
+          setStats(stats.value as AccountStats);
+        }
+      }
 
       let activeCollectionIds: AgentCollection[] =
         res?.data?.agentCreateds?.[0]?.activeCollectionIds || [];
@@ -259,7 +262,7 @@ const useAgent = (
           );
           if (!profile) {
             const result = await fetchAccountsAvailable(
-              lensConnected?.sessionClient || lensClient,
+              context?.lensConnected?.sessionClient || context?.lensClient!,
               {
                 managedBy: col?.data?.collectionCreateds?.[0]?.artist,
                 includeOwned: true,
@@ -314,7 +317,7 @@ const useAgent = (
 
       activeCollectionIds = (await Promise.all(
         activeCollectionIds?.map(async (id: any) => {
-          const result = await fetchAccountsAvailable(lensClient, {
+          const result = await fetchAccountsAvailable(context?.lensClient!, {
             managedBy: evmAddress(id?.artist),
             includeOwned: true,
           });
@@ -338,7 +341,7 @@ const useAgent = (
       collectionIdsHistory = (await Promise.all(
         collectionIdsHistory?.map(async (id: any) => {
           const result = await fetchAccountsAvailable(
-            lensConnected?.sessionClient || lensClient,
+            context?.lensConnected?.sessionClient || context?.lensClient!,
             {
               managedBy: evmAddress(id?.artist),
               includeOwned: true,
@@ -370,19 +373,6 @@ const useAgent = (
         };
       }) as Balance[];
 
-      const stats = await fetchAccountStats(
-        lensConnected?.sessionClient || lensClient,
-        {
-          account: result.value.items?.[0]?.account?.owner,
-        }
-      );
-
-      if (stats.isErr()) {
-        setAgentLoading(false);
-        return;
-      }
-
-      setStats(stats.value as AccountStats);
       const rent = await getAgentRent(
         Number(res?.data?.agentCreateds?.[0]?.SkyhuntersAgentManager_id)
       );
@@ -410,7 +400,7 @@ const useAgent = (
         activity: posts || [],
         activeCollectionIds,
         collectionIdsHistory,
-        accountConnected: result?.value.items[0]?.account?.address,
+        accountConnected: profile?.address,
         ownerProfile,
         feeds: metadata?.feeds,
         model: metadata?.model,
@@ -426,7 +416,7 @@ const useAgent = (
     setAgentLoading(true);
     try {
       const postsRes = await fetchPosts(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           pageSize: PageSize.Fifty,
           cursor: activityCursor,
@@ -473,10 +463,10 @@ const useAgent = (
   };
 
   useEffect(() => {
-    if (id && !agent && lensClient) {
+    if (id && !agent && context?.lensClient) {
       handleAgent();
     }
-  }, [id, lensClient]);
+  }, [id, context?.lensClient]);
 
   return {
     agent,

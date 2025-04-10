@@ -7,10 +7,10 @@ import {
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import { useRouter } from "next/navigation";
-import { AnimationContext } from "@/app/providers";
+import { AnimationContext, ModalContext } from "@/app/providers";
 import useAgentsCollection from "../hooks/useAgentsCollection";
 import { useAccount } from "wagmi";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import { createPublicClient, http } from "viem";
 import { ImSwitch } from "react-icons/im";
 
@@ -18,15 +18,14 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
   setDropSwitcher,
   setDrop,
   collection,
-  agents,
   setCollection,
-  setNotification,
 }): JSX.Element => {
   const { address } = useAccount();
+  const context = useContext(ModalContext);
   const publicClient = createPublicClient({
-    chain: chains.testnet,
+    chain: chains.mainnet,
     transport: http(
-      "https://rpc.testnet.lens.dev"
+      "https://rpc.lens.xyz"
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
@@ -47,8 +46,6 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
     address,
     publicClient,
     collection,
-    agents,
-    setNotification,
     setDrop,
     setDropSwitcher,
     setCollection
@@ -229,7 +226,7 @@ const AgentsCollection: FunctionComponent<AgentsCollectionProps> = ({
                     No Agents Assigned.
                   </div>
                 ) : (
-                  agents
+                  context?.agents
                     ?.filter((ag) => collection?.agentIds?.includes(ag?.id))
                     ?.map((agent, key) => {
                       return (

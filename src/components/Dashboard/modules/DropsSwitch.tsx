@@ -13,9 +13,6 @@ const DropsSwitch: FunctionComponent<DropsSwitchProps> = ({
   allDropsLoading,
   setSwitcher,
   allDrops,
-  lensClient,
-  setNotification,
-  agents
 }): JSX.Element => {
   const [dropSwitcher, setDropSwitcher] = useState<DropSwitcher>(
     DropSwitcher.Drops
@@ -30,7 +27,6 @@ const DropsSwitch: FunctionComponent<DropsSwitchProps> = ({
           setDrop={setDrop}
           setDropSwitcher={setDropSwitcher}
           drop={drop}
-          lensClient={lensClient}
           setCollection={setCollection}
         />
       );
@@ -42,8 +38,6 @@ const DropsSwitch: FunctionComponent<DropsSwitchProps> = ({
           setDrop={setDrop}
           setDropSwitcher={setDropSwitcher}
           collection={collection!}
-          setNotification={setNotification}
-          agents={agents}
         />
       );
 

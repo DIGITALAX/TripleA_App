@@ -8,9 +8,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { AnimationContext, ModalContext } from "../providers";
 import Image from "next/legacy/image";
 import { useRouter } from "next/navigation";
+import { handleProfilePicture } from "@/lib/helpers/handleProfilePicture";
 
 export default function AgentPayouts() {
-  const context = useContext(ModalContext);
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
   const {
@@ -23,7 +23,7 @@ export default function AgentPayouts() {
     hasMore,
     devTreasuryPaid,
     artistsPaid,
-  } = useAgentPayouts(context?.lensClient!);
+  } = useAgentPayouts();
 
   return (
     <div className="relative w-full h-full flex flex-col gap-4 items-start px-4 sm:px-20 py-10 justify-start font-nerd text-viol min-h-96">
@@ -137,7 +137,7 @@ export default function AgentPayouts() {
                           className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2"
                           onClick={() =>
                             window.open(
-                              `https://block-explorer.testnet.lens.dev/tx/${item?.transactionHash}`
+                              `https://explorer.lens.xyz/tx/${item?.transactionHash}`
                             )
                           }
                         >
@@ -200,21 +200,15 @@ export default function AgentPayouts() {
                               }}
                             >
                               <div className="relative flex rounded-full w-8 h-8 bg-pink border border-pink">
-                                {(item as any)?.profile?.metadata?.picture && (
-                                  <Image
-                                    src={`${INFURA_GATEWAY}/ipfs/${
-                                      (
-                                        item as any
-                                      )?.profile?.metadata?.picture?.split(
-                                        "ipfs://"
-                                      )?.[1]
-                                    }`}
-                                    draggable={false}
-                                    className="rounded-full"
-                                    layout="fill"
-                                    objectFit="cover"
-                                  />
-                                )}
+                                <Image
+                                  src={handleProfilePicture(
+                                    (item as any)?.profile?.metadata?.picture
+                                  )}
+                                  draggable={false}
+                                  className="rounded-full"
+                                  layout="fill"
+                                  objectFit="cover"
+                                />
                               </div>
                               <div className="relative flex w-fit h-fit text-xs">
                                 {"@" +

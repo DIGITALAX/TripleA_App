@@ -6,12 +6,10 @@ import { INFURA_GATEWAY, TOKENS } from "@/lib/constants";
 import { NFTData } from "../types/common.types";
 import { useRouter } from "next/navigation";
 import { AnimationContext } from "@/app/providers";
-import { PublicClient } from "@lens-protocol/client";
 
 const Gallery: FunctionComponent<{
-  lensClient: PublicClient;
   choice: string;
-}> = ({ lensClient, choice }): JSX.Element => {
+}> = ({ choice }): JSX.Element => {
   const animationContext = useContext(AnimationContext);
   const {
     handleMoreGallery,
@@ -20,7 +18,7 @@ const Gallery: FunctionComponent<{
     galleryLoading,
     priceIndex,
     setPriceIndex,
-  } = useGallery(lensClient!, choice);
+  } = useGallery(choice);
   const router = useRouter();
 
   return (

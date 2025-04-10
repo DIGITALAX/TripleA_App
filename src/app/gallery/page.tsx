@@ -4,16 +4,13 @@ import { useContext, useState } from "react";
 import GalleryItems from "@/components/Common/modules/Gallery";
 import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { AnimationContext, ModalContext } from "../providers";
-import { useRouter } from "next/navigation";
+import { ModalContext } from "../providers";
 import MiniGallery from "@/components/Common/modules/MiniGallery";
 
 export default function Gallery() {
   const context = useContext(ModalContext);
-  const animationContext = useContext(AnimationContext);
   const [openChoice, setOpenChoice] = useState<boolean>(false);
   const [choice, setChoice] = useState<string>("All Minted");
-  const router = useRouter();
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-3 sm:px-10 gap-24">
       <div className="relative w-full h-fit flex flex-col xl:flex-row justify-between xl:items-start items-end gap-6">
@@ -65,7 +62,7 @@ export default function Gallery() {
               )}
             </div>
           </div>
-          <GalleryItems lensClient={context?.lensClient!} choice={choice} />
+          <GalleryItems choice={choice} />
         </div>
       </div>
       <MiniGallery

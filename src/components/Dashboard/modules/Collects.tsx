@@ -14,17 +14,15 @@ import { useAccount } from "wagmi";
 import moment from "moment";
 import { AnimationContext } from "@/app/providers";
 import { createPublicClient, http } from "viem";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 
 const Collects: FunctionComponent<CollectsProps> = ({
   setSwitcher,
-  lensClient,
-  setNotification,
 }): JSX.Element => {
   const publicClient = createPublicClient({
-    chain: chains.testnet,
+    chain: chains.mainnet,
     transport: http(
-      "https://rpc.testnet.lens.dev"
+      "https://rpc.lens.xyz"
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
@@ -42,7 +40,7 @@ const Collects: FunctionComponent<CollectsProps> = ({
     fulfillmentOpen,
     setFulfillmentInfo,
     fulfillmentInfo,
-  } = useCollects(address, lensClient, setNotification, publicClient);
+  } = useCollects(address, publicClient);
   const animationContext = useContext(AnimationContext);
   const router = useRouter();
   return (
@@ -88,7 +86,6 @@ const Collects: FunctionComponent<CollectsProps> = ({
               </div>
             ) : (
               allCollects?.map((collect, key) => {
-
                 return (
                   <div
                     key={key}
@@ -411,7 +408,7 @@ const Collects: FunctionComponent<CollectsProps> = ({
                             className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2 font-jack text-sm"
                             onClick={() =>
                               window.open(
-                                `https://block-explorer.testnet.lens.dev/tx/${collect?.transactionHash}`
+                                `https://explorer.lens.xyz/tx/${collect?.transactionHash}`
                               )
                             }
                           >

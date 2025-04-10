@@ -1,20 +1,14 @@
-import { FunctionComponent, JSX } from "react";
-import { SignlessProps } from "../types/modals.types";
-import { AiOutlineLoading } from "react-icons/ai";
+import { FunctionComponent, JSX, useContext } from "react";
 import useSignless from "../hooks/useSignless";
+import { ModalContext } from "@/app/providers";
 
-const Signless: FunctionComponent<SignlessProps> = ({
-  lensConnected,
-  setSignless,
-}): JSX.Element => {
-  const { signlessLoading, handleSignless } = useSignless(
-    lensConnected,
-    setSignless
-  );
+const Signless: FunctionComponent = (): JSX.Element => {
+  const context = useContext(ModalContext);
+  const { signlessLoading, handleSignless } = useSignless();
   return (
     <div
       className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-canP items-center justify-center"
-      onClick={() => setSignless(false)}
+      onClick={() => context?.setSignless(false)}
     >
       <div
         className="w-96 h-fit text-sm text-windows pixel-border-5 bg-viol rounded-md font-nerd flex items-center justify-start p-3 cursor-default flex-col gap-10"

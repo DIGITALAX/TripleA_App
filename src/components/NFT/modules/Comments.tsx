@@ -5,20 +5,20 @@ import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import moment from "moment";
 import { useRouter } from "next/navigation";
-import { AnimationContext } from "@/app/providers";
+import { AnimationContext, ModalContext } from "@/app/providers";
+import { handleProfilePicture } from "@/lib/helpers/handleProfilePicture";
 
 const Comments: FunctionComponent<CommentsProps> = ({
   comments,
-  setImageView,
   setCommentQuote,
   handleLike,
   handleMirror,
   interactionsLoading,
   postLoading,
   commentQuote,
-  agents,
   post,
 }): JSX.Element => {
+  const context = useContext(ModalContext);
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
 
@@ -85,11 +85,11 @@ const Comments: FunctionComponent<CommentsProps> = ({
                 onClick={() => {
                   animationContext?.setPageChange?.(true);
                   router.push(
-                    agents
+                    context?.agents
                       ?.map((ag) => ag?.profile?.address)
                       ?.includes(activity?.author?.address)
                       ? `/agent/${
-                          agents?.find(
+                          context?.agents?.find(
                             (ag) =>
                               ag?.profile?.address?.toLowerCase() ==
                               activity?.author?.address?.toLowerCase()
@@ -106,11 +106,9 @@ const Comments: FunctionComponent<CommentsProps> = ({
                       objectFit="cover"
                       className="rounded-full"
                       draggable={false}
-                      src={`${INFURA_GATEWAY}/ipfs/${
-                        activity?.author?.metadata?.picture?.split(
-                          "ipfs://"
-                        )?.[1]
-                      }`}
+                      src={handleProfilePicture(
+                        activity?.author?.metadata?.picture
+                      )}
                     />
                   </div>
                 </div>
@@ -125,7 +123,6 @@ const Comments: FunctionComponent<CommentsProps> = ({
             <Metadata
               data={activity?.metadata as any}
               metadata={activity?.metadata?.__typename!}
-              setImageView={setImageView}
               post={post}
             />
             <div

@@ -10,11 +10,10 @@ import { AnimationContext } from "@/app/providers";
 
 const Sales: FunctionComponent<SalesProps> = ({
   setSwitcher,
-  lensClient,
 }): JSX.Element => {
   const { address } = useAccount();
   const animationContext = useContext(AnimationContext);
-  const { salesLoading, allSales } = useSales(address, lensClient);
+  const { salesLoading, allSales } = useSales(address);
   const router = useRouter();
   return (
     <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
@@ -103,7 +102,7 @@ const Sales: FunctionComponent<SalesProps> = ({
                         className="relative w-full h-fit flex cursor-canP justify-between items-center flex-row gap-2 text-sm"
                         onClick={() =>
                           window.open(
-                            `https://block-explorer.testnet.lens.dev/tx/${sale?.transactionHash}`
+                            `https://explorer.lens.xyz/tx/${sale?.transactionHash}`
                           )
                         }
                       >

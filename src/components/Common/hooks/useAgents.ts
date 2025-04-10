@@ -1,33 +1,20 @@
-import { SetStateAction, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { Agent } from "../../Dashboard/types/dashboard.types";
 import { getAgents } from "../../../../graphql/queries/getAgents";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import {
-  Account,
-  evmAddress,
-  PublicClient,
-  SessionClient,
-} from "@lens-protocol/client";
-import { TokenThreshold } from "../types/common.types";
+import { Account, evmAddress } from "@lens-protocol/client";
 import { getTokenThresholds } from "../../../../graphql/queries/getTokenThresholds";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useAgents = (
-  agents: Agent[],
-  setAgents: (e: SetStateAction<Agent[]>) => void,
-  lensClient: SessionClient | PublicClient,
-  tokenThresholds: TokenThreshold[],
-  setTokenThresholds: (e: SetStateAction<TokenThreshold[]>) => void,
-  setAgentsLoading: (e: SetStateAction<boolean>) => void
-) => {
+const useAgents = () => {
+  const context = useContext(ModalContext);
   const loadAgents = async () => {
-    setAgentsLoading(true);
     try {
       const data = await getAgents();
 
       const profileCache = new Map<string, Account>();
       const metadataCache = new Map<string, Account>();
-
       const allAgents: Agent[] = await Promise.all(
         data?.data?.agentCreateds?.map(async (agent: any) => {
           if (!agent.metadata) {
@@ -42,13 +29,12 @@ const useAgents = (
 
           const creatorAddress = evmAddress(agent?.creator);
           if (!profileCache.has(creatorAddress)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: creatorAddress,
               includeOwned: true,
             });
 
             if (result.isErr()) {
-              setAgentsLoading(false);
               return;
             }
 
@@ -74,32 +60,34 @@ const useAgents = (
           };
         })
       );
-      setAgents?.(allAgents?.sort(() => Math.random() - 0.5));
+      context?.setAgents?.(allAgents?.sort(() => Math.random() - 0.5));
     } catch (err: any) {
       console.error(err.message);
     }
-    setAgentsLoading(false);
   };
 
   const loadThresholdsAndRent = async () => {
     try {
       const data = await getTokenThresholds();
 
-      setTokenThresholds?.(data?.data?.tokenDetailsSets);
+      context?.setTokenThresholds?.(data?.data?.tokenDetailsSets);
     } catch (err: any) {
       console.error(err.message);
     }
   };
 
   useEffect(() => {
-    if (!agents || (agents?.length < 1 && lensClient)) {
+    if (
+      (!context?.agents || context?.agents?.length < 1) &&
+      context?.lensClient
+    ) {
       loadAgents();
     }
 
-    if (tokenThresholds?.length < 1) {
+    if (Number(context?.tokenThresholds?.length) < 1) {
       loadThresholdsAndRent();
     }
-  }, [lensClient]);
+  }, [context?.lensClient]);
 };
 
 export default useAgents;

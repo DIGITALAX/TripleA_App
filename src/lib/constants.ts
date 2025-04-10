@@ -1,35 +1,40 @@
 export const INFURA_GATEWAY: string = "https://thedial.infura-ipfs.io";
-export const STORAGE_NODE: string = "https://api.grove.storage";
+export const GROVE_GATEWAY: string = "https://api.grove.storage/";
 
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
 export const AGENTS_CONTRACT: `0x${string}` =
-  "0xeD6a08221D7A3E69635dC2C4FaE9205bC45E18Ed";
+  "0x424Fa11D84e5674809Fd0112eBa4f86d6C4ed2aD";
 export const SKYHUNTERS_AGENTS_MANAGER_CONTRACT: `0x${string}` =
-  "0xA3292bB2e4713662fF034A75adC7219c75876b9a";
+  "0xDb073899eef2Dcf496Ee987F5238c5E9FE5d5933";
 export const MARKET_CONTRACT: `0x${string}` =
-  "0x9F101Db166174A33ADd019cFf54Daa7965b14251";
+  "0x6c7a9d566F6c2a9829B940b7571A220c70817c1a";
 export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
-  "0xAFA95137afe705526bc3afb17D1AAdf554d07160";
+  "0xBa53Fd19053fceFc91D091A02c71AbDcD79d856f";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
-  "0x4695Df1FDC39Ad972915545EA2E2403d4860592B";
-export const AGENT_FEED_RULE: `0x${string}` = "0x27dfD1dc2867850E6c0930c1B5066854de0182e4";
-export const ZERO_ADDRESS: `0x${string}` = "0x0000000000000000000000000000000000000000";
-
+  "0x4F276081A4AC2d50eEE2aA6c78a3C4C06AAE9562";
+export const AGENT_FEED_RULE: `0x${string}` = "0x";
+export const ZERO_ADDRESS: `0x${string}` =
+  "0x0000000000000000000000000000000000000000";
 
 export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   {
-    symbol: "WGRASS",
-    contract: "0xeee5a340Cdc9c179Db25dea45AcfD5FE8d4d3eB8",
+    symbol: "WGHO",
+    contract: "0x6bDc36E20D267Ff0dd6097799f82e78907105e2F",
     image: "QmYCDxCv7mJyjn49n84kP6d3ADgGp422ukKzRyd2ZcGEsW",
   },
   {
+    symbol: "WETH",
+    contract: "0xE5ecd226b3032910CEaa43ba92EE8232f8237553",
+    image: "QmYJ6cpGRgQAr2d5hJDJ9CaJukt2szcHc1AqFBy9m6knUw",
+  },
+  {
     symbol: "MONA",
-    contract: "0x72ab7C7f3F6FF123D08692b0be196149d4951a41",
+    contract: "",
     image: "QmZSDyGYYy9hn8RAUC1vZeZXC5y2H3YimzajJRngCTu5Fq",
   },
   {
     symbol: "BONSAI",
-    contract: "0x15B58c74A0Ef6D0A593340721055223f38F5721E",
+    contract: "0xB0588f9A9cADe7CD5f194a5fe77AcD6A58250f82",
     image: "QmXoAwGW51843qTUxV8pkouewRHDvkyJ3A7tsCUGgGXqVs",
   },
 ];

@@ -1,21 +1,22 @@
 "use client";
-import { FunctionComponent, useEffect } from "react";
-import { IndexerProps } from "../types/modals.types";
+import { ModalContext } from "@/app/providers";
+import { FunctionComponent, useContext, useEffect } from "react";
 
-const Indexer: FunctionComponent<IndexerProps> = ({ indexer, setIndexer }) => {
+const Indexer: FunctionComponent = () => {
+  const context = useContext(ModalContext);
   useEffect(() => {
-    if (indexer) {
+    if (context?.indexer) {
       setTimeout(() => {
-        setIndexer(undefined);
+        context?.setIndexer(undefined);
       }, 5000);
     }
-  }, [indexer]);
+  }, [context?.indexer]);
 
   return (
     <div className="fixed bottom-5 right-5 w-fit h-fit z-200">
       <div className="w-fit h-10 sm:h-16 flex items-center justify-center pixel-border-4 rounded-xl bg-morado text-black rounded-md">
         <div className="relative w-fit h-fit flex items-center justify-center px-4 py-2 text-xs font-jack">
-          {indexer}
+          {context?.indexer}
         </div>
       </div>
     </div>

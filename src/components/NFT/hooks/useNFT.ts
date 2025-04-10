@@ -1,24 +1,16 @@
-import {
-  Collector,
-  LensConnected,
-  NFTData,
-} from "@/components/Common/types/common.types";
+import { Collector, NFTData } from "@/components/Common/types/common.types";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getCollection } from "../../../../graphql/queries/getCollection";
 import {
   Account,
   evmAddress,
   PageSize,
   Post,
-  PublicClient,
   TextOnlyMetadata,
 } from "@lens-protocol/client";
 import { getCollectors } from "../../../../graphql/queries/getCollectors";
-import {
-  Agent,
-  CollectionType,
-} from "@/components/Dashboard/types/dashboard.types";
+import { CollectionType } from "@/components/Dashboard/types/dashboard.types";
 import {
   getCollectionsArtist,
   getCollectionsArtistNot,
@@ -27,13 +19,10 @@ import {
   fetchAccountsAvailable,
   fetchPosts,
 } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useNFT = (
-  id: string,
-  lensClient: PublicClient,
-  agents: Agent[],
-  lensConnected: LensConnected | undefined
-) => {
+const useNFT = (id: string) => {
+  const context = useContext(ModalContext);
   const [nft, setNft] = useState<NFTData | undefined>();
   const [moreCollections, setMoreCollections] = useState<NFTData[]>([]);
   const [nftLoading, setNftLoading] = useState<boolean>(false);
@@ -49,7 +38,7 @@ const useNFT = (
   ): Promise<Post[] | void> => {
     try {
       const postsRes = await fetchPosts(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           pageSize: PageSize.Fifty,
           filter: {
@@ -75,7 +64,7 @@ const useNFT = (
         posts = postsRes?.value.items as Post[];
       } else {
         const postsRes = await fetchPosts(
-          lensConnected?.sessionClient || lensClient,
+          context?.lensConnected?.sessionClient || context?.lensClient!,
           {
             pageSize: PageSize.Fifty,
           }
@@ -128,7 +117,7 @@ const useNFT = (
       }
 
       const result = await fetchAccountsAvailable(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           managedBy: evmAddress(collection?.artist),
           includeOwned: true,
@@ -151,7 +140,7 @@ const useNFT = (
 
           if (!profileCache.has(buyerAddress)) {
             const accounts = await fetchAccountsAvailable(
-              lensConnected?.sessionClient || lensClient,
+              context?.lensConnected?.sessionClient || context?.lensClient!,
               {
                 managedBy: buyerAddress,
                 includeOwned: true,
@@ -204,7 +193,7 @@ const useNFT = (
         }
 
         const accounts = await fetchAccountsAvailable(
-          lensConnected?.sessionClient || lensClient,
+          context?.lensConnected?.sessionClient || context?.lensClient!,
           {
             managedBy: evmAddress(
               collData?.data?.collectionCreateds?.[0]?.remixCollection?.artist
@@ -265,7 +254,7 @@ const useNFT = (
     setAgentLoading(true);
     try {
       const postsRes = await fetchPosts(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           pageSize: PageSize.Fifty,
           cursor: activityCursor,
@@ -293,7 +282,7 @@ const useNFT = (
         posts = postsRes.value.items as Post[];
       } else {
         const postsRes = await fetchPosts(
-          lensConnected?.sessionClient || lensClient,
+          context?.lensConnected?.sessionClient || context?.lensClient!,
           {
             pageSize: PageSize.Fifty,
           }
@@ -352,7 +341,7 @@ const useNFT = (
           }
 
           const result = await fetchAccountsAvailable(
-            lensConnected?.sessionClient || lensClient,
+            context?.lensConnected?.sessionClient || context?.lensClient!,
             {
               managedBy: evmAddress(col?.artist),
               includeOwned: true,
@@ -381,10 +370,20 @@ const useNFT = (
   };
 
   useEffect(() => {
-    if (Number(id) > 0 && !nft && lensClient && agents?.length > 0) {
+    if (
+      Number(id) > 0 &&
+      !nft &&
+      context?.lensClient &&
+      context?.agents?.length > 0
+    ) {
       handleNFT();
     }
-  }, [id, lensClient, agents, lensConnected?.sessionClient]);
+  }, [
+    id,
+    context?.lensClient,
+    context?.agents,
+    context?.lensConnected?.sessionClient,
+  ]);
 
   useEffect(() => {
     if (nft && moreCollections?.length < 1) {

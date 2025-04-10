@@ -1,6 +1,5 @@
-import {  Post, SessionClient } from "@lens-protocol/client";
-import { SetStateAction, useEffect, useState } from "react";
-import { StorageClient } from "@lens-chain/storage-client";
+import { Post } from "@lens-protocol/client";
+import { SetStateAction, useContext, useEffect, useState } from "react";
 import { NFTData } from "@/components/Common/types/common.types";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import pollResult from "@/lib/helpers/pollResult";
@@ -11,14 +10,10 @@ import {
 } from "@lens-protocol/client/actions";
 import { textOnly } from "@lens-protocol/metadata";
 import { immutable } from "@lens-chain/storage-client";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
+import { ModalContext } from "@/app/providers";
 
 const useInteractions = (
-  sessionClient: SessionClient,
-  setSignless: (e: SetStateAction<boolean>) => void,
-  storageClient: StorageClient,
-  setIndexer: (e: SetStateAction<string | undefined>) => void,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
   setData:
     | ((e: SetStateAction<NFTData | undefined>) => void)
     | ((e: SetStateAction<Agent | undefined>) => void)
@@ -28,6 +23,7 @@ const useInteractions = (
   setPostData?: (e: SetStateAction<Post[]>) => void,
   postId?: string | undefined
 ) => {
+  const context = useContext(ModalContext);
   const [success, setSuccess] = useState<boolean>(false);
   const [post, setPost] = useState<string>("");
   const [postLoading, setPostLoading] = useState<boolean>(false);
@@ -74,15 +70,17 @@ const useInteractions = (
             : undefined,
         ]?.filter(Boolean),
       });
-      const acl = immutable(chains.testnet.id);
-      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
+      const acl = immutable(chains.mainnet.id);
+      const { uri } = await context?.storageClient?.uploadAsJson(schema, {
+        acl,
+      })!;
 
-      const res = await createPost(sessionClient!, {
+      const res = await createPost(context?.lensConnected?.sessionClient!, {
         contentUri: uri,
       });
 
       if (res.isErr()) {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
         setPostLoading(false);
         return;
       }
@@ -92,18 +90,23 @@ const useInteractions = (
           "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
         )
       ) {
-        setSignless?.(true);
+        context?.setSignless?.(true);
       } else if ((res.value as any)?.hash) {
-        if (await pollResult((res.value as any)?.hash, sessionClient)) {
+        if (
+          await pollResult(
+            (res.value as any)?.hash,
+            context?.lensConnected?.sessionClient!
+          )
+        ) {
           setSuccess(true);
           setPost("");
-          setIndexer?.("Post Indexing");
+          context?.setIndexer?.("Post Indexing");
           await handlePosts(true);
         } else {
-          setNotification?.("Something went wrong :( Try again?");
+          context?.setNotification?.("Something went wrong :( Try again?");
         }
       } else {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
       }
     } catch (err: any) {
       console.error(err.message);
@@ -125,10 +128,12 @@ const useInteractions = (
             : undefined,
         ]?.filter(Boolean),
       });
-      const acl = immutable(chains.testnet.id);
-      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
+      const acl = immutable(chains.mainnet.id);
+      const { uri } = await context?.storageClient?.uploadAsJson(schema, {
+        acl,
+      })!;
 
-      const res = await createPost(sessionClient!, {
+      const res = await createPost(context?.lensConnected?.sessionClient!, {
         contentUri: uri,
         commentOn: {
           post: commentQuote?.id,
@@ -136,7 +141,7 @@ const useInteractions = (
       });
 
       if (res.isErr()) {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
         setPostLoading(false);
         return;
       }
@@ -146,9 +151,14 @@ const useInteractions = (
           "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
         )
       ) {
-        setSignless?.(true);
+        context?.setSignless?.(true);
       } else if ((res.value as any)?.hash) {
-        if (await pollResult((res.value as any)?.hash, sessionClient)) {
+        if (
+          await pollResult(
+            (res.value as any)?.hash,
+            context?.lensConnected?.sessionClient!
+          )
+        ) {
           setSuccess(true);
           setPost("");
           if (commentQuote?.post) {
@@ -161,13 +171,13 @@ const useInteractions = (
             setCommentQuote(undefined);
           }
 
-          setIndexer?.("Comment Indexing");
+          context?.setIndexer?.("Comment Indexing");
           await handlePosts(true);
         } else {
-          setNotification?.("Something went wrong :( Try again?");
+          context?.setNotification?.("Something went wrong :( Try again?");
         }
       } else {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
       }
     } catch (err: any) {
       console.error(err.message);
@@ -196,7 +206,7 @@ const useInteractions = (
     }
 
     try {
-      const res = await addReaction(sessionClient!, {
+      const res = await addReaction(context?.lensConnected?.sessionClient!, {
         post: id,
         reaction,
       });
@@ -207,9 +217,9 @@ const useInteractions = (
             "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
           )
         ) {
-          setSignless?.(true);
+          context?.setSignless?.(true);
         } else if ((res.value as any)?.success) {
-          setIndexer?.("Reaction Success");
+          context?.setIndexer?.("Reaction Success");
           if (post) {
             setPostData?.((prev) => {
               const da = [...prev];
@@ -308,10 +318,10 @@ const useInteractions = (
             });
           }
         } else {
-          setNotification?.("Something went wrong :( Try again?");
+          context?.setNotification?.("Something went wrong :( Try again?");
         }
       } else {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
       }
     } catch (err: any) {
       console.error(err.message);
@@ -356,12 +366,12 @@ const useInteractions = (
       });
     }
     try {
-      const res = await repost(sessionClient!, {
+      const res = await repost(context?.lensConnected?.sessionClient!, {
         post: id,
       });
 
       if (res.isErr()) {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
         if (post) {
           setInteractionsLoadingPost((prev) => {
             let interactions = [...prev];
@@ -388,9 +398,9 @@ const useInteractions = (
           "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
         )
       ) {
-        setSignless?.(true);
+        context?.setSignless?.(true);
       } else if ((res.value as any)?.hash) {
-        setIndexer?.("Mirror Indexing");
+        context?.setIndexer?.("Mirror Indexing");
 
         if (post) {
           setPostData?.((prev) => {
@@ -494,7 +504,7 @@ const useInteractions = (
           });
         }
       } else {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
       }
     } catch (err: any) {
       console.error(err.message);
@@ -533,10 +543,12 @@ const useInteractions = (
             : undefined,
         ]?.filter(Boolean),
       });
-      const acl = immutable(chains.testnet.id);
-      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
+      const acl = immutable(chains.mainnet.id);
+      const { uri } = await context?.storageClient?.uploadAsJson(schema, {
+        acl,
+      })!;
 
-      const res = await createPost(sessionClient!, {
+      const res = await createPost(context?.lensConnected?.sessionClient!, {
         contentUri: uri,
         quoteOf: {
           post: commentQuote?.id,
@@ -544,7 +556,7 @@ const useInteractions = (
       });
 
       if (res.isErr()) {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
         setPostLoading(false);
 
         return;
@@ -555,9 +567,14 @@ const useInteractions = (
           "Signless experience is unavailable for this operation. You can continue by signing the sponsored request."
         )
       ) {
-        setSignless?.(true);
+        context?.setSignless?.(true);
       } else if ((res.value as any)?.hash) {
-        if (await pollResult((res.value as any)?.hash, sessionClient)) {
+        if (
+          await pollResult(
+            (res.value as any)?.hash,
+            context?.lensConnected?.sessionClient!
+          )
+        ) {
           setSuccess(true);
           setPost("");
           if (commentQuote?.post) {
@@ -569,13 +586,13 @@ const useInteractions = (
           } else {
             setCommentQuote(undefined);
           }
-          setIndexer?.("Quote Indexing");
+          context?.setIndexer?.("Quote Indexing");
           await handlePosts(true);
         } else {
-          setNotification?.("Something went wrong :( Try again?");
+          context?.setNotification?.("Something went wrong :( Try again?");
         }
       } else {
-        setNotification?.("Something went wrong :( Try again?");
+        context?.setNotification?.("Something went wrong :( Try again?");
       }
     } catch (err: any) {
       console.error(err.message);

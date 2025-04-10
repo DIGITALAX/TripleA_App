@@ -25,19 +25,11 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
     setMintSwitcher,
     allDrops,
     allDropsLoading,
-  } = useDashboard(address, context?.lensConnected);
+  } = useDashboard(address);
 
   switch (switcher) {
     case Switcher.Account:
-      return (
-        <Account
-          setSwitcher={setSwitcher}
-          lensConnected={context?.lensConnected}
-          setLensConnected={context?.setLensConnected!}
-          storageClient={context?.storageClient!}
-          setSignless={context?.setSignless!}
-        />
-      );
+      return <Account setSwitcher={setSwitcher} />;
 
     case Switcher.Drops:
       return (
@@ -45,32 +37,14 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
           setSwitcher={setSwitcher}
           allDrops={allDrops}
           allDropsLoading={allDropsLoading}
-          lensClient={context?.lensClient!}
-          agents={context?.agents!}
-          setNotification={context?.setNotification!}
         />
       );
 
     case Switcher.Collects:
-      return (
-        <Collects
-          setNotification={context?.setNotification!}
-          lensClient={context?.lensClient!}
-          setSwitcher={setSwitcher}
-        />
-      );
+      return <Collects setSwitcher={setSwitcher} />;
 
     case Switcher.Agents:
-      return (
-        <Agents
-          setSwitcher={setSwitcher}
-          address={address}
-          lensClient={context?.lensClient!}
-          setNotification={context?.setNotification!}
-          setAgents={context?.setAgents!}
-          sessionClient={context?.lensConnected?.sessionClient!}
-        />
-      );
+      return <Agents setSwitcher={setSwitcher} address={address} />;
 
     case Switcher.Mint:
       return (
@@ -98,13 +72,8 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
             <MintSwitch
               mintSwitcher={mintSwitcher}
               setMintSwitcher={setMintSwitcher}
-              agents={context?.agents!}
               allDrops={allDrops}
               allDropsLoading={allDropsLoading}
-              lensConnected={context?.lensConnected!}
-              tokenThresholds={context?.tokenThresholds!}
-              fulfillers={context?.fulfillers!}
-              setToolTip={context?.setToolTip!}
             />
             <div className="relative w-full h-fit flex items-end justify-between flex-row gap-4">
               <div
@@ -167,9 +136,7 @@ const DashboardSwitch: FunctionComponent = (): JSX.Element => {
       );
 
     case Switcher.Sales:
-      return (
-        <Sales lensClient={context?.lensClient!} setSwitcher={setSwitcher} />
-      );
+      return <Sales setSwitcher={setSwitcher} />;
 
     default:
       return (

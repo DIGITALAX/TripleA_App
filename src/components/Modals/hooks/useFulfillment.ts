@@ -1,7 +1,6 @@
-import { CollectData } from "@/components/NFT/types/nft.types";
 import { MARKET_CONTRACT } from "@/lib/constants";
-import { chains } from "@lens-network/sdk/viem";
-import { SetStateAction, useState } from "react";
+import { chains } from "@lens-chain/sdk/viem";
+import { useContext, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
 import {
@@ -10,27 +9,13 @@ import {
   uint8arrayFromString,
 } from "@lit-protocol/lit-node-client";
 import { LIT_NETWORK } from "@lit-protocol/constants";
+import { ModalContext } from "@/app/providers";
 
 const useFulfillment = (
   address: `0x${string}` | undefined,
-  publicClient: PublicClient,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
-  details: CollectData & {
-    id: number;
-    fulfiller: string;
-    agentId: number;
-  },
-  setFulfillmentOpen: (
-    e: SetStateAction<
-      | (CollectData & {
-          id: number;
-          fulfiller: string;
-          agentId: number;
-        })
-      | undefined
-    >
-  ) => void
+  publicClient: PublicClient
 ) => {
+  const context = useContext(ModalContext);
   const [purchaseLoading, setPurchaseLoading] = useState<boolean>(false);
   const [fulfillmentEncrypted, setFulfillmentEncrypted] = useState<string>("");
   const [fulfillmentInfo, setFulfillmentInfo] = useState<{
@@ -56,7 +41,7 @@ const useFulfillment = (
     setPurchaseLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -64,13 +49,13 @@ const useFulfillment = (
         address: MARKET_CONTRACT,
         abi: MarketAbi,
         functionName: "buy",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [
           fulfillmentEncrypted,
-          details?.token,
-          details.id,
-          details?.amount,
-          details?.agentId,
+          context?.fulfillmentOpen?.token,
+          context?.fulfillmentOpen?.id,
+          context?.fulfillmentOpen?.amount,
+          context?.fulfillmentOpen?.agentId,
         ],
         account: address,
       });
@@ -78,10 +63,10 @@ const useFulfillment = (
       const res = await clientWallet.writeContract(request);
       await publicClient.waitForTransactionReceipt({ hash: res });
 
-      setNotification?.(
+      context?.setNotification?.(
         "It's All Yours! Keep track of fulfillment updates in your dashboard."
       );
-      setFulfillmentOpen(undefined);
+      context?.setFulfillmentOpen(undefined);
       setFulfillmentInfo({
         name: "",
         address: "",
@@ -91,9 +76,16 @@ const useFulfillment = (
       });
     } catch (err: any) {
       if (err?.message?.includes("NotAvailable")) {
-        setNotification?.(
+        context?.setNotification?.(
           "We know you're eager, but you've reached this creations' collect limit!"
         );
+      }
+
+      if (
+        err?.message?.includes("0xfb8f41b2") ||
+        err?.message?.includes("ERC20InsufficientAllowance")
+      ) {
+        context?.setNotification?.("Out of tokens? Fill up your wallet!");
       }
       console.error(err?.message);
     }
@@ -139,7 +131,7 @@ const useFulfillment = (
           parameters: [":userAddress"],
           returnValueTest: {
             comparator: "=",
-            value: details?.fulfiller?.toLowerCase(),
+            value: context?.fulfillmentOpen?.fulfiller?.toLowerCase(),
           },
         },
       ];
@@ -148,8 +140,8 @@ const useFulfillment = (
         accessControlConditions,
         dataToEncrypt: uint8arrayFromString(
           JSON.stringify({
-            color: details.color,
-            size: details.size,
+            color: context?.fulfillmentOpen?.color,
+            size: context?.fulfillmentOpen?.size,
             name: fulfillmentInfo.name,
             address: fulfillmentInfo.address,
             zip: fulfillmentInfo.zip,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Switcher,
   MintSwitcher,
@@ -6,12 +6,10 @@ import {
 } from "../types/dashboard.types";
 import { getDrops } from "../../../../graphql/queries/getDrops";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { LensConnected } from "@/components/Common/types/common.types";
+import { ModalContext } from "@/app/providers";
 
-const useDashboard = (
-  address: `0x${string}` | undefined,
-  lensConnected: LensConnected | undefined
-) => {
+const useDashboard = (address: `0x${string}` | undefined) => {
+  const context = useContext(ModalContext);
   const [switcher, setSwitcher] = useState<Switcher>(Switcher.Home);
   const [mintSwitcher, setMintSwitcher] = useState<MintSwitcher>(
     MintSwitcher.Type
@@ -51,7 +49,7 @@ const useDashboard = (
 
   useEffect(() => {
     handleAllDrops();
-  }, [address, lensConnected?.profile]);
+  }, [address, context?.lensConnected?.profile]);
 
   return {
     switcher,

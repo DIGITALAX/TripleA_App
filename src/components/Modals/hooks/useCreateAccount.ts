@@ -1,28 +1,18 @@
-import { SetStateAction, useState } from "react";
-import { LensConnected } from "@/components/Common/types/common.types";
-import { evmAddress } from "@lens-protocol/client";
+import { useContext, useState } from "react";
+import { Account, evmAddress } from "@lens-protocol/client";
 import { createWalletClient, custom } from "viem";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import pollResult from "@/lib/helpers/pollResult";
-import { StorageClient } from "@lens-chain/storage-client";
 import {
   createAccountWithUsername,
   fetchAccount,
 } from "@lens-protocol/client/actions";
 import { immutable } from "@lens-chain/storage-client";
 import { account as accountMetadata } from "@lens-protocol/metadata";
+import { ModalContext } from "@/app/providers";
 
-const useCreateAccount = (
-  address: `0x${string}` | undefined,
-  lensConnected: LensConnected | undefined,
-  setLensConnected:
-    | ((e: SetStateAction<LensConnected | undefined>) => void)
-    | undefined,
-  setCreateAccount: (e: SetStateAction<boolean>) => void,
-  setIndexer: (e: SetStateAction<string | undefined>) => void,
-  storageClient: StorageClient,
-  setNotification: (e: SetStateAction<string | undefined>) => void
-) => {
+const useCreateAccount = (address: `0x${string}` | undefined) => {
+  const context = useContext(ModalContext);
   const [account, setAccount] = useState<{
     localname: string;
     bio: string;
@@ -36,11 +26,11 @@ const useCreateAccount = (
   const [accountLoading, setAccountLoading] = useState<boolean>(false);
 
   const handleCreateAccount = async () => {
-    if (!address || !lensConnected?.sessionClient) return;
+    if (!address || !context?.lensConnected?.sessionClient) return;
     setAccountLoading(true);
     try {
       const signer = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom(window.ethereum!),
         account: address,
       });
@@ -62,11 +52,13 @@ const useCreateAccount = (
         bio: account?.bio,
         picture,
       });
-      const acl = immutable(chains.testnet.id);
-      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
+      const acl = immutable(chains.mainnet.id);
+      const { uri } = await context?.storageClient?.uploadAsJson(schema, {
+        acl,
+      })!;
 
       const accountResponse = await createAccountWithUsername(
-        lensConnected?.sessionClient,
+        context?.lensConnected?.sessionClient,
         {
           accountManager: [evmAddress(signer.account.address)],
           username: {
@@ -78,7 +70,7 @@ const useCreateAccount = (
 
       if (accountResponse.isErr()) {
         setAccountLoading(false);
-        setNotification("Something went wrong. Try again? :/");
+        context?.setNotification("Something went wrong. Try again? :/");
         return;
       }
 
@@ -87,7 +79,7 @@ const useCreateAccount = (
           "username already exists"
         )
       ) {
-        setNotification("Username Already Taken. Try something else?");
+        context?.setNotification("Username Already Taken. Try something else?");
         setAccountLoading(false);
         return;
       }
@@ -95,15 +87,18 @@ const useCreateAccount = (
       if ((accountResponse.value as any)?.hash) {
         const res = await pollResult(
           (accountResponse.value as any)?.hash,
-          lensConnected?.sessionClient
+          context?.lensConnected?.sessionClient
         );
 
         if (res) {
-          const newAcc = await fetchAccount(lensConnected?.sessionClient, {
-            username: {
-              localName: account?.username,
-            },
-          });
+          const newAcc = await fetchAccount(
+            context?.lensConnected?.sessionClient,
+            {
+              username: {
+                localName: account?.username,
+              },
+            }
+          );
 
           if (newAcc.isErr()) {
             setAccountLoading(false);
@@ -112,17 +107,17 @@ const useCreateAccount = (
 
           if (newAcc.value?.address) {
             const ownerSigner =
-              await lensConnected?.sessionClient?.switchAccount({
+              await context?.lensConnected?.sessionClient?.switchAccount({
                 account: newAcc.value?.address,
               });
 
             if (ownerSigner?.isOk()) {
-              setLensConnected?.({
-                ...lensConnected,
-                profile: newAcc.value,
+              context?.setLensConnected?.((prev) => ({
+                ...(prev || {}),
+                profile: newAcc.value as Account,
                 sessionClient: ownerSigner?.value,
-              });
-              setCreateAccount(false);
+              }));
+              context?.setCreateAccount(false);
               setAccount({
                 localname: "",
                 bio: "",
@@ -131,19 +126,19 @@ const useCreateAccount = (
             }
           } else {
             console.error(accountResponse);
-            setIndexer?.("Error with Fetching New Account");
+            context?.setIndexer?.("Error with Fetching New Account");
             setAccountLoading(false);
             return;
           }
         } else {
           console.error(accountResponse);
-          setIndexer?.("Error with Account Creation");
+          context?.setIndexer?.("Error with Account Creation");
           setAccountLoading(false);
           return;
         }
       } else {
         console.error(accountResponse);
-        setIndexer?.("Error with Account Creation");
+        context?.setIndexer?.("Error with Account Creation");
         setAccountLoading(false);
         return;
       }

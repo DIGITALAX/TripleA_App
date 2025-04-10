@@ -1,34 +1,20 @@
-import { Fulfiller, NFTData } from "@/components/Common/types/common.types";
-import { chains } from "@lens-network/sdk/viem";
-import { SetStateAction, useEffect, useState } from "react";
+import { NFTData } from "@/components/Common/types/common.types";
+import { chains } from "@lens-chain/sdk/viem";
+import { SetStateAction, useContext, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
 import { MARKET_CONTRACT } from "@/lib/constants";
 import { CollectData } from "../types/nft.types";
-import {
-  Agent,
-  CollectionType,
-} from "@/components/Dashboard/types/dashboard.types";
+import { CollectionType } from "@/components/Dashboard/types/dashboard.types";
+import { ModalContext } from "@/app/providers";
 
 const usePurchase = (
   nft: NFTData,
   setNft: (e: SetStateAction<NFTData | undefined>) => void,
   address: `0x${string}` | undefined,
-  publicClient: PublicClient,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
-  setFulfillmentOpen: (
-    e: SetStateAction<
-      | (CollectData & {
-          id: number;
-          fulfiller: string;
-          agentId: number;
-        })
-      | undefined
-    >
-  ) => void,
-  fulfillers: Fulfiller[],
-  agents: Agent[]
+  publicClient: PublicClient
 ) => {
+  const context = useContext(ModalContext);
   const [purchaseLoading, setPurchaseLoading] = useState<boolean>(false);
   const [collectData, setCollectData] = useState<CollectData>({
     amount: 1,
@@ -137,13 +123,13 @@ const usePurchase = (
           ).toFixed(0)
         )
       ) {
-        setNotification?.("Not Enough Tokens in Your Wallet :(");
+        context?.setNotification?.("Not Enough Tokens in Your Wallet :(");
         setPurchaseLoading(false);
         return;
       }
 
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -176,7 +162,7 @@ const usePurchase = (
           },
         ],
         functionName: "approve",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [
           MARKET_CONTRACT,
           BigInt(
@@ -205,13 +191,14 @@ const usePurchase = (
   const handlePurchase = async () => {
     if (collectData?.amount < 1) return;
     if (nft?.collectionType == CollectionType.IRL) {
-      setFulfillmentOpen({
+      context?.setFulfillmentOpen({
         ...collectData,
         id: Number(nft.id),
-        fulfiller: fulfillers?.find((ful) => ful.fulfillerId == nft.fulfillerId)
-          ?.wallet!,
+        fulfiller: context?.fulfillers?.find(
+          (ful) => ful.fulfillerId == nft.fulfillerId
+        )?.wallet!,
         agentId: Number(
-          agents?.find((ag) =>
+          context?.agents?.find((ag) =>
             ag?.wallets
               ?.map((w) => w.toLowerCase())
               ?.includes(nft?.artist?.toLowerCase())
@@ -224,7 +211,7 @@ const usePurchase = (
     setPurchaseLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -232,14 +219,14 @@ const usePurchase = (
         address: MARKET_CONTRACT,
         abi: MarketAbi,
         functionName: "buy",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [
           "",
           collectData?.token,
           Number(nft.id),
           collectData?.amount,
           Number(
-            agents?.find((ag) =>
+            context?.agents?.find((ag) =>
               ag?.wallets
                 ?.map((w) => w.toLowerCase())
                 ?.includes(nft?.artist?.toLowerCase())
@@ -252,7 +239,9 @@ const usePurchase = (
       const res = await clientWallet.writeContract(request);
       await publicClient.waitForTransactionReceipt({ hash: res });
 
-      setNotification?.("It's All Yours! Check sales in your dashboard.");
+      context?.setNotification?.(
+        "It's All Yours! Check sales in your dashboard."
+      );
       setNft({
         ...nft,
         amountSold: Number(nft?.amountSold) + Number(collectData?.amount),
@@ -264,8 +253,14 @@ const usePurchase = (
       });
     } catch (err: any) {
       if (err?.message?.includes("NotAvailable")) {
-        setNotification?.(
+        context?.setNotification?.(
           "We know you're eager, but you've reached this creations' collect limit!"
+        );
+      }
+
+      if (err?.message?.includes("0xfb8f41b2") ||err?.message?.includes("ERC20InsufficientAllowance") ) {
+        context?.setNotification?.(
+          "Out of tokens? Fill up your wallet!"
         );
       }
       console.error(err?.message);

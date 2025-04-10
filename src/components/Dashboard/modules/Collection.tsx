@@ -8,10 +8,9 @@ const Collection: FunctionComponent<CollectionProps> = ({
   setDropSwitcher,
   drop,
   setDrop,
-  lensClient,
   setCollection,
 }): JSX.Element => {
-  const { allCollections, collectionsLoading } = useDrops(drop, lensClient);
+  const { allCollections, collectionsLoading } = useDrops(drop);
 
   return (
     <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">

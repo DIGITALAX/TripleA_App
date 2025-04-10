@@ -1,17 +1,6 @@
-import {
-  Fulfiller,
-  LensConnected,
-  NFTData,
-  TokenThreshold,
-} from "@/components/Common/types/common.types";
-import {
-  Account,
-  Post,
-  PublicClient,
-  SessionClient,
-} from "@lens-protocol/client";
+import { NFTData } from "@/components/Common/types/common.types";
+import { Account, Post } from "@lens-protocol/client";
 import { SetStateAction } from "react";
-import { StorageClient } from "@lens-chain/storage-client";
 
 export enum Switcher {
   Home,
@@ -57,13 +46,8 @@ export enum DropSwitcher {
 export type MintSwitchProps = {
   mintSwitcher: MintSwitcher;
   setMintSwitcher: (e: SetStateAction<MintSwitcher>) => void;
-  agents: Agent[];
   allDrops: DropInterface[];
   allDropsLoading: boolean;
-  lensConnected: LensConnected;
-  tokenThresholds: TokenThreshold[];
-  fulfillers: Fulfiller[];
-  setToolTip: (e: SetStateAction<boolean>) => void;
 };
 
 export type DropsProps = {
@@ -76,13 +60,10 @@ export type DropsProps = {
 
 export type SalesProps = {
   setSwitcher: (e: SetStateAction<Switcher>) => void;
-  lensClient: PublicClient;
 };
 
 export type CollectsProps = {
   setSwitcher: (e: SetStateAction<Switcher>) => void;
-  lensClient: PublicClient;
-  setNotification: (e: SetStateAction<string | undefined>) => void;
 };
 
 export type DropProps = {
@@ -98,7 +79,6 @@ export type MintProps = {
   mintLoading: boolean;
   mintData: MintData;
   allDrops: DropInterface[];
-  tokenThresholds: TokenThreshold[];
 };
 
 export type CustomiseAgentProps = {
@@ -110,29 +90,17 @@ export type CustomiseAgentProps = {
 };
 
 export type ChooseAgentProps = {
-  agents: Agent[];
-  agentsLoading: boolean;
   mintData: MintData;
   setMintData: (e: SetStateAction<MintData>) => void;
-  tokenThresholds: TokenThreshold[];
-  setToolTip: (e: SetStateAction<boolean>) => void;
 };
 
 export type AgentProps = {
   setSwitcher: (e: SetStateAction<Switcher>) => void;
-  lensClient: PublicClient;
   address: `0x${string}` | undefined;
-  setNotification: (e: SetStateAction<string | undefined>) => void;
-  setAgents: (e: SetStateAction<Agent[]>) => void;
-  sessionClient: SessionClient;
 };
 
 export type AccountProps = {
   setSwitcher: (e: SetStateAction<Switcher>) => void;
-  lensConnected: LensConnected | undefined;
-  setLensConnected: (e: SetStateAction<LensConnected | undefined>) => void;
-  storageClient: StorageClient;
-  setSignless: (e: SetStateAction<boolean>) => void;
 };
 
 export type MintData = {
@@ -280,26 +248,20 @@ export type DropsSwitchProps = {
   allDrops: DropInterface[];
   allDropsLoading: boolean;
   setSwitcher: (e: SetStateAction<Switcher>) => void;
-  lensClient: PublicClient;
-  agents: Agent[];
-  setNotification: (e: SetStateAction<string | undefined>) => void;
 };
 
 export type CollectionProps = {
   setDropSwitcher: (e: SetStateAction<DropSwitcher>) => void;
   drop: DropInterface | undefined;
   setDrop: (e: SetStateAction<DropInterface | undefined>) => void;
-  lensClient: PublicClient;
   setCollection: (e: SetStateAction<NFTData | undefined>) => void;
 };
 
 export type AgentsCollectionProps = {
-  agents: Agent[];
   collection: NFTData;
   setDrop: (e: SetStateAction<DropInterface | undefined>) => void;
   setDropSwitcher: (e: SetStateAction<DropSwitcher>) => void;
   setCollection: (e: SetStateAction<NFTData | undefined>) => void;
-  setNotification: (e: SetStateAction<string | undefined>) => void;
 };
 
 export enum AgentEditSwitcher {

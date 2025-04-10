@@ -3,14 +3,16 @@ import {
   Agent,
   DropInterface,
 } from "@/components/Dashboard/types/dashboard.types";
-import { Account, AccountStats, PublicClient } from "@lens-protocol/client";
-import { useEffect, useState } from "react";
+import { Account, AccountStats } from "@lens-protocol/client";
+import { useContext, useEffect, useState } from "react";
 import { getDropCollections } from "../../../../graphql/queries/getDropCollections";
 import { getUserAgentsPaginated } from "../../../../graphql/queries/getUserAgentsPaginated";
 import { getOrdersPaginated } from "../../../../graphql/queries/getOrdersPaginated";
 import { fetchAccount, fetchAccountStats } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useUser = (username: string, lensClient: PublicClient) => {
+const useUser = (username: string) => {
+  const context = useContext(ModalContext);
   const [screen, setScreen] = useState<number>(0);
   const [userInfo, setUserInfo] = useState<
     | (Account & {
@@ -45,7 +47,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
   const handleUserInfo = async () => {
     setInfoLoading(true);
     try {
-      const newAcc = await fetchAccount(lensClient, {
+      const newAcc = await fetchAccount(context?.lensClient!, {
         username: {
           localName: username,
         },
@@ -57,7 +59,7 @@ const useUser = (username: string, lensClient: PublicClient) => {
         return;
       }
 
-      const stats = await fetchAccountStats(lensClient, {
+      const stats = await fetchAccountStats(context?.lensClient!, {
         account: newAcc.value?.owner,
       });
 
@@ -195,10 +197,10 @@ const useUser = (username: string, lensClient: PublicClient) => {
   };
 
   useEffect(() => {
-    if (username && lensClient) {
+    if (username && context?.lensClient) {
       handleUserInfo();
     }
-  }, [username, lensClient]);
+  }, [username, context?.lensClient]);
 
   return {
     screen,

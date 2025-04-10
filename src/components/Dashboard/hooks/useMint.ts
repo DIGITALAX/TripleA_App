@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useContext, useEffect, useState } from "react";
 import {
   CollectionType,
   Format,
@@ -13,16 +13,17 @@ import {
 } from "@/lib/constants";
 import CollectionManagerAbi from "@abis/CollectionManagerAbi.json";
 import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import { getCollectionSearch } from "../../../../graphql/queries/getCollectionSearch";
+import { ModalContext } from "@/app/providers";
 
 const useMint = (
   publicClient: PublicClient,
   address: `0x${string}` | undefined,
   setMintSwitcher: (e: SetStateAction<MintSwitcher>) => void
 ) => {
+  const context = useContext(ModalContext);
   const [mintLoading, setMintLoading] = useState<boolean>(false);
-  const [agentsLoading, setAgentsLoading] = useState<boolean>(false);
   const [id, setId] = useState<string | undefined>();
   const [remixSearchLoading, setRemixSearchLoading] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
@@ -65,7 +66,7 @@ const useMint = (
     setMintLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -151,7 +152,7 @@ const useMint = (
         address: COLLECTION_MANAGER_CONTRACT,
         abi: CollectionManagerAbi,
         functionName: "create",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [
           {
             tokens: filteredTokensAndPrices?.map(({ token }) => token),
@@ -232,6 +233,9 @@ const useMint = (
       });
       setMintSwitcher(MintSwitcher.Success);
     } catch (err: any) {
+      if (err.message?.includes("PriceTooLow")) {
+        context?.setNotification("Update prices to activate agents.");
+      }
       console.error(err.message);
     }
     setMintLoading(false);
@@ -285,7 +289,6 @@ const useMint = (
     handleMint,
     mintData,
     setMintData,
-    agentsLoading,
     id,
     remixSearch,
     handleRemixSearch,

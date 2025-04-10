@@ -1,23 +1,21 @@
-import Image from "next/legacy/image";
-import { FunctionComponent, JSX } from "react";
+import { FunctionComponent, JSX, useContext } from "react";
 import { FulfillmentProps } from "../types/modals.types";
 import useFulfillment from "../hooks/useFulfillment";
 import { createPublicClient, http } from "viem";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
+import { ModalContext } from "@/app/providers";
 
 const Fulfillment: FunctionComponent<FulfillmentProps> = ({
   address,
-  setFulfillmentOpen,
-  details,
-  setNotification,
 }): JSX.Element => {
   const publicClient = createPublicClient({
-    chain: chains.testnet,
+    chain: chains.mainnet,
     transport: http(
-      "https://rpc.testnet.lens.dev"
+      "https://rpc.lens.xyz"
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
+  const context = useContext(ModalContext);
   const {
     purchaseLoading,
     handlePurchase,
@@ -25,17 +23,11 @@ const Fulfillment: FunctionComponent<FulfillmentProps> = ({
     fulfillmentInfo,
     setFulfillmentInfo,
     fulfillmentEncrypted,
-  } = useFulfillment(
-    address,
-    publicClient,
-    setNotification,
-    details,
-    setFulfillmentOpen
-  );
+  } = useFulfillment(address, publicClient);
   return (
     <div
       className="inset-0 justify-center fixed z-50 bg-opacity-50 backdrop-blur-sm overflow-y-hidden grid grid-flow-col auto-cols-auto w-full h-auto cursor-canP items-center justify-center"
-      onClick={() => setFulfillmentOpen(undefined)}
+      onClick={() => context?.setFulfillmentOpen(undefined)}
     >
       <div
         className="rounded-2xl w-96 h-fit text-sm text-viol bg-windows rounded-md pixel-border-5 flex items-center justify-start p-3 cursor-default flex-col gap-6 font-nerd"

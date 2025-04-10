@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getOwnersPaid } from "../../../../graphql/queries/getOwnersPaid";
 import { getCollectorsPaid } from "../../../../graphql/queries/getCollectorsPaid";
 import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
@@ -6,8 +6,10 @@ import { INFURA_GATEWAY } from "@/lib/constants";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 import { getDevTreasuryPaid } from "../../../../graphql/queries/getDevTreasuryPaid";
 import { getArtistPaid } from "../../../../graphql/queries/getArtistsPaid";
+import { ModalContext } from "@/app/providers";
 
-const useAgentPayouts = (lensClient: PublicClient) => {
+const useAgentPayouts = () => {
+  const context = useContext(ModalContext);
   const accountCache = new Map<string, any>();
   const metadataCache = new Set<string>();
   const [screen, setScreen] = useState<number>(0);
@@ -110,7 +112,7 @@ const useAgentPayouts = (lensClient: PublicClient) => {
   const fetchAccountData = async (artist: string) => {
     if (accountCache.has(artist)) return accountCache.get(artist);
 
-    const result = await fetchAccountsAvailable(lensClient, {
+    const result = await fetchAccountsAvailable(context?.lensClient!, {
       managedBy: evmAddress(artist),
       includeOwned: true,
     });
@@ -383,10 +385,14 @@ const useAgentPayouts = (lensClient: PublicClient) => {
   };
 
   useEffect(() => {
-    if (ownersPaid?.length < 1 && collectorsPaid?.length < 1 && lensClient) {
+    if (
+      ownersPaid?.length < 1 &&
+      collectorsPaid?.length < 1 &&
+      context?.lensClient
+    ) {
       handleOrderPayments();
     }
-  }, [lensClient]);
+  }, [context?.lensClient]);
 
   return {
     screen,

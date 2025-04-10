@@ -1,18 +1,16 @@
-import { FunctionComponent, JSX } from "react";
+import { FunctionComponent, JSX, useContext } from "react";
 import { AccountProps, Switcher } from "../types/dashboard.types";
 import Image from "next/legacy/image";
 import useAccount from "../hooks/useAccount";
 import { INFURA_GATEWAY } from "@/lib/constants";
+import { ModalContext } from "@/app/providers";
 
 const Account: FunctionComponent<AccountProps> = ({
   setSwitcher,
-  lensConnected,
-  setLensConnected,
-  storageClient,
-  setSignless
 }): JSX.Element => {
+  const context = useContext(ModalContext);
   const { accountLoading, setNewAccount, newAccount, handleUpdateAccount } =
-    useAccount(lensConnected, setLensConnected, storageClient, setSignless);
+    useAccount();
   return (
     <div className="relative w-full h-full flex items-start px-4 sm:px-20 py-10 justify-start font-nerd text-windows">
       <div className="relative w-full h-full bg-viol rounded-md p-3 flex flex-col items-center justify-between gap-6 min-h-80">
@@ -84,7 +82,7 @@ const Account: FunctionComponent<AccountProps> = ({
               <input
                 disabled={true}
                 className="relative w-full h-8 border border-windows bg-viol focus:outline-none p-1"
-                value={lensConnected?.profile?.username?.localName}
+                value={context?.lensConnected?.profile?.username?.localName}
               />
             </div>
             <div className="relative w-full h-fit flex flex-col gap-1.5 items-start justify-start">

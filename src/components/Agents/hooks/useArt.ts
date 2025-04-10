@@ -1,11 +1,13 @@
-import { LensConnected, NFTData } from "@/components/Common/types/common.types";
-import { useEffect, useState } from "react";
+import { NFTData } from "@/components/Common/types/common.types";
+import { useContext, useEffect, useState } from "react";
 import { getCollections } from "../../../../graphql/queries/getGallery";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
+import { Account, evmAddress } from "@lens-protocol/client";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useArt = (lensClient: PublicClient, lensConnected: LensConnected) => {
+const useArt = () => {
+  const context = useContext(ModalContext);
   const [moreArtLoading, setMoreArtLoading] = useState<boolean>(false);
   const [moreArt, setMoreArt] = useState<NFTData[]>([]);
 
@@ -33,7 +35,7 @@ const useArt = (lensClient: PublicClient, lensConnected: LensConnected) => {
           const artistAddress = evmAddress(col?.artist);
           if (!profileCache.has(artistAddress)) {
             const result = await fetchAccountsAvailable(
-              lensConnected?.sessionClient || lensClient,
+              context?.lensConnected?.sessionClient || context?.lensClient!,
               {
                 managedBy: artistAddress,
                 includeOwned: true,
@@ -65,10 +67,10 @@ const useArt = (lensClient: PublicClient, lensConnected: LensConnected) => {
   };
 
   useEffect(() => {
-    if (moreArt?.length < 1 && lensClient) {
+    if (moreArt?.length < 1 && context?.lensClient) {
       handleMoreCollections();
     }
-  }, [lensClient]);
+  }, [context?.lensClient]);
 
   return {
     moreArtLoading,

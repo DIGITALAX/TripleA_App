@@ -1,21 +1,21 @@
 import { COLLECTION_MANAGER_CONTRACT } from "@/lib/constants";
-import { chains } from "@lens-network/sdk/viem";
-import { SetStateAction, useEffect, useState } from "react";
+import { chains } from "@lens-chain/sdk/viem";
+import { SetStateAction, useContext, useEffect, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
 import CollectionManagerAbi from "@abis/CollectionManagerAbi.json";
 import { NFTData } from "@/components/Common/types/common.types";
-import { Agent, DropInterface, DropSwitcher } from "../types/dashboard.types";
+import {  DropInterface, DropSwitcher } from "../types/dashboard.types";
+import { ModalContext } from "@/app/providers";
 
 const useAgentsCollection = (
   address: `0x${string}` | undefined,
   publicClient: PublicClient,
   collection: NFTData,
-  agents: Agent[],
-  setNotification: (e: SetStateAction<string | undefined>) => void,
   setDrop: (e: SetStateAction<DropInterface | undefined>) => void,
   setDropSwitcher: (e: SetStateAction<DropSwitcher>) => void,
   setCollection: (e: SetStateAction<NFTData | undefined>) => void
 ) => {
+  const context = useContext(ModalContext);
   const [priceAdjustLoading, setPriceAdjustLoading] = useState<boolean>(false);
   const [editAgentsLoading, setEditAgentsLoading] = useState<boolean>(false);
   const [statusLoading, setStatusLoading] = useState<boolean>(false);
@@ -45,7 +45,7 @@ const useAgentsCollection = (
     setPriceAdjustLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -53,12 +53,12 @@ const useAgentsCollection = (
         address: COLLECTION_MANAGER_CONTRACT,
         abi: CollectionManagerAbi,
         functionName: "adjustCollectionPrice",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [
           priceAdjusted?.[index]?.token,
           Number(collection?.id),
           priceAdjusted?.[index]?.price * 10 ** 18,
-          0
+          0,
         ],
         account: address,
       });
@@ -77,10 +77,10 @@ const useAgentsCollection = (
     setEditAgentsLoading(true);
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
-      let ids = agents
+      let ids = context?.agents
         ?.filter((ag) => collection?.agentIds?.includes(ag?.id))
         ?.map((ag) => Number(ag?.id));
 
@@ -88,7 +88,7 @@ const useAgentsCollection = (
         address: COLLECTION_MANAGER_CONTRACT,
         abi: CollectionManagerAbi,
         functionName: "updateCollectionWorkerAndDetails",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [frequencies, customInstructions, ids, Number(collection?.id), 0],
         account: address,
       });
@@ -98,7 +98,9 @@ const useAgentsCollection = (
         hash: res,
       });
 
-      setNotification?.("Success! Everything will be on chain soon :)");
+      context?.setNotification?.(
+        "Success! Everything will be on chain soon :)"
+      );
     } catch (err: any) {
       console.error(err.message);
     }
@@ -116,7 +118,7 @@ const useAgentsCollection = (
           : "activateCollection";
 
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -124,7 +126,7 @@ const useAgentsCollection = (
         address: COLLECTION_MANAGER_CONTRACT,
         abi: CollectionManagerAbi,
         functionName: functionName,
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [Number(collection?.id), 0],
         account: address,
       });
@@ -134,7 +136,7 @@ const useAgentsCollection = (
         hash: res,
       });
 
-      setNotification?.(
+      context?.setNotification?.(
         `Success! Collection ${
           Number(collection?.amountSold || 0) == 0
             ? "Deleted"
@@ -164,7 +166,7 @@ const useAgentsCollection = (
         )
       );
       if (collection?.agentIds?.length > 0) {
-        let nftAgents = agents?.filter((ag) =>
+        let nftAgents = context?.agents?.filter((ag) =>
           collection?.agentIds?.includes(ag?.id)
         );
         if (nftAgents) {
@@ -223,7 +225,7 @@ const useAgentsCollection = (
         }
       }
     }
-  }, [collection, agents]);
+  }, [collection, context?.agents]);
 
   return {
     handlePriceAdjust,

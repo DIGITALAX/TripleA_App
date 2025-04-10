@@ -1,30 +1,26 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CollectionType, Order } from "../types/dashboard.types";
 import { getOrders } from "../../../../graphql/queries/getOrders";
-import {
-  Account,
-  evmAddress,
-  PublicClient as PublicLensClient,
-} from "@lens-protocol/client";
-import { MARKET_CONTRACT,  } from "@/lib/constants";
+import { Account, evmAddress } from "@lens-protocol/client";
+import { MARKET_CONTRACT } from "@/lib/constants";
 import {
   checkAndSignAuthMessage,
   LitNodeClient,
   uint8arrayFromString,
   uint8arrayToString,
 } from "@lit-protocol/lit-node-client";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 import { LIT_NETWORK } from "@lit-protocol/constants";
+import { ModalContext } from "@/app/providers";
 
 const useCollects = (
   address: `0x${string}` | undefined,
-  lensClient: PublicLensClient,
-  setNotification: (e: SetStateAction<string | undefined>) => void,
   publicClient: PublicClient
 ) => {
+  const context = useContext(ModalContext);
   const [collectsLoading, setCollectsLoading] = useState<boolean>(false);
   const [allCollects, setAllCollects] = useState<Order[]>([]);
   const [fulfillmentOpen, setFulfillmentOpen] = useState<boolean[]>([]);
@@ -62,7 +58,7 @@ const useCollects = (
           const artistAddress = evmAddress(collect?.collection?.artist);
 
           if (!profileCache.has(artistAddress)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: artistAddress,
               includeOwned: true,
             });
@@ -76,8 +72,6 @@ const useCollects = (
           }
 
           const profile = profileCache.get(artistAddress);
-
-         
 
           return {
             id: collect?.id,
@@ -288,7 +282,7 @@ const useCollects = (
     });
     try {
       const clientWallet = createWalletClient({
-        chain: chains.testnet,
+        chain: chains.mainnet,
         transport: custom((window as any).ethereum),
       });
 
@@ -296,7 +290,7 @@ const useCollects = (
         address: MARKET_CONTRACT,
         abi: MarketAbi,
         functionName: "updateFulfillmentDetails",
-        chain: chains.testnet,
+        chain: chains.mainnet,
         args: [fulfillmentEncrypted?.[index], allCollects?.[index].id],
         account: address,
       });
@@ -304,7 +298,7 @@ const useCollects = (
       const res = await clientWallet.writeContract(request);
       await publicClient.waitForTransactionReceipt({ hash: res });
 
-      setNotification?.("Fulfillment Details Updated!");
+      context?.setNotification?.("Fulfillment Details Updated!");
       setFulfillmentEncrypted((prev) => {
         let arr = [...prev];
 
@@ -333,10 +327,10 @@ const useCollects = (
   };
 
   useEffect(() => {
-    if (allCollects?.length < 1 && lensClient) {
+    if (allCollects?.length < 1 && context?.lensClient) {
       handleCollects();
     }
-  }, [lensClient]);
+  }, [context?.lensClient]);
 
   return {
     allCollects,

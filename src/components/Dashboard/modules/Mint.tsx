@@ -1,17 +1,18 @@
-import { FunctionComponent, JSX } from "react";
+import { FunctionComponent, JSX, useContext } from "react";
 import { CollectionType, MintProps } from "../types/dashboard.types";
 import Image from "next/legacy/image";
 import { TOKENS } from "@/lib/constants";
 import calculateRent from "@/lib/helpers/calculateRent";
 import descriptionRegex from "@/lib/helpers/descriptionRegex";
+import { ModalContext } from "@/app/providers";
 
 const Mint: FunctionComponent<MintProps> = ({
   handleMint,
   mintLoading,
   mintData,
   allDrops,
-  tokenThresholds,
 }): JSX.Element => {
+  const context = useContext(ModalContext);
   return (
     <div className="relative w-full h-full flex items-start justify-between font-nerd text-windows flex-col gap-4">
       <div className="relative w-full h-full flex flex-col md:flex-row items-center md:items-start justify-start md:justify-center gap-10">
@@ -30,7 +31,7 @@ const Mint: FunctionComponent<MintProps> = ({
                     {agent?.agent?.title}
                   </div>
                   {mintData?.tokens?.map((tok, index) => {
-                    const tokenThreshold = tokenThresholds?.find(
+                    const tokenThreshold = context?.tokenThresholds?.find(
                       (t) => t.token?.toLowerCase() == tok?.toLowerCase()
                     );
                     const rent = calculateRent(tokenThreshold!, agent as any);
@@ -99,7 +100,7 @@ const Mint: FunctionComponent<MintProps> = ({
             className="relative flex w-full h-fit max-h-60 overflow-y-scroll text-center text-black text-windows items-start justify-center"
             dangerouslySetInnerHTML={{
               __html: descriptionRegex(mintData?.description, false),
-            }} 
+            }}
           ></div>
         </div>
       </div>

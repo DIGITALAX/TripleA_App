@@ -1,34 +1,29 @@
-import { LensConnected } from "@/components/Common/types/common.types";
-import { SetStateAction, useState } from "react";
+import { useContext, useState } from "react";
 import pollResult from "@/lib/helpers/pollResult";
-import { StorageClient } from "@lens-chain/storage-client";
 import {
   fetchAccount,
   setAccountMetadata,
 } from "@lens-protocol/client/actions";
 import { account } from "@lens-protocol/metadata";
 import { immutable } from "@lens-chain/storage-client";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
+import { ModalContext } from "@/app/providers";
 
-const useAccount = (
-  lensConnected: LensConnected | undefined,
-  setLensConnected: (e: SetStateAction<LensConnected | undefined>) => void,
-  storageClient: StorageClient,
-  setSignless: (e: SetStateAction<boolean>) => void
-) => {
+const useAccount = () => {
+  const context = useContext(ModalContext);
   const [accountLoading, setAccountLoading] = useState<boolean>(false);
   const [newAccount, setNewAccount] = useState<{
     localname: string;
     bio: string;
     pfp?: Blob | string;
   }>({
-    pfp: lensConnected?.profile?.metadata?.picture,
-    localname: lensConnected?.profile?.metadata?.name || "",
-    bio: lensConnected?.profile?.metadata?.bio || "",
+    pfp: context?.lensConnected?.profile?.metadata?.picture,
+    localname: context?.lensConnected?.profile?.metadata?.name || "",
+    bio: context?.lensConnected?.profile?.metadata?.bio || "",
   });
 
   const handleUpdateAccount = async () => {
-    if (!lensConnected?.sessionClient) return;
+    if (!context?.lensConnected?.sessionClient) return;
     setAccountLoading(true);
     try {
       let picture = undefined;
@@ -48,11 +43,13 @@ const useAccount = (
         bio: newAccount?.bio,
         picture,
       });
-      const acl = immutable(chains.testnet.id);
-      const { uri } = await storageClient?.uploadAsJson(schema, { acl })!;
+      const acl = immutable(chains.mainnet.id);
+      const { uri } = await context?.storageClient?.uploadAsJson(schema, {
+        acl,
+      })!;
 
       const accountResponse = await setAccountMetadata(
-        lensConnected?.sessionClient,
+        context?.lensConnected?.sessionClient,
         {
           metadataUri: uri,
         }
@@ -67,27 +64,29 @@ const useAccount = (
         if (
           await pollResult(
             (accountResponse.value as any)?.hash,
-            lensConnected?.sessionClient
+            context?.lensConnected?.sessionClient
           )
         ) {
-          const result = await fetchAccount(lensConnected?.sessionClient, {
-            address: lensConnected?.profile?.address,
-          });
+          const result = await fetchAccount(
+            context?.lensConnected?.sessionClient,
+            {
+              address: context?.lensConnected?.profile?.address,
+            }
+          );
 
           if (result.isErr()) {
             setAccountLoading(false);
             return;
           }
 
-         
           if (result.value?.__typename == "Account") {
-            setLensConnected?.({
-              ...lensConnected,
+            context?.setLensConnected?.({
+              ...context?.lensConnected,
               profile: result.value,
             });
           }
         } else {
-          setSignless?.(true);
+          context?.setSignless?.(true);
           console.error(accountResponse);
           setAccountLoading(false);
           return;

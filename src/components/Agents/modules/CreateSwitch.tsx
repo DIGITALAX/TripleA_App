@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import useCreateAgent from "../hooks/useCreateAgent";
 import { useAccount } from "wagmi";
 import { createPublicClient, http } from "viem";
-import { chains } from "@lens-network/sdk/viem";
+import { chains } from "@lens-chain/sdk/viem";
 import Image from "next/legacy/image";
 import { AnimationContext } from "@/app/providers";
 import { IoAddCircle } from "react-icons/io5";
@@ -15,19 +15,14 @@ import { downloadEliza } from "@/lib/helpers/downloadEliza";
 const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
   createSwitcher,
   setCreateSwitcher,
-  lensConnected,
-  setIndexer,
-  storageClient,
-  setNotifcation,
-  lensClient,
 }): JSX.Element => {
   const router = useRouter();
   const { address } = useAccount();
   const animationContext = useContext(AnimationContext);
   const publicClient = createPublicClient({
-    chain: chains.testnet,
+    chain: chains.mainnet,
     transport: http(
-      "https://rpc.testnet.lens.dev"
+      "https://rpc.lens.xyz"
       // `https://lens-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_LENS_KEY}`
     ),
   });
@@ -47,16 +42,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
     setFeed,
     addFeedRule,
     feedAdminLoading,
-  } = useCreateAgent(
-    publicClient,
-    address,
-    setCreateSwitcher,
-    lensConnected,
-    setIndexer,
-    storageClient,
-    setNotifcation,
-    lensClient
-  );
+  } = useCreateAgent(publicClient, address, setCreateSwitcher);
   switch (createSwitcher) {
     case CreateSwitcher.Success:
       return (
@@ -394,22 +380,6 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                   }
                   className="relative w-full h-8 text-viol rounded-md bg-windows focus:outline-none p-1"
                   value={feed.name}
-                />
-              </div>
-              <div className="relative w-full h-fit flex flex-col gap-1.5 items-start justify-start">
-                <div className="relative w-fit h-fit flex">Title</div>
-                <input
-                  disabled={
-                    createAgentLoading || lensLoading || createFeedLoading
-                  }
-                  onChange={(e) =>
-                    setFeed({
-                      ...feed,
-                      title: e.target.value,
-                    })
-                  }
-                  className="relative w-full h-8 text-viol rounded-md bg-windows focus:outline-none p-1"
-                  value={feed.title}
                 />
               </div>
               <div className="relative w-full h-fit flex flex-col gap-1.5 items-start justify-start">

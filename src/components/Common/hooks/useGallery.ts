@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NFTData } from "../types/common.types";
 import { getCollections } from "../../../../graphql/queries/getGallery";
 import { INFURA_GATEWAY } from "@/lib/constants";
-import { Account, evmAddress, PublicClient } from "@lens-protocol/client";
+import { Account, evmAddress } from "@lens-protocol/client";
 import { FetchResult } from "@apollo/client";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const useGallery = (lensClient: PublicClient, choice: string) => {
+const useGallery = (choice: string) => {
+  const context = useContext(ModalContext);
   const metadataCache = new Map<string, any>();
   const profileCache = new Map<string, Account>();
   const [nfts, setNfts] = useState<NFTData[]>([]);
@@ -42,7 +44,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
 
           const artistAddress = evmAddress(collection?.artist);
           if (!profileCache.has(artistAddress)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: artistAddress,
               includeOwned: true,
             });
@@ -85,10 +87,10 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
   };
 
   useEffect(() => {
-    if (lensClient) {
+    if (context?.lensClient) {
       handleGallery();
     }
-  }, [lensClient, choice]);
+  }, [context?.lensClient, choice]);
 
   const handleMoreGallery = async () => {
     setGalleryLoading(true);
@@ -118,7 +120,7 @@ const useGallery = (lensClient: PublicClient, choice: string) => {
 
           const artistAddress = evmAddress(collection?.artist);
           if (!profileCache.has(artistAddress)) {
-            const result = await fetchAccountsAvailable(lensClient, {
+            const result = await fetchAccountsAvailable(context?.lensClient!, {
               managedBy: artistAddress,
               includeOwned: true,
             });

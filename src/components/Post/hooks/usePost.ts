@@ -1,21 +1,10 @@
-import { LensConnected } from "@/components/Common/types/common.types";
-import {
-  PageSize,
-  Post,
-  PostReferenceType,
-  PublicClient,
-} from "@lens-protocol/client";
-import { useEffect, useState } from "react";
-import {
-  fetchPost,
-  fetchPostReferences,
-} from "@lens-protocol/client/actions";
+import { PageSize, Post, PostReferenceType } from "@lens-protocol/client";
+import { useContext, useEffect, useState } from "react";
+import { fetchPost, fetchPostReferences } from "@lens-protocol/client/actions";
+import { ModalContext } from "@/app/providers";
 
-const usePost = (
-  lensConnected: LensConnected | undefined,
-  lensClient: PublicClient,
-  postId: string
-) => {
+const usePost = (postId: string) => {
+  const context = useContext(ModalContext);
   const [postData, setPostData] = useState<Post[]>([]);
   const [activity, setActivity] = useState<Post[]>([]);
   const [activityLoading, setActivityLoading] = useState<boolean>(false);
@@ -27,7 +16,7 @@ const usePost = (
     setActivityLoading(true);
     try {
       const postsRes = await fetchPostReferences(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           pageSize: PageSize.Fifty,
           referencedPost: postId,
@@ -52,7 +41,6 @@ const usePost = (
         setActivityCursor(postsRes.value?.pageInfo?.next);
       }
 
-      
       setActivity(posts);
     } catch (err: any) {
       console.error(err.message);
@@ -64,7 +52,7 @@ const usePost = (
     if (!activityCursor || !postId) return;
     try {
       const postsRes = await fetchPostReferences(
-        lensConnected?.sessionClient || lensClient,
+        context?.lensConnected?.sessionClient || context?.lensClient!,
         {
           pageSize: PageSize.Fifty,
           referencedPost: postId,
@@ -98,15 +86,17 @@ const usePost = (
   const handlePostData = async () => {
     setPostDataLoading(true);
     try {
-      const res = await fetchPost(lensConnected?.sessionClient || lensClient, {
-        post: postId,
-      });
+      const res = await fetchPost(
+        context?.lensConnected?.sessionClient || context?.lensClient!,
+        {
+          post: postId,
+        }
+      );
 
       if (res.isErr()) {
         setPostDataLoading(false);
         return;
       }
-
 
       await handleActivity();
 
@@ -118,10 +108,10 @@ const usePost = (
   };
 
   useEffect(() => {
-    if (lensClient || lensConnected?.sessionClient) {
+    if (context?.lensClient || context?.lensConnected?.sessionClient) {
       handlePostData();
     }
-  }, [lensConnected, lensClient]);
+  }, [context?.lensConnected?.sessionClient, context?.lensClient]);
 
   return {
     postData,
