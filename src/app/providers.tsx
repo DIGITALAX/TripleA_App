@@ -3,17 +3,17 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { createContext, SetStateAction, useEffect, useState } from "react";
-import { chains } from "@lens-chain/sdk/viem";
-import { Context, PublicClient, mainnet } from "@lens-protocol/client";
+import { Context, PublicClient, mainnet, testnet } from "@lens-protocol/client";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import {
   Fulfiller,
   LensConnected,
   TokenThreshold,
 } from "@/components/Common/types/common.types";
-import { StorageClient } from "@lens-chain/storage-client";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 import { CollectData } from "@/components/NFT/types/nft.types";
+import { StorageClient } from "@lens-chain/storage-client";
+import { chains } from "@lens-chain/sdk/viem";
 
 export const config = createConfig(
   getDefaultConfig({
@@ -117,7 +117,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     if (!lensClient) {
       setLensClient(
         PublicClient.create({
-          environment: mainnet,
+          environment: {
+            backend: "https://api.lens.xyz/graphql" as any,
+            indexingTimeout: 10000,
+            name: "mainnet",
+            pollingInterval: 100,
+          },
           storage: window.localStorage,
         })
       );
