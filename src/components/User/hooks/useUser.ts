@@ -10,6 +10,7 @@ import { getUserAgentsPaginated } from "../../../../graphql/queries/getUserAgent
 import { getOrdersPaginated } from "../../../../graphql/queries/getOrdersPaginated";
 import { fetchAccount, fetchAccountStats } from "@lens-protocol/client/actions";
 import { ModalContext } from "@/app/providers";
+import { INFURA_GATEWAY } from "@/lib/constants";
 
 const useUser = (username: string) => {
   const context = useContext(ModalContext);
@@ -99,6 +100,58 @@ const useUser = (username: string) => {
           collected?.data?.collectionPurchaseds?.length == 20 ? true : false,
         drops: drops?.data?.dropCreateds?.length == 20 ? true : false,
       });
+      const dropsData = await Promise.all(
+        drops?.data?.dropCreateds?.map(async (drop: any) => {
+          if (!drop.metadata && drop.uri && drop.uri?.trim() !== "") {
+            const cadena = await fetch(
+              `${INFURA_GATEWAY}/ipfs/${drop.uri.split("ipfs://")?.[1]}`
+            );
+            const metadata = await cadena.json();
+
+            drop.metadata = metadata;
+          }
+
+          const colls = await Promise.all(
+            drop?.collections?.map(async (col: any) => {
+              if (!col.metadata) {
+                const cadena = await fetch(
+                  `${INFURA_GATEWAY}/ipfs/${col.uri.split("ipfs://")?.[1]}`
+                );
+                const metadata = await cadena.json();
+
+                col.metadata = metadata;
+              }
+
+              return col;
+            })
+          );
+
+          return {
+            ...drop,
+            collections: colls,
+          };
+        })
+      );
+
+      const collectionsPurchase = await Promise.all(
+        collected?.data?.collectionPurchaseds?.map(async (drop: any) => {
+          if (!drop.collection.metadata) {
+            const cadena = await fetch(
+              `${INFURA_GATEWAY}/ipfs/${
+                drop.collection.uri.split("ipfs://")?.[1]
+              }`
+            );
+            const metadata = await cadena.json();
+
+            drop.collection = {
+              ...drop.collection,
+              metadata,
+            };
+          }
+
+          return drop;
+        })
+      );
 
       setPaginated({
         agents:
@@ -115,9 +168,9 @@ const useUser = (username: string) => {
             : paginated?.drops,
       });
 
-      setCollected(collected?.data?.collectionPurchaseds);
+      setCollected(collectionsPurchase);
       setAgents(agents?.data?.agentCreateds);
-      setDrops(drops?.data?.dropCreateds);
+      setDrops(dropsData);
     } catch (err: any) {
       console.error(err.message);
     }
@@ -139,10 +192,27 @@ const useUser = (username: string) => {
           userInfo?.owner,
           paginated?.agents
         );
-        setCollected([
-          ...collected,
-          ...(collectedData?.data?.collectionPurchaseds || []),
-        ] as any);
+        const collectionsPurchase = await Promise.all(
+          collectedData?.data?.collectionPurchaseds?.map(async (drop: any) => {
+            if (!drop.collection.metadata) {
+              const cadena = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${
+                  drop.collection.uri.split("ipfs://")?.[1]
+                }`
+              );
+              const metadata = await cadena.json();
+
+              drop.collection = {
+                ...drop.collection,
+                metadata,
+              };
+            }
+
+            return drop;
+          })
+        );
+
+        setCollected([...collected, ...collectionsPurchase] as any);
 
         if (collectedData?.data?.collectionPurchaseds?.length == 20) {
           hasMoreCollected = true;
@@ -155,7 +225,39 @@ const useUser = (username: string) => {
           userInfo?.owner,
           paginated?.drops
         );
-        setDrops([...drops, ...(dropsData?.data?.dropCreateds || [])] as any);
+        const dropsDataMore = await Promise.all(
+          dropsData?.data?.dropCreateds?.map(async (drop: any) => {
+            if  (!drop.metadata && drop.uri && drop.uri?.trim() !== "") {
+              const cadena = await fetch(
+                `${INFURA_GATEWAY}/ipfs/${drop.uri.split("ipfs://")?.[1]}`
+              );
+              const metadata = await cadena.json();
+  
+              drop.metadata = metadata;
+            }
+  
+            const colls = await Promise.all(
+              drop?.collections?.map(async (col: any) => {
+                if (!col.metadata) {
+                  const cadena = await fetch(
+                    `${INFURA_GATEWAY}/ipfs/${col.uri.split("ipfs://")?.[1]}`
+                  );
+                  const metadata = await cadena.json();
+  
+                  col.metadata = metadata;
+                }
+  
+                return col;
+              })
+            );
+  
+            return {
+              ...drop,
+              collections: colls,
+            };
+          })
+        );
+        setDrops([...drops, ...dropsDataMore] as any);
 
         if (dropsData?.data?.dropCreateds?.length == 20) {
           hasMoreDrops = true;

@@ -214,7 +214,7 @@ export default function User() {
                                 ? (item as any)?.metadata?.cover?.split(
                                     "ipfs://"
                                   )?.[1]
-                                : (item as any)?.metadata?.cover
+                                : (item as any)?.metadata?.cover ?? `QmX5Uk9WeqsVHoNQhUP3fzTasv3J6zuat4L5L6zmaTVzBW`
                             }`}
                           />
                         </div>

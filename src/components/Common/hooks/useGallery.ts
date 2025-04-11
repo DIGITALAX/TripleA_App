@@ -29,7 +29,6 @@ const useGallery = (choice: string) => {
           choice?.includes("Agent") ? true : false
         );
       }
-
       const gallery: NFTData[] = await Promise.all(
         data?.data?.collectionCreateds?.map(async (collection: any) => {
           if (!collection.metadata) {

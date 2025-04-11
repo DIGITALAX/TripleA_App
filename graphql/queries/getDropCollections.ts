@@ -9,6 +9,7 @@ const DROP_COLLECTIONS = gql`
         cover
       }
       collections {
+        uri
         collectionId
         metadata {
           image

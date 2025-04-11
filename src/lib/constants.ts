@@ -12,7 +12,7 @@ export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
   "0xBa53Fd19053fceFc91D091A02c71AbDcD79d856f";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
   "0x4F276081A4AC2d50eEE2aA6c78a3C4C06AAE9562";
-export const AGENT_FEED_RULE: `0x${string}` = "0x";
+export const AGENT_FEED_RULE: `0x${string}` = "0xaf44dc29bF3578127A8971C764CEd7a4e448e31c";
 export const ZERO_ADDRESS: `0x${string}` =
   "0x0000000000000000000000000000000000000000";
 

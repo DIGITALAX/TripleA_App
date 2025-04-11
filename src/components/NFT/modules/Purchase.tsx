@@ -173,6 +173,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         animationContext?.setPageChange?.(true);
+
                         router.prefetch(
                           `/user/${nft?.profile?.username?.localName}`
                         );
@@ -667,6 +668,7 @@ const Purchase: FunctionComponent<PurchaseProps> = ({
                               onClick={(e) => {
                                 e.stopPropagation();
                                 animationContext?.setPageChange?.(true);
+
                                 router.prefetch(`/agent/${agent?.id}`);
                                 router.push(`/agent/${agent?.id}`);
                               }}
