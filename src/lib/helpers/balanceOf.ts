@@ -49,7 +49,7 @@ export const balanceOf = async (
   } catch (err: any) {
     console.error(err.message);
     setNotification?.(
-      "Hold at least 5 $MONA to " + mint ? "mint  :)" : "create an agent :)"
+      `Hold at least 5 $MONA to ${mint ? "mint  :)" : "create an agent :)"}`
     );
     return false;
   }
