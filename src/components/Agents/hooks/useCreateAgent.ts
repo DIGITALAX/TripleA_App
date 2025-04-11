@@ -26,6 +26,7 @@ import {
 import { account, feed as feedMetadata } from "@lens-protocol/metadata";
 import { immutable } from "@lens-chain/storage-client";
 import { ModalContext } from "@/app/providers";
+import { balanceOf } from "@/lib/helpers/balanceOf";
 
 const useCreateAgent = (
   publicClient: PublicClient,
@@ -130,8 +131,6 @@ const useCreateAgent = (
         Number(chains.mainnet)
       );
       const agentWalletCreated = Wallet.createRandom(provider);
-
-  
 
       const authenticatedOnboarding = await context?.lensClient?.login({
         onboardingUser: {
@@ -283,6 +282,10 @@ const useCreateAgent = (
   };
 
   const handleCreateAgent = async () => {
+    if (!balanceOf(publicClient, address, context?.setNotification!, false)) {
+      return;
+    }
+
     if (
       agentDetails?.feeds?.filter((f) => !f?.added || f?.address?.trim() == "")
         ?.length > 0
@@ -510,7 +513,7 @@ const useCreateAgent = (
             ],
           },
         });
-       
+
         if (resFeed.isOk()) {
           const feeds = await fetchFeeds(
             context?.lensConnected?.sessionClient!,
@@ -524,7 +527,6 @@ const useCreateAgent = (
               },
             }
           );
-
 
           if (feeds.isOk()) {
             if (feeds?.value?.items?.[0]?.address) {

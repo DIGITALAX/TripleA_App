@@ -2,6 +2,7 @@ export const INFURA_GATEWAY: string = "https://thedial.infura-ipfs.io";
 export const GROVE_GATEWAY: string = "https://api.grove.storage/";
 
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
+export const MONA: `0x${string}` = "0x";
 export const AGENTS_CONTRACT: `0x${string}` =
   "0x424Fa11D84e5674809Fd0112eBa4f86d6C4ed2aD";
 export const SKYHUNTERS_AGENTS_MANAGER_CONTRACT: `0x${string}` =
@@ -12,7 +13,8 @@ export const COLLECTION_MANAGER_CONTRACT: `0x${string}` =
   "0xBa53Fd19053fceFc91D091A02c71AbDcD79d856f";
 export const ACCESS_CONTROLS_CONTRACT: `0x${string}` =
   "0x4F276081A4AC2d50eEE2aA6c78a3C4C06AAE9562";
-export const AGENT_FEED_RULE: `0x${string}` = "0xaf44dc29bF3578127A8971C764CEd7a4e448e31c";
+export const AGENT_FEED_RULE: `0x${string}` =
+  "0xaf44dc29bF3578127A8971C764CEd7a4e448e31c";
 export const ZERO_ADDRESS: `0x${string}` =
   "0x0000000000000000000000000000000000000000";
 

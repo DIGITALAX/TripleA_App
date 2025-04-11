@@ -16,6 +16,7 @@ import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
 import { chains } from "@lens-chain/sdk/viem";
 import { getCollectionSearch } from "../../../../graphql/queries/getCollectionSearch";
 import { ModalContext } from "@/app/providers";
+import { balanceOf } from "@/lib/helpers/balanceOf";
 
 const useMint = (
   publicClient: PublicClient,
@@ -55,6 +56,9 @@ const useMint = (
   });
 
   const handleMint = async () => {
+    if (!balanceOf(publicClient, address, context?.setNotification!, true)) {
+      return;
+    }
     if (
       !mintData.image ||
       mintData.prices?.length < 1 ||
