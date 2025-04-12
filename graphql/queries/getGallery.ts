@@ -2,13 +2,13 @@ import { aaaClient } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const COLLECTIONS_AGENT = gql`
-  query ($skip: Int!, $isAgent: Bool!) {
+  query ($skip: Int!, $isAgent: Boolean!) {
     collectionCreateds(
-      first: 40
+      first: 10
       skip: $skip
       orderDirection: desc
       orderBy: blockTimestamp
-      where: { agent: $agent }
+      where: { isAgent: $isAgent }
     ) {
       id
       artist
@@ -98,6 +98,7 @@ export const getCollections = async (
   isAgent?: boolean
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
+
   const queryPromise = aaaClient.query({
     query: isAgent !== undefined ? COLLECTIONS_AGENT : COLLECTIONS,
     variables: isAgent !== undefined ? { skip, isAgent } : { skip },
