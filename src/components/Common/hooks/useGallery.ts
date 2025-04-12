@@ -18,14 +18,15 @@ const useGallery = (choice: string) => {
   const [priceIndex, setPriceIndex] = useState<number[]>([]);
 
   const handleGallery = async (): Promise<void> => {
+  
     setGalleryLoading(true);
     try {
       let data: FetchResult | void;
       if (choice?.includes("All")) {
-        data = await getCollections(page);
+        data = await getCollections(0);
       } else {
         data = await getCollections(
-          page,
+          0,
           choice?.includes("Agent") ? true : false
         );
       }
@@ -75,8 +76,8 @@ const useGallery = (choice: string) => {
         })
       );
 
-      setPage(gallery?.length == 40 ? 40 : 0);
-      setHasMore(gallery?.length == 40 ? true : false);
+      setPage(gallery?.length == 10 ? 10 : 0);
+      setHasMore(gallery?.length == 10 ? true : false);
       setNfts(gallery?.sort(() => Math.random() - 0.5));
       setPriceIndex(Array.from({ length: gallery?.length }, () => 0));
     } catch (err: any) {
@@ -132,7 +133,6 @@ const useGallery = (choice: string) => {
             profileCache.set(artistAddress, result.value.items?.[0]?.account);
           }
 
-          let picture = "";
           const profile = profileCache.get(artistAddress);
 
           return {
@@ -153,8 +153,8 @@ const useGallery = (choice: string) => {
         })
       );
 
-      setPage(gallery?.length == 40 ? page + 40 : page);
-      setHasMore(gallery?.length == 40 ? true : false);
+      setPage(gallery?.length == 10 ? page + 10 : page);
+      setHasMore(gallery?.length == 10 ? true : false);
       setNfts([...nfts, ...gallery?.sort(() => Math.random() - 0.5)]);
 
       setPriceIndex([

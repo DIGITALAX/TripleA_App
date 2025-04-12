@@ -6,8 +6,6 @@ const COLLECTIONS_AGENT = gql`
     collectionCreateds(
       first: 10
       skip: $skip
-      orderDirection: desc
-      orderBy: blockTimestamp
       where: { isAgent: $isAgent }
     ) {
       id
@@ -38,7 +36,7 @@ const COLLECTIONS_AGENT = gql`
 const COLLECTIONS = gql`
   query ($skip: Int!) {
     collectionCreateds(
-      first: 40
+      first: 10
       skip: $skip
       orderDirection: desc
       orderBy: blockTimestamp
@@ -98,7 +96,6 @@ export const getCollections = async (
   isAgent?: boolean
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-
   const queryPromise = aaaClient.query({
     query: isAgent !== undefined ? COLLECTIONS_AGENT : COLLECTIONS,
     variables: isAgent !== undefined ? { skip, isAgent } : { skip },
