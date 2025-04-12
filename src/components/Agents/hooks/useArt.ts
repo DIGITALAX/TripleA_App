@@ -14,7 +14,9 @@ const useArt = () => {
   const handleMoreCollections = async () => {
     setMoreArtLoading(true);
     try {
-      const data = await getCollections(0);
+      const data = await getCollections(
+        [0, 10, 20, 25, 30][Math.floor(Math.random() * 5)]
+      );
 
       const metadataCache = new Map<string, any>();
       const profileCache = new Map<string, Account>();
