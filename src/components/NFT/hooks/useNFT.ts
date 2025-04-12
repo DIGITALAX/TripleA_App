@@ -37,6 +37,7 @@ const useNFT = (id: string) => {
     title?: string
   ): Promise<Post[] | void> => {
     try {
+    
       const postsRes = await fetchPosts(
         context?.lensConnected?.sessionClient || context?.lensClient!,
         {
@@ -55,8 +56,11 @@ const useNFT = (id: string) => {
       );
 
       if (postsRes.isErr()) {
+        console.log(postsRes.error)
         return;
       }
+
+      console.log(postsRes.value.items)
 
       let posts: Post[] = [];
 
@@ -66,19 +70,20 @@ const useNFT = (id: string) => {
         const postsRes = await fetchPosts(
           context?.lensConnected?.sessionClient || context?.lensClient!,
           {
+            filter: {
+              metadata: {
+                tags: {
+                  all: ["tripleA",  nft?.title?.replaceAll(" ", "")?.toLowerCase()!]
+                }
+              }
+            },
             pageSize: PageSize.Fifty,
           }
         );
         if (postsRes.isErr()) {
           return;
         }
-        posts = postsRes.value?.items?.filter(
-          (pos: any) =>
-            (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA") &&
-            (pos?.metadata as TextOnlyMetadata)?.tags?.includes(
-              (title || nft?.title?.replaceAll(" ", "")?.toLowerCase())!
-            )
-        ) as Post[];
+        posts = postsRes.value?.items as Post[]
       }
 
       if (postsRes.value?.pageInfo?.next) {
@@ -284,6 +289,13 @@ const useNFT = (id: string) => {
         const postsRes = await fetchPosts(
           context?.lensConnected?.sessionClient || context?.lensClient!,
           {
+            filter: {
+              metadata: {
+                tags: {
+                  all: ["tripleA",  nft?.title?.replaceAll(" ", "")?.toLowerCase()!]
+                }
+              }
+            },
             pageSize: PageSize.Fifty,
           }
         );
@@ -292,13 +304,7 @@ const useNFT = (id: string) => {
           return;
         }
 
-        posts = postsRes.value.items?.filter(
-          (pos: any) =>
-            (pos?.metadata as TextOnlyMetadata)?.tags?.includes("tripleA") &&
-            (pos?.metadata as TextOnlyMetadata)?.tags?.includes(
-              nft?.title?.replaceAll(" ", "")?.toLowerCase()!
-            )
-        ) as Post[];
+        posts = postsRes.value.items as Post[];
       }
 
       if (postsRes.value?.pageInfo?.next) {
