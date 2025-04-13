@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { createContext, SetStateAction, useEffect, useState } from "react";
-import { Context, PublicClient, mainnet, testnet } from "@lens-protocol/client";
+import { Context, mainnet, PublicClient, } from "@lens-protocol/client";
 import { Agent } from "@/components/Dashboard/types/dashboard.types";
 import {
   Fulfiller,
@@ -117,12 +117,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     if (!lensClient) {
       setLensClient(
         PublicClient.create({
-          environment: {
-            backend: "https://api.lens.xyz/graphql" as any,
-            indexingTimeout: 10000,
-            name: "mainnet",
-            pollingInterval: 100,
-          },
+          environment: mainnet,
           storage: window.localStorage,
         })
       );

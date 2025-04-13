@@ -19,9 +19,10 @@ import {
   fetchAccountsAvailable,
   fetchPosts,
 } from "@lens-protocol/client/actions";
-import { ModalContext } from "@/app/providers";
+import { AnimationContext, ModalContext } from "@/app/providers";
 
 const useNFT = (id: string) => {
+  const animationContext = useContext(AnimationContext);
   const context = useContext(ModalContext);
   const [nft, setNft] = useState<NFTData | undefined>();
   const [moreCollections, setMoreCollections] = useState<NFTData[]>([]);
@@ -37,7 +38,6 @@ const useNFT = (id: string) => {
     title?: string
   ): Promise<Post[] | void> => {
     try {
-    
       const postsRes = await fetchPosts(
         context?.lensConnected?.sessionClient || context?.lensClient!,
         {
@@ -47,7 +47,7 @@ const useNFT = (id: string) => {
               tags: {
                 all: [
                   "tripleA",
-                  (title || nft?.title?.replaceAll(" ", "")?.toLowerCase())!,
+                  (title ?? nft?.title?.replaceAll(" ", "")?.toLowerCase())!,
                 ]?.filter(Boolean),
               },
             },
@@ -56,34 +56,14 @@ const useNFT = (id: string) => {
       );
 
       if (postsRes.isErr()) {
-        console.log(postsRes.error)
+        console.error(postsRes.error);
         return;
       }
-
-      console.log(postsRes.value.items)
 
       let posts: Post[] = [];
 
       if (postsRes.value?.items?.length > 0) {
         posts = postsRes?.value.items as Post[];
-      } else {
-        const postsRes = await fetchPosts(
-          context?.lensConnected?.sessionClient || context?.lensClient!,
-          {
-            filter: {
-              metadata: {
-                tags: {
-                  all: ["tripleA",  nft?.title?.replaceAll(" ", "")?.toLowerCase()!]
-                }
-              }
-            },
-            pageSize: PageSize.Fifty,
-          }
-        );
-        if (postsRes.isErr()) {
-          return;
-        }
-        posts = postsRes.value?.items as Post[]
       }
 
       if (postsRes.value?.pageInfo?.next) {
@@ -292,9 +272,12 @@ const useNFT = (id: string) => {
             filter: {
               metadata: {
                 tags: {
-                  all: ["tripleA",  nft?.title?.replaceAll(" ", "")?.toLowerCase()!]
-                }
-              }
+                  all: [
+                    "tripleA",
+                    nft?.title?.replaceAll(" ", "")?.toLowerCase()!,
+                  ],
+                },
+              },
             },
             pageSize: PageSize.Fifty,
           }
@@ -392,7 +375,7 @@ const useNFT = (id: string) => {
   ]);
 
   useEffect(() => {
-    if (nft && moreCollections?.length < 1) {
+    if (nft && moreCollections?.length < 1 && !animationContext?.pageChange) {
       handleMoreCollections();
     }
   }, [nft]);

@@ -29,11 +29,11 @@ export const TOKENS: { symbol: string; contract: string; image: string }[] = [
     contract: "0xE5ecd226b3032910CEaa43ba92EE8232f8237553",
     image: "QmYJ6cpGRgQAr2d5hJDJ9CaJukt2szcHc1AqFBy9m6knUw",
   },
-  // {
-  //   symbol: "MONA",
-  //   contract: "",
-  //   image: "QmZSDyGYYy9hn8RAUC1vZeZXC5y2H3YimzajJRngCTu5Fq",
-  // },
+  {
+    symbol: "MONA",
+    contract: "0x28547B5b6B405A1444A17694AC84aa2d6A03b3Bd",
+    image: "QmZSDyGYYy9hn8RAUC1vZeZXC5y2H3YimzajJRngCTu5Fq",
+  },
   {
     symbol: "BONSAI",
     contract: "0xB0588f9A9cADe7CD5f194a5fe77AcD6A58250f82",

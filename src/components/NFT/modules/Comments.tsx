@@ -21,7 +21,6 @@ const Comments: FunctionComponent<CommentsProps> = ({
   const context = useContext(ModalContext);
   const router = useRouter();
   const animationContext = useContext(AnimationContext);
-
   return (
     <div
       className={`relative w-full font-nerd flex flex-col items-start justify-start gap-3 h-fit ${

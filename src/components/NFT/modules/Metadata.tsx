@@ -5,6 +5,7 @@ import Image from "next/legacy/image";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import descriptionRegex from "@/lib/helpers/descriptionRegex";
 import { ModalContext } from "@/app/providers";
+import { handleImage } from "@/lib/helpers/handleImage";
 
 const Metadata: FunctionComponent<MetadataProps> = ({
   metadata,
@@ -27,22 +28,14 @@ const Metadata: FunctionComponent<MetadataProps> = ({
               }`}
               onClick={() =>
                 context?.setImageView(
-                  `${INFURA_GATEWAY}/ipfs/${
-                    ((data as ImageMetadata)?.image?.item as string)?.split(
-                      "ipfs://"
-                    )?.[1]
-                  }`
+                  handleImage((data as ImageMetadata)?.image?.item)
                 )
               }
             >
               <Image
                 layout="fill"
                 className="rounded-sm"
-                src={`${INFURA_GATEWAY}/ipfs/${
-                  ((data as ImageMetadata)?.image?.item as string)?.split(
-                    "ipfs://"
-                  )?.[1]
-                }`}
+                src={handleImage((data as ImageMetadata)?.image?.item)}
                 objectFit="cover"
                 draggable={false}
               />

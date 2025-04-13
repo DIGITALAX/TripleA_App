@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.12.3",
-    "@lens-chain/sdk": "^0.0.0-canary-20250401091809",
+    "@lens-chain/sdk": "^1.0.3",
     "@lens-chain/storage-client": "^0.0.0-next-20250303153545",
     "@lens-protocol/client": "^0.0.0-canary-20250409200234",
     "@lens-protocol/metadata": "^2.0.0-next.7",

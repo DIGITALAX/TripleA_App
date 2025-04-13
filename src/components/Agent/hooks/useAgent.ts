@@ -23,10 +23,11 @@ import {
   follow,
   unfollow,
 } from "@lens-protocol/client/actions";
-import { ModalContext } from "@/app/providers";
+import { AnimationContext, ModalContext } from "@/app/providers";
 
 const useAgent = (id: string | undefined) => {
   const context = useContext(ModalContext);
+  const animationContext = useContext(AnimationContext)
   const [screen, setScreen] = useState<number>(0);
   const [agent, setAgent] = useState<Agent | undefined>();
   const [agentLoading, setAgentLoading] = useState<boolean>(false);
@@ -139,20 +140,20 @@ const useAgent = (id: string | undefined) => {
   ): Promise<Post[] | void> => {
     try {
       const postsRes = await fetchPosts(
-        context?.lensConnected?.sessionClient || context?.lensClient!,
+        context?.lensConnected?.sessionClient ?? context?.lensClient!,
         {
-          pageSize: PageSize.Fifty,
+          pageSize: PageSize.Ten,
           filter: {
-            authors: [agentInput ? agentInput : agent?.profile?.address],
+            // apps: [TRIPLE_A_APP],
+            authors: [agentInput  ?? agent?.profile?.address],
             metadata: {
               tags: {
-                oneOf: ["tripleA"],
+                all: ["tripleA"],
               },
             },
           },
         }
       );
-
       if (postsRes.isErr()) {
         return;
       }
@@ -424,7 +425,7 @@ const useAgent = (id: string | undefined) => {
             authors: [agent?.profile?.address],
             metadata: {
               tags: {
-                oneOf: ["tripleA"],
+                all: ["tripleA"],
               },
             },
 
@@ -463,7 +464,7 @@ const useAgent = (id: string | undefined) => {
   };
 
   useEffect(() => {
-    if (id && !agent && context?.lensClient) {
+    if (id && !agent && context?.lensClient && !animationContext?.pageChange) {
       handleAgent();
     }
   }, [id, context?.lensClient]);
