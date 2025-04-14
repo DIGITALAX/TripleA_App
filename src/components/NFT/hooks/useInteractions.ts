@@ -7,6 +7,8 @@ import {
   addReaction,
   post as createPost,
   repost,
+transferPrimitiveOwnership,
+
 } from "@lens-protocol/client/actions";
 import { textOnly } from "@lens-protocol/metadata";
 import { immutable } from "@lens-chain/storage-client";
