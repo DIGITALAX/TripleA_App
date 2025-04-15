@@ -9,6 +9,7 @@ import { AnimationContext } from "./providers";
 
 export default function Home() {
   const router = useRouter();
+
   const animationContext = useContext(AnimationContext);
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-4 tablet:px-10">

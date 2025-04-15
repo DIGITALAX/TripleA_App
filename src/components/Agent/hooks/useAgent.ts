@@ -11,7 +11,7 @@ import {
   PageSize,
   Post,
 } from "@lens-protocol/client";
-import {  useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getAgent } from "../../../../graphql/queries/getAgent";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import { getAgentRent } from "../../../../graphql/queries/getAgentRent";
@@ -27,7 +27,7 @@ import { AnimationContext, ModalContext } from "@/app/providers";
 
 const useAgent = (id: string | undefined) => {
   const context = useContext(ModalContext);
-  const animationContext = useContext(AnimationContext)
+  const animationContext = useContext(AnimationContext);
   const [screen, setScreen] = useState<number>(0);
   const [agent, setAgent] = useState<Agent | undefined>();
   const [agentLoading, setAgentLoading] = useState<boolean>(false);
@@ -144,13 +144,8 @@ const useAgent = (id: string | undefined) => {
         {
           pageSize: PageSize.Ten,
           filter: {
-            // apps: [TRIPLE_A_APP],
-            authors: [agentInput  ?? agent?.profile?.address],
-            metadata: {
-              tags: {
-                all: ["tripleA"],
-              },
-            },
+            authors: [agentInput ?? agent?.profile?.address],
+           
           },
         }
       );
@@ -184,6 +179,7 @@ const useAgent = (id: string | undefined) => {
       console.error(err.message);
     }
   };
+
 
   const handleAgent = async () => {
     if (!id) return;
@@ -423,13 +419,6 @@ const useAgent = (id: string | undefined) => {
           cursor: activityCursor,
           filter: {
             authors: [agent?.profile?.address],
-            metadata: {
-              tags: {
-                all: ["tripleA"],
-              },
-            },
-
-            // authors: [agent?.accountConnected],
           },
         }
       );

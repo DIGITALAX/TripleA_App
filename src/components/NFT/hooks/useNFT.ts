@@ -45,8 +45,8 @@ const useNFT = (id: string) => {
           filter: {
             metadata: {
               tags: {
-                all: [
-                  "tripleA",
+                oneOf: [
+                  // "tripleA",
                   (title ?? nft?.title?.replaceAll(" ", "")?.toLowerCase())!,
                 ]?.filter(Boolean),
               },
@@ -246,8 +246,8 @@ const useNFT = (id: string) => {
           filter: {
             metadata: {
               tags: {
-                all: [
-                  "tripleA",
+                oneOf: [
+                  // "tripleA",
                   nft?.title?.replaceAll(" ", "")?.toLowerCase()!,
                 ],
               },
@@ -272,8 +272,8 @@ const useNFT = (id: string) => {
             filter: {
               metadata: {
                 tags: {
-                  all: [
-                    "tripleA",
+                  oneOf: [
+                    // "tripleA",
                     nft?.title?.replaceAll(" ", "")?.toLowerCase()!,
                   ],
                 },
