@@ -15,23 +15,35 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
-  description: "",
-
+  description: "Everyone wins in this agent-to-earn story.",
   twitter: {
+    creator: "@emmajane1313",
     card: "summary_large_image",
     title: "TripleA",
     description: "Everyone wins in this agent-to-earn story.",
-    images: [
-      "https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut",
-    ],
   },
-
   openGraph: {
     title: "TripleA",
     description: "Everyone wins in this agent-to-earn story.",
-    images:
-      "https://thedial.infura-ipfs.io/ipfs/QmNQ5fe9Ruyy8LDMgJbxCnM8upSus1eNriqnKda31Wcsut",
   },
+  creator: "Emma-Jane MacKinnon-Lee",
+  publisher: "Emma-Jane MacKinnon-Lee",
+  keywords: [
+    "Web3",
+    "Web3 Fashion",
+    "Moda Web3",
+    "Open Source",
+    "CC0",
+    "Emma-Jane MacKinnon-Lee",
+    "Open Source LLMs",
+    "DIGITALAX",
+    "F3Manifesto",
+    "www.digitalax.xyz",
+    "www.f3manifesto.xyz",
+    "Women",
+    "Life",
+    "Freedom",
+  ],
 };
 
 export default function RootLayout({
