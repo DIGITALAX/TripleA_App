@@ -352,13 +352,14 @@ export default function Agent() {
                 </>
               ) : screen == 1 ? (
                 <div className="relative w-full gap-3 flex flex-col h-full justify-between">
-                  <div className="relative w-full h-[20rem] overflow-y-scroll">
+                  <div className="relative w-full h-[20rem] overflow-y-scroll" id="target">
                     <InfiniteScroll
                       dataLength={agent?.activity?.length || 1}
                       next={handleMoreActivity}
                       hasMore={hasMore}
                       loader={<div key={0} />}
                       className="relative w-full"
+                      scrollableTarget="target"
                     >
                       <Comments
                         comments={agent?.activity || []}
