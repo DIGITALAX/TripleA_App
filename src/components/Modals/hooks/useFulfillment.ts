@@ -32,7 +32,7 @@ const useFulfillment = (
     zip: "",
   });
   const client = new LitNodeClient({
-    litNetwork: LIT_NETWORK.DatilDev,
+    litNetwork: LIT_NETWORK.Datil,
     debug: false,
   });
 
