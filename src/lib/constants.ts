@@ -1,6 +1,6 @@
 export const INFURA_GATEWAY: string = "https://thedial.infura-ipfs.io";
 export const GROVE_GATEWAY: string = "https://api.grove.storage/";
-
+export const INFURA_GATEWAY_INTERNAL: string = "https://triplea.agentmeme.xyz/infura/api/";
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;
 export const MONA: `0x${string}` = "0x28547B5b6B405A1444A17694AC84aa2d6A03b3Bd";
 export const AGENTS_CONTRACT: `0x${string}` =

@@ -6,7 +6,6 @@ import useNFT from "@/components/NFT/hooks/useNFT";
 import Data from "@/components/NFT/modules/Data";
 import Purchase from "@/components/NFT/modules/Purchase";
 import { useParams } from "next/navigation";
-import { useContext } from "react";
 
 export default function NFT() {
   const id = useParams();

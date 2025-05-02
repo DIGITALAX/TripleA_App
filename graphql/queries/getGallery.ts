@@ -3,11 +3,7 @@ import { FetchResult, gql } from "@apollo/client";
 
 const COLLECTIONS_AGENT = gql`
   query ($skip: Int!, $isAgent: Boolean!) {
-    collectionCreateds(
-      first: 10
-      skip: $skip
-      where: { isAgent: $isAgent }
-    ) {
+    collectionCreateds(first: 10, skip: $skip, where: { isAgent: $isAgent }) {
       id
       artist
       collectionId
@@ -61,6 +57,20 @@ const COLLECTIONS = gql`
         token
       }
       blockTimestamp
+    }
+  }
+`;
+
+const ALL_COLLECTIONS = gql`
+  query {
+    collectionCreateds {
+      artist
+      uri
+      collectionId
+      metadata {
+        title
+        image
+      }
     }
   }
 `;
@@ -155,6 +165,31 @@ export const getCollectionsArtistNot = async (
   const queryPromise = aaaClient.query({
     query: COLLECTIONS_ARTIST_NOT,
     variables: { artist },
+    fetchPolicy: "no-cache",
+    errorPolicy: "all",
+  });
+
+  const timeoutPromise = new Promise((resolve) => {
+    timeoutId = setTimeout(() => {
+      resolve({ timedOut: true });
+    }, 60000);
+  });
+
+  const result: any = await Promise.race([queryPromise, timeoutPromise]);
+
+  timeoutId && clearTimeout(timeoutId);
+
+  if (result.timedOut) {
+    return;
+  } else {
+    return result;
+  }
+};
+
+export const getAllCollections = async (): Promise<FetchResult | void> => {
+  let timeoutId: NodeJS.Timeout | undefined;
+  const queryPromise = aaaClient.query({
+    query: ALL_COLLECTIONS,
     fetchPolicy: "no-cache",
     errorPolicy: "all",
   });

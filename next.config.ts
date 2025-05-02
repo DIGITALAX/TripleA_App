@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         hostname: "thedial.infura-ipfs.io",
         pathname: "/ipfs/**",
       },
+      {
+        protocol: "https",
+        hostname: "triplea.agentmeme.xyz",
+        pathname: "/api/infura/**",
+      },
     ],
     unoptimized: true,
   },
@@ -33,7 +38,10 @@ const nextConfig: NextConfig = {
       headers: { key: string; value: string }[];
     }[] = [];
 
-    const allowedOrigins = ["https://thedial.infura-ipfs.io"];
+    const allowedOrigins = [
+      "https://thedial.infura-ipfs.io",
+      "https://triplea.agentmeme.xyz",
+    ];
     allowedOrigins.forEach((origin) => {
       headersConfig.push({
         source: "/(.*)",

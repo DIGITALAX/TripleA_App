@@ -3,7 +3,7 @@ import { FetchResult, gql } from "@apollo/client";
 
 const AGENTS = gql`
   query {
-    agentCreateds(first: 50) {
+    agentCreateds(first: 1000) {
       metadata {
         title
         style
