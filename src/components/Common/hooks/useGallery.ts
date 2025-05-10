@@ -76,6 +76,8 @@ const useGallery = (choice: string) => {
         })
       );
 
+      console.log({gallery})
+
       setPage(gallery?.length == 10 ? 10 : 0);
       setHasMore(gallery?.length == 10 ? true : false);
       setNfts(gallery?.sort(() => Math.random() - 0.5));
@@ -136,7 +138,7 @@ const useGallery = (choice: string) => {
           const profile = profileCache.get(artistAddress);
 
           return {
-            id: collection?.id,
+            id: collection?.collectionId,
             image: collection?.metadata?.image,
             title: collection?.metadata?.title,
             description: collection?.metadata?.description,

@@ -65,9 +65,9 @@ export async function GET() {
 
       return `
       <url>
-        <loc>${baseUrl}/nft/${username}/${coll.collectionId}</loc>
+        <loc>${baseUrl}/nft/${username}/${coll.collectionId}/</loc>
         <image:image>
-          <image:loc>${INFURA_GATEWAY_INTERNAL}${image}</image:loc>
+          <image:loc>${INFURA_GATEWAY_INTERNAL}${image}/</image:loc>
           <image:title><![CDATA[${rawTitle} | TripleA | DIGITALAX]]></image:title>
           <image:caption><![CDATA[${rawTitle} | TripleA | DIGITALAX]]></image:caption>
         </image:image>
@@ -87,20 +87,20 @@ export async function GET() {
       </url>
 
            <url>
-        <loc>${baseUrl}/gallery</loc>
+        <loc>${baseUrl}/gallery/</loc>
       </url>
 
              <url>
-        <loc>${baseUrl}/agents</loc>
+        <loc>${baseUrl}/agents/</loc>
       </url>
 
              <url>
-        <loc>${baseUrl}/agent-payouts</loc>
+        <loc>${baseUrl}/agent-payouts/</loc>
       </url>
     
       ${Array.from({ length: 35 }).map(
         (_, index) => `<url>
-        <loc>${baseUrl}/agent/${index + 1}</loc>
+        <loc>${baseUrl}/agent/${index + 1}/</loc>
       </url>`
       )}
       ${collectionsXml.join("")}

@@ -89,6 +89,7 @@ const useNFT = (id: string) => {
   const handleNFT = async () => {
     setNftLoading(true);
     try {
+  
       const collData = await getCollection(Number(id));
 
       let collection = collData?.data?.collectionCreateds?.[0];
@@ -199,7 +200,7 @@ const useNFT = (id: string) => {
       }
 
       setNft({
-        id: Number(collection?.id),
+        id: Number(collection?.collectionId),
         image: collection?.metadata?.image,
         title: collection?.metadata?.title,
         description: collection?.metadata?.description,
@@ -343,7 +344,7 @@ const useNFT = (id: string) => {
           }
 
           return {
-            id: Number(col?.id),
+            id: Number(col?.collectionId),
             image: col?.metadata?.image,
             artist: col?.artist,
             profile: result.value.items?.[0]?.account,

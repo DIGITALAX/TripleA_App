@@ -114,7 +114,7 @@ export default function Agents() {
         content={
           moreArt?.map((col) => ({
             cover: col?.image!,
-            id: col?.id.toString(),
+            id: col?.id?.toString(),
             username: col?.profile?.username?.value?.split("lens/")?.[1]!,
           }))!
         }
