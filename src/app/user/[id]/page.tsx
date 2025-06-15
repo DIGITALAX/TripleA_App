@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimationContext } from "@/app/providers";
+import { AnimationContext } from "@/providers";
 import { DropInterface } from "@/components/Dashboard/types/dashboard.types";
 import useUser from "@/components/User/hooks/useUser";
 import UserInfo from "@/components/User/modules/UserInfo";

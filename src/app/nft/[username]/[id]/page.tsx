@@ -1,6 +1,6 @@
 "use client";
 
-import { ModalContext } from "@/app/providers";
+import { ModalContext } from "@/providers";
 import MiniGallery from "@/components/Common/modules/MiniGallery";
 import useNFT from "@/components/NFT/hooks/useNFT";
 import Data from "@/components/NFT/modules/Data";

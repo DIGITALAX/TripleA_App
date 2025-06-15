@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimationContext, ModalContext } from "@/app/providers";
+import { AnimationContext, ModalContext } from "@/providers";
 import useAgent from "@/components/Agent/hooks/useAgent";
 import useRecharge from "@/components/Agent/hooks/useRecharge";
 import MiniGallery from "@/components/Common/modules/MiniGallery";

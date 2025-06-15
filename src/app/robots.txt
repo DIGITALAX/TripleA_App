@@ -2,3 +2,4 @@ User-Agent: *
 Allow: /
 
 Sitemap: https://triplea.agentmeme.xyz/sitemap.xml
+Sitemap: https://triplea.agentmeme.xyz/image-sitemap.xml
