@@ -60,6 +60,7 @@ const MiniGallery: FunctionComponent<MiniGalleryProps> = ({
                         className="relative cursor-canP flex w-56 h-56 rounded-md bg-pink p-4"
                         onClick={() => {
                           animationContext?.setPageChange?.(true);
+
                           router.prefetch(
                             route
                               ? `/agent/${item?.id}`

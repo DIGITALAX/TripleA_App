@@ -10,6 +10,7 @@ const COLLECTION_ARTIST = gql`
       orderBy: blockTimestamp
     ) {
       artist
+      collectionId
       metadata {
         image
         title

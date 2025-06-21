@@ -11,7 +11,6 @@ export default function Gallery() {
   const context = useContext(ModalContext);
   const [openChoice, setOpenChoice] = useState<boolean>(false);
   const [choice, setChoice] = useState<string>("All Minted");
-
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-3 sm:px-10 gap-24">
       <div className="relative w-full h-fit flex flex-col xl:flex-row justify-between xl:items-start items-end gap-6">

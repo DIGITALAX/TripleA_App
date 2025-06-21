@@ -81,6 +81,7 @@ const COLLECTIONS_ARTIST = gql`
       artist
       id
       uri
+      collectionId
       metadata {
         image
       }
@@ -94,6 +95,7 @@ const COLLECTIONS_ARTIST_NOT = gql`
       artist
       id
       uri
+      collectionId
       metadata {
         image
       }

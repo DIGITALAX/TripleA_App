@@ -20,7 +20,6 @@ export default function NFT() {
     moreCollections,
     moreCollectionsLoading,
   } = useNFT(id?.id as string);
-
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-3 sm:px-10 gap-24">
       <div className="relative w-full h-[60rem] md:h-[40rem] flex flex-col md:flex-row items-center justify-between gap-4 pb-10 xl:px-6 pt-6">
