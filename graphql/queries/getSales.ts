@@ -1,4 +1,4 @@
-import { aaaClient } from "@/lib/graph/client";
+import { aaaClient ,graphTripleServer } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const SALES = gql`
@@ -31,7 +31,7 @@ const SALES = gql`
 
 export const getSales = async (artist: string): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: SALES,
     variables: { artist },
     fetchPolicy: "no-cache",

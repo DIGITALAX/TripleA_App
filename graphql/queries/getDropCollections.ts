@@ -1,4 +1,4 @@
-import { aaaClient } from "@/lib/graph/client";
+import { aaaClient ,graphTripleServer } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const DROP_COLLECTIONS = gql`
@@ -30,7 +30,7 @@ export const getDropCollections = async (
   skip: number
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: DROP_COLLECTIONS,
     variables: { artist, skip },
     fetchPolicy: "no-cache",

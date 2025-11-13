@@ -1,4 +1,4 @@
-import { aaaClient } from "@/lib/graph/client";
+import { aaaClient ,graphTripleServer } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const DEV_TREASURY_PAID = gql`
@@ -24,7 +24,7 @@ export const getDevTreasuryPaid = async (
   skip: number
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: DEV_TREASURY_PAID,
     variables: {
       skip,

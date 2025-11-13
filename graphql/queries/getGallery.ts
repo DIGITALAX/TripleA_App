@@ -1,4 +1,4 @@
-import { aaaClient } from "@/lib/graph/client";
+import { aaaClient ,graphTripleServer} from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const COLLECTIONS_AGENT = gql`
@@ -108,7 +108,7 @@ export const getCollections = async (
   isAgent?: boolean
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: isAgent !== undefined ? COLLECTIONS_AGENT : COLLECTIONS,
     variables: isAgent !== undefined ? { skip, isAgent } : { skip },
     fetchPolicy: "no-cache",
@@ -136,7 +136,7 @@ export const getCollectionsArtist = async (
   artist: string
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: COLLECTIONS_ARTIST,
     variables: { artist },
     fetchPolicy: "no-cache",
@@ -164,7 +164,7 @@ export const getCollectionsArtistNot = async (
   artist: string
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: COLLECTIONS_ARTIST_NOT,
     variables: { artist },
     fetchPolicy: "no-cache",
@@ -190,7 +190,7 @@ export const getCollectionsArtistNot = async (
 
 export const getAllCollections = async (): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: ALL_COLLECTIONS,
     fetchPolicy: "no-cache",
     errorPolicy: "all",

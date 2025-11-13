@@ -1,4 +1,4 @@
-import { aaaClient } from "@/lib/graph/client";
+import { aaaClient ,graphTripleServer } from "@/lib/graph/client";
 import { FetchResult, gql } from "@apollo/client";
 
 const AGENT = gql`
@@ -69,12 +69,12 @@ const AGENT = gql`
     }
   }
 `;
-
+ 
 export const getAgent = async (
   SkyhuntersAgentManager_id: number
 ): Promise<FetchResult | void> => {
   let timeoutId: NodeJS.Timeout | undefined;
-  const queryPromise = aaaClient.query({
+  const queryPromise = (typeof window === "undefined" ? graphTripleServer : aaaClient).query({
     query: AGENT,
     variables: {
       SkyhuntersAgentManager_id,
