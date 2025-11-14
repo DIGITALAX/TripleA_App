@@ -956,7 +956,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
               </div>
               {agentDetails.modelsOpen && !createAgentLoading && (
                 <div className="absolute top-16 left-0 bg-windows w-full h-fit flex flex-col rounded-md z-40 border border-white cursor-canP text-viol">
-                  {["llama-3.3-70b", "dolphin-2.9.2-qwen2-72b"].map(
+                  {["llama-3.3-70b", "llama-3.1-70b"].map(
                     (model, index) => {
                       return (
                         <div
