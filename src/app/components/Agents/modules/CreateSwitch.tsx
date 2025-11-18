@@ -11,6 +11,7 @@ import { IoAddCircle } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
 import { INFURA_GATEWAY } from "@/lib/constants";
 import { downloadEliza } from "@/lib/helpers/downloadEliza";
+import { downloadAgentConfig } from "@/lib/helpers/downloadAgentConfig";
 
 const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
   createSwitcher,
@@ -42,37 +43,80 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
     setFeed,
     addFeedRule,
     feedAdminLoading,
+    agentWallet,
+    agentAccountAddress,
+    coverCid,
   } = useCreateAgent(publicClient, address, setCreateSwitcher);
   switch (createSwitcher) {
     case CreateSwitcher.Success:
       return (
-        <div className="relative w-full h-full flex flex-col gap-8 text-windows items-center justify-center">
+        <div className="relative w-full h-full flex flex-col gap-8 text-windows items-center justify-center font-nerd">
           <div className="relative flex w-fit h-10 text-center font-start uppercase text-3xl">
             Created!
           </div>
+          <div
+            className={`relative w-1/2 h-fit rounded-md flex items-center justify-center text-windows text-center`}
+          >
+            Your agent is fully yours, self hosted on your own machine. Download
+            your agent config to spin up your local server.
+          </div>
           <div className="relative text-sm font-nerd w-full h-fit flex items-center justify-center flex-col gap-3">
-            <div className="relative w-fit h-fit flex">
-              <div className="relative w-7 h-7 rounded-full border border-windows">
-                <Image
-                  draggable={false}
-                  layout="fill"
-                  className="rounded-full"
-                  src={`${INFURA_GATEWAY}/ipfs/QmRGFsZ5Qg6WWKo3761WdwGSoqbDD1ZR9zVV95CTaomqdU`}
-                  objectFit="cover"
-                />
-              </div>
-            </div>
             <div
-              className={`relative w-1/2 h-fit rounded-md flex items-center justify-center text-windows text-center`}
+              className={`relative w-fit h-fit cursor-canP hover:opacity-70 text-base rounded-md flex items-center justify-center text-xxs px-1 text-windows border border-windows`}
+              onClick={() =>
+                agentWallet &&
+                id &&
+                agentAccountAddress &&
+                coverCid &&
+                downloadAgentConfig(
+                  Number(id),
+                  agentWallet.privateKey,
+                  agentWallet.address,
+                  agentAccountAddress,
+                  agentDetails.title,
+                  agentDetails.bio,
+                  agentDetails.lore,
+                  agentDetails.knowledge,
+                  agentDetails.adjectives,
+                  agentDetails.style,
+                  agentDetails.messageExamples,
+                  "ipfs://" + coverCid,
+                  agentDetails.customInstructions
+                )
+              }
             >
-              Your agent is fully yours. Use it seamlessly with ElizaOS—
-              download the character sheet here, test it out, and refine it as
-              needed.
-              <br />
-              <br />
-              Don't forget to explore the Coin Op, TripleA Remix, and Airdrop
-              Hunter plugins for even more functionality!
+              Download Agent Config
             </div>
+            <div className="relative w-3/4 h-fit rounded-md flex items-center justify-center text-windows text-center text-xxs">
+              Follow server setup{" "}
+              <a
+                href="https://github.com/DIGITALAX/triplea-local-agent"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:opacity-70 ml-1"
+              >
+                here
+              </a>
+            </div>
+          </div>
+          <div className="relative w-fit h-fit flex">
+            <div className="relative w-7 h-7 rounded-full border border-windows">
+              <Image
+                draggable={false}
+                layout="fill"
+                className="rounded-full"
+                src={`${INFURA_GATEWAY}/ipfs/QmRGFsZ5Qg6WWKo3761WdwGSoqbDD1ZR9zVV95CTaomqdU`}
+                objectFit="cover"
+              />
+            </div>
+          </div>
+          <div
+            className={`relative w-1/2 h-fit rounded-md flex items-center justify-center text-windows text-center`}
+          >
+            Use it seamlessly with ElizaOS— download the character sheet here,
+            test it out, and refine it as needed.
+          </div>
+          <div className="relative w-full h-fit flex flex-col gap-2 items-center justify-center">
             <div
               className={`relative w-fit h-fit cursor-canP hover:opacity-70 text-base rounded-md flex items-center justify-center text-xxs px-1 text-windows border border-windows`}
               onClick={() =>
@@ -87,7 +131,7 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
                 )
               }
             >
-              Download
+              Download Character Sheet
             </div>
           </div>
           <div className="relative w-full h-fit flex items-center justify-center">
@@ -956,27 +1000,25 @@ const CreateSwitch: FunctionComponent<CreateSwitchProps> = ({
               </div>
               {agentDetails.modelsOpen && !createAgentLoading && (
                 <div className="absolute top-16 left-0 bg-windows w-full h-fit flex flex-col rounded-md z-40 border border-white cursor-canP text-viol">
-                  {["llama-3.3-70b", "llama-3.1-70b"].map(
-                    (model, index) => {
-                      return (
-                        <div
-                          key={index}
-                          className={`relative w-full h-fit flex text-center items-center justify-center p-1 hover:opacity-50 ${
-                            index > 0 && "border-t border-white"
-                          }`}
-                          onClick={() =>
-                            setAgentDetails({
-                              ...agentDetails,
-                              model,
-                              modelsOpen: false,
-                            })
-                          }
-                        >
-                          {model}
-                        </div>
-                      );
-                    }
-                  )}
+                  {["llama-3.3-70b", "llama-3.1-70b"].map((model, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className={`relative w-full h-fit flex text-center items-center justify-center p-1 hover:opacity-50 ${
+                          index > 0 && "border-t border-white"
+                        }`}
+                        onClick={() =>
+                          setAgentDetails({
+                            ...agentDetails,
+                            model,
+                            modelsOpen: false,
+                          })
+                        }
+                      >
+                        {model}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
               <div className="relative w-fit h-fit flex items-start justify-start text-windows">

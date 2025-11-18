@@ -14,7 +14,6 @@ import {
 } from "@lens-protocol/client";
 import pollResult from "@/lib/helpers/pollResult";
 import { Wallet, HDNodeWallet, JsonRpcProvider } from "ethers";
-import forge from "node-forge";
 import {
   createAccountWithUsername,
   createFeed,
@@ -50,6 +49,7 @@ const useCreateAgent = (
   const [agentAccountAddress, setAgentAccountAddress] = useState<
     string | undefined
   >();
+  const [coverCid, setCoverCid] = useState<string | undefined>();
   const [agentDetails, setAgentDetails] = useState<AgentDetails>({
     title: "",
     cover: undefined,
@@ -329,6 +329,7 @@ const useCreateAgent = (
       }
 
       const responseImageJSON = await responseImage.json();
+      setCoverCid(responseImageJSON.cid);
 
       const response = await fetch("/api/ipfs", {
         method: "POST",
@@ -407,54 +408,54 @@ const useCreateAgent = (
         })
         .filter((event) => event !== null);
 
-      const responsePublicKey = await fetch("/api/public-key");
-      const { publicKey } = await responsePublicKey.json();
+      // const responsePublicKey = await fetch("/api/public-key");
+      // const { publicKey } = await responsePublicKey.json();
 
-      const rsaPublicKey = forge.pki.publicKeyFromPem(publicKey);
-      const encryptedPrivateKey = forge.util.encode64(
-        rsaPublicKey.encrypt(agentWallet.privateKey, "RSA-OAEP")
-      );
+      // const rsaPublicKey = forge.pki.publicKeyFromPem(publicKey);
+      // const encryptedPrivateKey = forge.util.encode64(
+      //   rsaPublicKey.encrypt(agentWallet.privateKey, "RSA-OAEP")
+      // );
 
-      const responseKey = await fetch("/api/encrypt", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          encryptedPrivateKey,
-        }),
-      });
+      // const responseKey = await fetch("/api/encrypt", {
+      //   method: "POST",
+      //   headers: {
+      //     "content-type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     encryptedPrivateKey,
+      //   }),
+      // });
 
-      let responseKeyJSON = await responseKey.json();
+      // let responseKeyJSON = await responseKey.json();
 
-      const data = {
-        publicAddress: agentWallet.address,
-        encryptionDetails: responseKeyJSON.encryptionDetails,
-        id: agentId,
-        title: agentDetails.title,
-        bio: agentDetails.bio,
-        lore: agentDetails.lore,
-        knowledge: agentDetails.knowledge,
-        adjectives: agentDetails.adjectives,
-        style: agentDetails.style,
-        messageExamples: agentDetails.messageExamples,
-        cover: "ipfs://" + responseImageJSON.cid,
-        customInstructions: agentDetails.customInstructions,
-        accountAddress: agentAccountAddress,
-      };
+      // const data = {
+      //   publicAddress: agentWallet.address,
+      //   // encryptionDetails: responseKeyJSON.encryptionDetails,
+      //   id: agentId,
+      //   title: agentDetails.title,
+      //   bio: agentDetails.bio,
+      //   lore: agentDetails.lore,
+      //   knowledge: agentDetails.knowledge,
+      //   adjectives: agentDetails.adjectives,
+      //   style: agentDetails.style,
+      //   messageExamples: agentDetails.messageExamples,
+      //   cover: "ipfs://" + responseImageJSON.cid,
+      //   customInstructions: agentDetails.customInstructions,
+      //   accountAddress: agentAccountAddress,
+      // };
 
-      const newSocket = new WebSocket(
-        // `ws://127.0.0.1:10000?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
-        `wss://triplea-66ij.onrender.com?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
-      );
+      // const newSocket = new WebSocket(
+      //   // `ws://127.0.0.1:10000?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
+      //   `wss://triplea-66ij.onrender.com?key=${process.env.NEXT_PUBLIC_RENDER_KEY}`
+      // );
 
-      newSocket.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
+      // newSocket.onerror = (error) => {
+      //   console.error("WebSocket error:", error);
+      // };
 
-      newSocket.onopen = () => {
-        newSocket.send(JSON.stringify(data));
-      };
+      // newSocket.onopen = () => {
+      //   newSocket.send(JSON.stringify(data));
+      // };
       setCreateSwitcher(CreateSwitcher.Success);
     } catch (err: any) {
       console.error(err.message);
@@ -638,6 +639,8 @@ const useCreateAgent = (
     setFeed,
     addFeedRule,
     feedAdminLoading,
+    agentAccountAddress,
+    coverCid,
   };
 };
 
