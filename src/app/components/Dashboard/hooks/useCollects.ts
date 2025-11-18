@@ -1,26 +1,29 @@
 import { useContext, useEffect, useState } from "react";
-import { CollectionType, Order } from "../types/dashboard.types";
+import { CollectionType, EncryptedData, Order } from "../types/dashboard.types";
 import { getOrders } from "./../../../../../graphql/queries/getOrders";
 import { Account, evmAddress } from "@lens-protocol/client";
-import { MARKET_CONTRACT } from "@/lib/constants";
 import {
-  checkAndSignAuthMessage,
-  LitNodeClient,
-  uint8arrayFromString,
-  uint8arrayToString,
-} from "@lit-protocol/lit-node-client";
+  DIGITALAX_ADDRESS,
+  DIGITALAX_PUBLIC_KEY,
+  MARKET_CONTRACT,
+} from "@/lib/constants";
 import { chains } from "@lens-chain/sdk/viem";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
-import { LIT_NETWORK } from "@lit-protocol/constants";
 import { ModalContext } from "@/providers";
+import {
+  decryptData,
+  encryptForMultipleRecipients,
+  getPublicKeyFromSignature,
+} from "@/lib/helpers/encryption";
 
 const useCollects = (
   address: `0x${string}` | undefined,
   publicClient: PublicClient
 ) => {
   const context = useContext(ModalContext);
+  const [privateKey, setPrivateKey] = useState<string | null>(null);
   const [collectsLoading, setCollectsLoading] = useState<boolean>(false);
   const [allCollects, setAllCollects] = useState<Order[]>([]);
   const [fulfillmentOpen, setFulfillmentOpen] = useState<boolean[]>([]);
@@ -40,10 +43,6 @@ const useCollects = (
   const [fulfillmentEncrypted, setFulfillmentEncrypted] = useState<string[]>(
     []
   );
-  const client = new LitNodeClient({
-    litNetwork: LIT_NETWORK.Datil,
-    debug: false,
-  });
 
   const handleCollects = async () => {
     if (!address) return;
@@ -135,24 +134,32 @@ const useCollects = (
     try {
       const encrypted = await JSON.parse(allCollects?.[index].fulfillment);
 
-      let nonce = await client.getLatestBlockhash();
-      const authSig = await checkAndSignAuthMessage({
-        chain: "polygon",
-        nonce: nonce!,
-      });
-      await client.connect();
+      let key = privateKey;
 
-      const { decryptedData } = await client.decrypt({
-        dataToEncryptHash: encrypted.dataToEncryptHash,
-        accessControlConditions: encrypted.accessControlConditions,
-        chain: encrypted.chain,
-        ciphertext: encrypted.ciphertext,
-        authSig,
-      });
+      if (!key) {
+        const promptMessage =
+          "Enter your wallet private key to decrypt your fulfillment details.\n\nThis interface is fully open source, runs entirely in your browser, and never stores your key. Make sure you are in a secure environment before entering it.";
+        const promptValue = window.prompt(promptMessage);
 
-      const fulfillmentDetails = await JSON.parse(
-        uint8arrayToString(decryptedData)
+        if (!promptValue) {
+          return;
+        }
+
+        key = promptValue.trim();
+
+        if (!key.startsWith("0x")) {
+          key = `0x${key}`;
+        }
+
+        setPrivateKey(key);
+      }
+
+      const fulfillmentDetails = await decryptData(
+        encrypted as EncryptedData,
+        key,
+        address!
       );
+
       setFulfillmentInfo((prev) => {
         let arr = [...prev];
         arr[index] = {
@@ -201,63 +208,51 @@ const useCollects = (
       return arr;
     });
     try {
-      let nonce = await client.getLatestBlockhash();
-      await checkAndSignAuthMessage({
-        chain: "polygon",
-        nonce: nonce!,
+      const clientWallet = createWalletClient({
+        chain: chains.mainnet,
+        transport: custom((window as any).ethereum),
       });
-      await client.connect();
 
-      const accessControlConditions = [
-        {
-          contractAddress: "",
-          standardContractType: "",
-          chain: "polygon",
-          method: "",
-          parameters: [":userAddress"],
-          returnValueTest: {
-            comparator: "=",
-            value: address?.toLowerCase(),
-          },
-        },
-        { operator: "or" },
-        {
-          contractAddress: "",
-          standardContractType: "",
-          chain: "polygon",
-          method: "",
-          parameters: [":userAddress"],
-          returnValueTest: {
-            comparator: "=",
-            value: allCollects?.[index]?.fulfiller?.toLowerCase(),
-          },
-        },
-      ];
-
-      const { ciphertext, dataToEncryptHash } = await client.encrypt({
-        accessControlConditions,
-        dataToEncrypt: uint8arrayFromString(
-          JSON.stringify({
-            color: allCollects?.[index].fulfillmentDetails?.color,
-            size: allCollects?.[index].fulfillmentDetails?.size,
-            name: fulfillmentInfo?.[index].name,
-            address: fulfillmentInfo?.[index].address,
-            zip: fulfillmentInfo?.[index].zip,
-            country: fulfillmentInfo?.[index].country,
-            state: fulfillmentInfo?.[index].state,
-          })
-        ),
+      const message = "Sign this message to encrypt your fulfillment details";
+      const signature = await clientWallet.signMessage({
+        account: address!,
+        message,
       });
+
+      const buyerPublicKey = await getPublicKeyFromSignature(
+        message,
+        signature
+      );
+
+      const encryptedData = await encryptForMultipleRecipients(
+        {
+          color: allCollects?.[index].fulfillmentDetails?.color,
+          size: allCollects?.[index].fulfillmentDetails?.size,
+          name: fulfillmentInfo?.[index].name,
+          address: fulfillmentInfo?.[index].address,
+          zip: fulfillmentInfo?.[index].zip,
+          country: fulfillmentInfo?.[index].country,
+          state: fulfillmentInfo?.[index].state,
+        },
+        [
+          { address: address!, publicKey: buyerPublicKey },
+          { address: DIGITALAX_ADDRESS, publicKey: DIGITALAX_PUBLIC_KEY },
+        ]
+      );
+
+      const ipfsRes = await fetch("/api/ipfs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(encryptedData),
+      });
+      const json = await ipfsRes.json();
 
       setFulfillmentEncrypted((prev) => {
         let arr = [...prev];
 
-        arr[index] = JSON.stringify({
-          ciphertext,
-          dataToEncryptHash,
-          chain: "polygon",
-          accessControlConditions,
-        });
+        arr[index] = "ipfs://" + json?.cid;
 
         return arr;
       });

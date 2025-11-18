@@ -18,6 +18,12 @@ export const AGENT_FEED_RULE: `0x${string}` =
 export const ZERO_ADDRESS: `0x${string}` =
   "0x0000000000000000000000000000000000000000";
 
+export const DIGITALAX_ADDRESS: `0x${string}` =
+  "0xdd35935c12e3748704c96492e5565d34dae73de7";
+
+export const DIGITALAX_PUBLIC_KEY: string =
+  "0x04d9824e95252fda536edb1e80797e5ba885d2a98e1a6d880ab9ccbe050aa850c8d0fdb95f347256c907468b74e058181b14edc8acb3f3b178f2b7946bb9170ebe";
+
 export const TOKENS: { symbol: string; contract: string; image: string }[] = [
   {
     symbol: "WGHO",

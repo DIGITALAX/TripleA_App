@@ -1,15 +1,17 @@
-import { MARKET_CONTRACT } from "@/lib/constants";
+import {
+  DIGITALAX_ADDRESS,
+  DIGITALAX_PUBLIC_KEY,
+  MARKET_CONTRACT,
+} from "@/lib/constants";
 import { chains } from "@lens-chain/sdk/viem";
 import { useContext, useState } from "react";
 import { createWalletClient, custom, PublicClient } from "viem";
 import MarketAbi from "@abis/MarketAbi.json";
-import {
-  checkAndSignAuthMessage,
-  LitNodeClient,
-  uint8arrayFromString,
-} from "@lit-protocol/lit-node-client";
-import { LIT_NETWORK } from "@lit-protocol/constants";
 import { ModalContext } from "@/providers";
+import {
+  encryptForMultipleRecipients,
+  getPublicKeyFromSignature,
+} from "@/lib/helpers/encryption";
 
 const useFulfillment = (
   address: `0x${string}` | undefined,
@@ -30,10 +32,6 @@ const useFulfillment = (
     state: "",
     country: "",
     zip: "",
-  });
-  const client = new LitNodeClient({
-    litNetwork: LIT_NETWORK.Datil,
-    debug: false,
   });
 
   const handlePurchase = async () => {
@@ -103,62 +101,48 @@ const useFulfillment = (
       return;
     setPurchaseLoading(true);
     try {
-      let nonce = await client.getLatestBlockhash();
-      await checkAndSignAuthMessage({
-        chain: "polygon",
-        nonce: nonce!,
-      });
-      await client.connect();
-
-      const accessControlConditions = [
-        {
-          contractAddress: "",
-          standardContractType: "",
-          chain: "polygon",
-          method: "",
-          parameters: [":userAddress"],
-          returnValueTest: {
-            comparator: "=",
-            value: address?.toLowerCase(),
-          },
-        },
-        { operator: "or" },
-        {
-          contractAddress: "",
-          standardContractType: "",
-          chain: "polygon",
-          method: "",
-          parameters: [":userAddress"],
-          returnValueTest: {
-            comparator: "=",
-            value: context?.fulfillmentOpen?.fulfiller?.toLowerCase(),
-          },
-        },
-      ];
-
-      const { ciphertext, dataToEncryptHash } = await client.encrypt({
-        accessControlConditions,
-        dataToEncrypt: uint8arrayFromString(
-          JSON.stringify({
-            color: context?.fulfillmentOpen?.color,
-            size: context?.fulfillmentOpen?.size,
-            name: fulfillmentInfo.name,
-            address: fulfillmentInfo.address,
-            zip: fulfillmentInfo.zip,
-            country: fulfillmentInfo.country,
-            state: fulfillmentInfo.state,
-          })
-        ),
+      const clientWallet = createWalletClient({
+        chain: chains.mainnet,
+        transport: custom((window as any).ethereum),
       });
 
-      setFulfillmentEncrypted(
-        JSON.stringify({
-          ciphertext,
-          dataToEncryptHash,
-          chain: "polygon",
-          accessControlConditions,
-        })
+      const message = "Sign this message to encrypt your fulfillment details";
+      const signature = await clientWallet.signMessage({
+        account: address!,
+        message,
+      });
+
+      const buyerPublicKey = await getPublicKeyFromSignature(
+        message,
+        signature
       );
+
+      const encryptedData = await encryptForMultipleRecipients(
+        {
+          color: context?.fulfillmentOpen?.color,
+          size: context?.fulfillmentOpen?.size,
+          name: fulfillmentInfo.name,
+          address: fulfillmentInfo.address,
+          zip: fulfillmentInfo.zip,
+          country: fulfillmentInfo.country,
+          state: fulfillmentInfo.state,
+        },
+        [
+          { address: address!, publicKey: buyerPublicKey },
+          { address: DIGITALAX_ADDRESS, publicKey: DIGITALAX_PUBLIC_KEY },
+        ]
+      );
+
+      const ipfsRes = await fetch("/api/ipfs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(encryptedData),
+      });
+      const json = await ipfsRes.json();
+
+      setFulfillmentEncrypted(JSON.stringify("ipfs://" + json?.cid));
     } catch (err: any) {
       console.error(err.message);
     }

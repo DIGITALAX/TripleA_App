@@ -14,8 +14,6 @@
     "@lens-chain/storage-client": "^1.0.4",
     "@lens-protocol/client": "^0.0.0-canary-20250409200234",
     "@lens-protocol/metadata": "^2.0.0-next.7",
-    "@lit-protocol/lit-node-client": "^7.0.6",
-    "@lit-protocol/types": "^7.0.4",
     "@tanstack/react-query": "^5.67.1",
     "connectkit": "^1.8.2",
     "critters": "^0.0.25",
@@ -34,7 +32,8 @@
     "react-infinite-scroll-component": "^6.1.0",
     "uuid": "^11.0.3",
     "viem": "^2.23.6",
-    "wagmi": "^2.14.12"
+    "wagmi": "^2.14.12",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

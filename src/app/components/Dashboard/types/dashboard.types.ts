@@ -29,6 +29,14 @@ export enum CollectionType {
   IRL = "IRL",
 }
 
+export interface EncryptedData {
+  [address: string]: {
+    ephemPublicKey: string;
+    iv: string;
+    ciphertext: string;
+  };
+}
+
 export enum Format {
   Hoodie = "Hoodie",
   LongSleeve = "Long Sleeve",
