@@ -10,25 +10,20 @@ import {
   LensConnected,
   TokenThreshold,
 } from "@/components/Common/types/common.types";
-import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { ConnectKitProvider } from "connectkit";
 import { CollectData } from "@/components/NFT/types/nft.types";
 import { StorageClient } from "@lens-chain/storage-client";
 import { chains } from "@lens-chain/sdk/viem";
+import { metaMask } from "wagmi/connectors";
 
-export const config = createConfig(
-  getDefaultConfig({
-    appName: "TripleA",
-    walletConnectProjectId: process.env
-      .NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
-    appUrl: "https://triplea.agentmeme.xyz",
-    appIcon: "https://triplea.agentmeme.xyz/favicon.ico",
-    chains: [chains.mainnet],
-    transports: {
-      [chains.mainnet.id]: http("https://rpc.lens.xyz"),
-    },
-    ssr: true,
-  })
-);
+export const config = createConfig({
+  chains: [chains.mainnet],
+  transports: {
+    [chains.mainnet.id]: http("https://rpc.lens.xyz"),
+  },
+  connectors: [metaMask()],
+  ssr: true,
+});
 
 const queryClient = new QueryClient();
 
