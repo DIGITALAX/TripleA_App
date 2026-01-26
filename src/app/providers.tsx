@@ -14,14 +14,18 @@ import { ConnectKitProvider } from "connectkit";
 import { CollectData } from "@/components/NFT/types/nft.types";
 import { StorageClient } from "@lens-chain/storage-client";
 import { chains } from "@lens-chain/sdk/viem";
-import { metaMask } from "wagmi/connectors";
+import { injected } from "wagmi/connectors";
 
 export const config = createConfig({
   chains: [chains.mainnet],
   transports: {
     [chains.mainnet.id]: http("https://rpc.lens.xyz"),
   },
-  connectors: [metaMask()],
+  connectors: [
+    injected({
+      target: "metaMask",
+    }),
+  ],
   ssr: true,
 });
 
