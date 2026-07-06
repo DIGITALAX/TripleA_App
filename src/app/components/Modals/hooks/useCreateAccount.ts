@@ -38,13 +38,14 @@ const useCreateAccount = (address: `0x${string}` | undefined) => {
       let picture = undefined;
 
       if (account?.pfp) {
-        const res = await fetch("/api/ipfs", {
-          method: "POST",
-          body: account?.pfp,
-        });
-        const json = await res.json();
+        const { uri } = await context?.storageClient?.uploadFile(
+          new File([account?.pfp], "pfp", { type: account?.pfp?.type }),
+          {
+            acl: immutable(chains.mainnet.id),
+          }
+        )!;
 
-        picture = "ipfs://" + json?.cid;
+        picture = uri;
       }
 
       const schema = accountMetadata({

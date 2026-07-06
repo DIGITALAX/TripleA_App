@@ -29,13 +29,14 @@ const useAccount = () => {
       let picture = undefined;
 
       if (newAccount?.pfp && newAccount.pfp instanceof Blob) {
-        const res = await fetch("/api/ipfs", {
-          method: "POST",
-          body: newAccount?.pfp,
-        });
-        const json = await res.json();
+        const { uri } = await context?.storageClient?.uploadFile(
+          new File([newAccount?.pfp], "pfp", { type: newAccount?.pfp?.type }),
+          {
+            acl: immutable(chains.mainnet.id),
+          }
+        )!;
 
-        picture = "ipfs://" + json?.cid;
+        picture = uri;
       }
 
       const schema = account({

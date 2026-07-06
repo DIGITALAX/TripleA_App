@@ -43,8 +43,8 @@ export default {
         xxs: "0.6rem",
       },
       cursor: {
-        canP: "url('https://thedial.infura-ipfs.io/ipfs/QmRet46G3agnioVtrfgnWKhw5r1FZNqcpDT9xtpbgZ8RB2'), pointer",
-        can: "url('https://thedial.infura-ipfs.io/ipfs/QmbCFJeTGrXsP917jhH758BkYKAN12LHJC9qnwysbCdBRb'), default",
+        canP: "url('https://cdn.digitalax.xyz/ipfs/QmRet46G3agnioVtrfgnWKhw5r1FZNqcpDT9xtpbgZ8RB2'), pointer",
+        can: "url('https://cdn.digitalax.xyz/ipfs/QmbCFJeTGrXsP917jhH758BkYKAN12LHJC9qnwysbCdBRb'), default",
       },
       screens: {
         tablet: "800px",

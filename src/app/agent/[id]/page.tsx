@@ -29,7 +29,7 @@ export default function Agent() {
   const { isConnected, address } = useAccount();
   const context = useContext(ModalContext);
   const animationContext = useContext(AnimationContext);
-  const { setOpen } = useModal();
+  const { setOpen, open } = useModal();
   const publicClient = createPublicClient({
     chain: chains.mainnet,
     transport: http(

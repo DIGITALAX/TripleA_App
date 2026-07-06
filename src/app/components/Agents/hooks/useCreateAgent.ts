@@ -99,15 +99,17 @@ const useCreateAgent = (
       let picture = undefined;
 
       if (agentLensDetails?.pfp || agentDetails?.cover) {
-        const res = await fetch("/api/ipfs", {
-          method: "POST",
-          body: agentLensDetails?.pfp
-            ? agentLensDetails?.pfp
-            : agentDetails?.cover,
-        });
-        const json = await res.json();
+        const pfpBlob = agentLensDetails?.pfp
+          ? agentLensDetails?.pfp
+          : agentDetails?.cover!;
+        const { uri } = await context?.storageClient?.uploadFile(
+          new File([pfpBlob], "pfp", { type: pfpBlob?.type }),
+          {
+            acl: immutable(chains.mainnet.id),
+          }
+        )!;
 
-        picture = "ipfs://" + json?.cid;
+        picture = uri;
       }
 
       const schema = account({

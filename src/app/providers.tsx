@@ -10,10 +10,10 @@ import {
   LensConnected,
   TokenThreshold,
 } from "@/components/Common/types/common.types";
-import { ConnectKitProvider } from "connectkit";
 import { CollectData } from "@/components/NFT/types/nft.types";
 import { StorageClient } from "@lens-chain/storage-client";
 import { chains } from "@lens-chain/sdk/viem";
+import { ConnectKitProvider } from "connectkit";
 import { injected } from "wagmi/connectors";
 
 export const config = createConfig({

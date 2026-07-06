@@ -21,7 +21,7 @@ export default function Agents() {
   );
   const { moreArt, moreArtLoading } = useArt();
   const { isConnected } = useAccount();
-  const { setOpen } = useModal();
+  const { setOpen, open } = useModal();
 
   return (
     <div className="relative w-full h-full flex items-start justify-between flex-col py-6 px-3 sm:px-10 gap-24">

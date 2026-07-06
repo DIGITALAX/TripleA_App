@@ -21,13 +21,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "thedial.infura-ipfs.io",
+        hostname: "cdn.digitalax.xyz",
         pathname: "/ipfs/**",
-      },
-      {
-        protocol: "https",
-        hostname: "triplea.agentmeme.xyz",
-        pathname: "/api/infura/**",
       },
       {
         protocol: "https",
@@ -45,7 +40,7 @@ const nextConfig: NextConfig = {
     }[] = [];
 
     const allowedOrigins = [
-      "https://thedial.infura-ipfs.io",
+      "https://cdn.digitalax.xyz",
       "https://triplea.agentmeme.xyz",
       "https://ik.imagekit.io",
     ];

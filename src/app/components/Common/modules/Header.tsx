@@ -15,7 +15,7 @@ import useAgents from "../hooks/useAgents";
 import { handleProfilePicture } from "@/lib/helpers/handleProfilePicture";
 import { chains } from "@lens-chain/sdk/viem";
 
-const Header: FunctionComponent = (): JSX.Element => {
+  const Header: FunctionComponent = (): JSX.Element => {
   const router = useRouter();
   const { openProfile, openSwitchNetworks, openOnboarding } = useModal();
   const animationContext = useContext(AnimationContext);
