@@ -2,7 +2,8 @@ import { Worker } from "@/components/Dashboard/types/dashboard.types";
 import { AGENTS_CONTRACT } from "@/lib/constants";
 import { chains } from "@lens-chain/sdk/viem";
 import { useContext, useEffect, useState } from "react";
-import { createWalletClient, custom, PublicClient } from "viem";
+import { custom, PublicClient } from "viem";
+import { createWalletClient } from "@/lib/helpers/contractsPaused";
 import AgentAbi from "@abis/AgentAbi.json";
 import { ModalContext } from "@/providers";
 

@@ -1,4 +1,11 @@
 export const INFURA_GATEWAY: string = "https://cdn.digitalax.xyz";
+export const CONTRACTS_PAUSED: boolean = true;
+export const CONTRACTS_PAUSED_EVENT: string = "triplea-contracts-paused";
+export const NOTICE_STORAGE_KEY: string = "triplea-contract-notice-seen";
+export const NOTICE_URL: string = "https://restore.digitalax.xyz";
+export const NOTICE_URL_LABEL: string = "restore.digitalax.xyz";
+export const NOTICE_TEXT: string =
+  "The TripleA contracts are being rebuilt. Until the new ones are live, on-chain actions here are switched off. For more details go to";
 export const GROVE_GATEWAY: string = "https://api.grove.storage/";
 export const INFURA_GATEWAY_INTERNAL: string = "https://cdn.digitalax.xyz/ipfs/";
 export const IPFS_REGEX: RegExp = /\b(Qm[1-9A-Za-z]{44}|ba[A-Za-z2-7]{57})\b/;

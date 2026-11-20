@@ -15,6 +15,7 @@ import { StorageClient } from "@lens-chain/storage-client";
 import { chains } from "@lens-chain/sdk/viem";
 import { ConnectKitProvider } from "connectkit";
 import { injected } from "wagmi/connectors";
+import useNotice from "@/components/Modals/hooks/useNotice";
 
 export const config = createConfig({
   chains: [chains.mainnet],
@@ -49,6 +50,8 @@ export const ModalContext = createContext<
       setIndexer: (e: SetStateAction<string | undefined>) => void;
       notification: string | undefined;
       setNotification: (e: SetStateAction<string | undefined>) => void;
+      noticeOpen: boolean;
+      hideNotice: () => void;
       agents: Agent[];
       setAgents: (e: SetStateAction<Agent[]>) => void;
       lensClient: PublicClient<Context> | undefined;
@@ -111,6 +114,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     | undefined
   >();
   const storageClient = StorageClient.create();
+  const { noticeOpen, hideNotice } = useNotice();
 
   useEffect(() => {
     if (!lensClient) {
@@ -155,6 +159,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 setIndexer,
                 notification,
                 setNotification,
+                noticeOpen,
+                hideNotice,
                 storageClient,
                 signless,
                 setSignless,

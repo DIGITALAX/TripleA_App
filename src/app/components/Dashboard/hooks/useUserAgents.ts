@@ -11,11 +11,11 @@ import {
   PublicClient,
   SessionClient,
 } from "@lens-protocol/client";
+import { custom, PublicClient as LensPublicClient } from "viem";
 import {
+  blockIfPaused,
   createWalletClient,
-  custom,
-  PublicClient as LensPublicClient,
-} from "viem";
+} from "@/lib/helpers/contractsPaused";
 import { getUserAgents } from "./../../../../../graphql/queries/getUserAgents";
 import {
   SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
@@ -396,6 +396,7 @@ const useUserAgents = (
       return feeds;
     });
     try {
+      blockIfPaused();
       const res = await updateFeedRules(
         context?.lensConnected?.sessionClient!,
         {

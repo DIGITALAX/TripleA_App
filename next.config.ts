@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
       fs: false,
       path: false,
     };
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@x402/core": false,
+      "@x402/evm": false,
+      "@x402/svm": false,
+      "@x402/extensions": false,
+      "@x402/express": false,
+      "@x402/fetch": false,
+    };
     return config;
   },
   eslint: {

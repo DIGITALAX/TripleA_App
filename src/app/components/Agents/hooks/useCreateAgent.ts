@@ -1,6 +1,10 @@
 import { chains } from "@lens-chain/sdk/viem";
 import { SetStateAction, useContext, useEffect, useState } from "react";
-import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
+import { custom, decodeEventLog, PublicClient } from "viem";
+import {
+  blockIfPaused,
+  createWalletClient,
+} from "@/lib/helpers/contractsPaused";
 import { AgentDetails, CreateSwitcher } from "../types/agents.types";
 import {
   SKYHUNTERS_AGENTS_MANAGER_CONTRACT,
@@ -96,6 +100,7 @@ const useCreateAgent = (
     if (!address || !context?.lensConnected?.sessionClient) return;
     setLensLoading(true);
     try {
+      blockIfPaused();
       let picture = undefined;
 
       if (agentLensDetails?.pfp || agentDetails?.cover) {
@@ -567,6 +572,7 @@ const useCreateAgent = (
       return feeds;
     });
     try {
+      blockIfPaused();
       const res = await updateFeedRules(
         context?.lensConnected?.sessionClient!,
         {

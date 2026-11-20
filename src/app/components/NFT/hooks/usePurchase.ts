@@ -1,7 +1,8 @@
 import { NFTData } from "@/components/Common/types/common.types";
 import { chains } from "@lens-chain/sdk/viem";
 import { SetStateAction, useContext, useEffect, useState } from "react";
-import { createWalletClient, custom, PublicClient } from "viem";
+import { custom, PublicClient } from "viem";
+import { createWalletClient } from "@/lib/helpers/contractsPaused";
 import MarketAbi from "@abis/MarketAbi.json";
 import { MARKET_CONTRACT } from "@/lib/constants";
 import { CollectData } from "../types/nft.types";

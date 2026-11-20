@@ -5,7 +5,8 @@ import {
 } from "@/lib/constants";
 import { chains } from "@lens-chain/sdk/viem";
 import { useContext, useState } from "react";
-import { createWalletClient, custom, PublicClient } from "viem";
+import { custom, PublicClient } from "viem";
+import { createWalletClient } from "@/lib/helpers/contractsPaused";
 import MarketAbi from "@abis/MarketAbi.json";
 import { ModalContext } from "@/providers";
 import {

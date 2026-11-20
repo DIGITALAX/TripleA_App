@@ -1,7 +1,8 @@
 import { COLLECTION_MANAGER_CONTRACT } from "@/lib/constants";
 import { chains } from "@lens-chain/sdk/viem";
 import { SetStateAction, useContext, useEffect, useState } from "react";
-import { createWalletClient, custom, PublicClient } from "viem";
+import { custom, PublicClient } from "viem";
+import { createWalletClient } from "@/lib/helpers/contractsPaused";
 import CollectionManagerAbi from "@abis/CollectionManagerAbi.json";
 import { NFTData } from "@/components/Common/types/common.types";
 import {  DropInterface, DropSwitcher } from "../types/dashboard.types";

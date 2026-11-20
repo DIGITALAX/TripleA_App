@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { Contract, Wallet, JsonRpcProvider } from "ethers";
-import { ACCESS_CONTROLS_CONTRACT } from "@/lib/constants";
+import { ACCESS_CONTROLS_CONTRACT, CONTRACTS_PAUSED } from "@/lib/constants";
 import AccessControlsAbi from "@abis/AccessControlsAbi.json";
 import { chains } from "@lens-chain/sdk/viem";
 
 export async function POST(req: Request) {
+  if (CONTRACTS_PAUSED) {
+    return NextResponse.json({ error: "Faucet is paused" }, { status: 503 });
+  }
   try {
     const { address } = await req.json();
     const provider = new JsonRpcProvider("https://rpc.lens.xyz", Number(chains.mainnet));

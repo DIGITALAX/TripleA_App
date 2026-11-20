@@ -9,6 +9,7 @@ import Notification from "./Notification";
 import Signless from "./Signless";
 import Fulfillment from "./Fulfillment";
 import Tooltip from "./Tooltip";
+import Notice from "./Notice";
 
 const Modals: FunctionComponent = (): JSX.Element => {
   const context = useContext(ModalContext);
@@ -22,6 +23,7 @@ const Modals: FunctionComponent = (): JSX.Element => {
       {context?.fulfillmentOpen && <Fulfillment address={address} />}
       {context?.signless && <Signless />}
       {context?.notification && <Notification />}
+      {context?.noticeOpen && <Notice />}
     </>
   );
 };

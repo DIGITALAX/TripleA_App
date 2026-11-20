@@ -8,7 +8,8 @@ import {
   MARKET_CONTRACT,
 } from "@/lib/constants";
 import { chains } from "@lens-chain/sdk/viem";
-import { createWalletClient, custom, PublicClient } from "viem";
+import { custom, PublicClient } from "viem";
+import { createWalletClient } from "@/lib/helpers/contractsPaused";
 import MarketAbi from "@abis/MarketAbi.json";
 import { fetchAccountsAvailable } from "@lens-protocol/client/actions";
 import { ModalContext } from "@/providers";

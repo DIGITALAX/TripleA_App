@@ -12,7 +12,8 @@ import {
   ZERO_ADDRESS,
 } from "@/lib/constants";
 import CollectionManagerAbi from "@abis/CollectionManagerAbi.json";
-import { createWalletClient, custom, decodeEventLog, PublicClient } from "viem";
+import { custom, decodeEventLog, PublicClient } from "viem";
+import { createWalletClient } from "@/lib/helpers/contractsPaused";
 import { chains } from "@lens-chain/sdk/viem";
 import { getCollectionSearch } from "./../../../../../graphql/queries/getCollectionSearch";
 import { ModalContext } from "@/providers";
